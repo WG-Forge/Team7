@@ -9,7 +9,7 @@ Circumflex
 
 - [Барковский Ярослав](https://github.com/BarikQ)
 - [Владислав Шихутин](https://github.com/VladicColosozhatelb)
-- [Тодор Грынь](https://github.com/TodorGrin)
+- [Тодор Гринь](https://github.com/TodorGrin)
 
 ## Language: 
 C++
