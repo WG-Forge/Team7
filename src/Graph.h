@@ -1,17 +1,20 @@
 #ifndef GRAPH_H
 #define GRAPH_H
-#include <vector>
-#include "Point.h"
-#include "Line.h"
-#include "QFile"
+
+#include "Vertex.h"
+#include "Edge.h"
+#include <QJsonObject>
+
 class Graph{
-public:
-    Graph() = default;
-    Graph(FILE json);
-    void calcCoords();
-private:
-    std::vector<Point> pints;
-    std::vector<Line> lines;
+    public:
+        explicit Graph(const QJsonObject &graph);
+
+        void print();
+        void calcCoords();
+
+    private:
+        std::vector<Vertex> vertices;
+        std::vector<Edge> edges;
 };
 
 #endif // GRAPH_H

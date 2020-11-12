@@ -1,7 +1,9 @@
 HEADERS += \
+    $$PWD/Edge.h \
     $$PWD/Graph.h \
-    $$PWD/Line.h \
-    $$PWD/point.h
+    $$PWD/Vertex.h
 
 SOURCES += \
-    $$PWD/Graph.cpp
+    $$PWD/Edge.cpp \
+    $$PWD/Graph.cpp \
+    $$PWD/Vertex.cpp
