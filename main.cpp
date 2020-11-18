@@ -1,23 +1,27 @@
 #include "gui/mainwindow.h"
+#include "src/Graph.h"
+#include "src/rand.h"
 #include <QApplication>
 #include <QFile>
 #include <QJsonDocument>
 #include <iostream>
-#include "src/Graph.h"
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
+    Rand::init();
+
     MainWindow w;
     w.show();
 
     try {
-        QFile file("small_graph.json");
+        QFile file("big_graph.json");
 
         if (!file.open(QIODevice::ReadOnly))
             throw std::runtime_error("Couldn't open save file.");
 
-        Graph g(QJsonDocument::fromJson(file.readAll()).object());
-        g.print();
+        Graph *g = new Graph(QJsonDocument::fromJson(file.readAll()).object());
+        g->calcCoords();
+        w.setGraph(g);
     }
     catch (std::exception &e) {
         std::cout << e.what() << std::endl;

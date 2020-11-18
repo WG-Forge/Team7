@@ -12,9 +12,12 @@ class Graph{
         void print();
         void calcCoords();
 
+        std::vector<Vertex>& vertices();
+        std::vector<Edge>& edges();
+
     private:
-        std::vector<Vertex> vertices;
-        std::vector<Edge> edges;
+        std::vector<Vertex> vertices_;
+        std::vector<Edge> edges_;
 };
 
 #endif // GRAPH_H

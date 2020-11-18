@@ -12,11 +12,12 @@ class Vertex{
         explicit Vertex(int idx, int postIdx, bool postIdxNull);
 
         void addEdge(Edge *edge);
-        void setPosition(qreal x, qreal y);
+        void setPosition(const QPointF &position);
 
         int idx();
         int postIdx();
         bool isPostIdxNull();
+        QPointF position();
         std::vector<Edge*>& edges();
 
     private:

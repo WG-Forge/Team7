@@ -19,9 +19,8 @@ void Vertex::addEdge(Edge *edge) {
     edges_.push_back(edge);
 }
 
-void Vertex::setPosition(qreal x, qreal y) {
-    pos_.setX(x);
-    pos_.setY(y);
+void Vertex::setPosition(const QPointF &position) {
+    pos_ = position;
 }
 
 int Vertex::idx() {
@@ -34,6 +33,10 @@ int Vertex::postIdx() {
 
 bool Vertex::isPostIdxNull() {
     return postIdxNull_;
+}
+
+QPointF Vertex::position() {
+    return pos_;
 }
 
 std::vector<Edge*>& Vertex::edges() {
