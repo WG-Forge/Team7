@@ -9,12 +9,15 @@ class Rand {
 
         static int intInRange(int min, int max);
         static double doubleInRange(double min, double max);
+        static float floatInRange(float min, float max);
+
+        Rand(const Rand&) = delete;
+        Rand& operator=(const Rand&) = delete;
 
     private:
-        static std::minstd_rand *gen; //mt19937_64
+        static std::minstd_rand *gen;
 
         Rand() = default;
-		Rand& operator=(const Rand& rand);
 };
 
 #endif // RAND_H

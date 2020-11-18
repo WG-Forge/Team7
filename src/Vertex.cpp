@@ -19,7 +19,7 @@ void Vertex::addEdge(Edge *edge) {
     edges_.push_back(edge);
 }
 
-void Vertex::setPosition(const QPointF &position) {
+void Vertex::setPosition(const QVector2D &position) {
     pos_ = position;
 }
 
@@ -35,7 +35,7 @@ bool Vertex::isPostIdxNull() {
     return postIdxNull_;
 }
 
-QPointF Vertex::position() {
+QVector2D Vertex::position() {
     return pos_;
 }
 

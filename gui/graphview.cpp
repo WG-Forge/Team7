@@ -14,6 +14,6 @@ void GraphView::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
 
     for (Edge &edge : graph_->edges()) {
-        painter.drawLine(edge.vertex1().position(), edge.vertex2().position());
+        painter.drawLine(edge.vertex1().position().toPointF(), edge.vertex2().position().toPointF());
     }
 }

@@ -21,3 +21,8 @@ double Rand::doubleInRange(double min, double max) {
     std::uniform_real_distribution<double> urd(min, max);
 	return urd(*gen);
 }
+
+float Rand::floatInRange(float min, float max) {
+    std::uniform_real_distribution<float> urd(min, max);
+    return urd(*gen);
+}

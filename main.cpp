@@ -11,6 +11,7 @@ int main(int argc, char *argv[]) {
     Rand::init();
 
     MainWindow w;
+    w.setWindowState(Qt::WindowMaximized);
     w.show();
 
     try {

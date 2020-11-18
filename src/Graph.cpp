@@ -68,20 +68,19 @@ void Graph::calcCoords() {
 
     const float k = 0.2 * sqrt(W * H / vertices_.size());
     float t = W / 10;
-    std::map<Vertex*, QVector2D> disp;
 
     for (Vertex &v : vertices_) {
-        v.setPosition(QPointF(Rand::doubleInRange(W / 4, W * 3 / 4), Rand::doubleInRange(H / 4, H * 3 / 4)));
+        v.setPosition(QVector2D(Rand::floatInRange(W / 4, W * 3 / 4), Rand::floatInRange(H / 4, H * 3 / 4)));
     }
 
     for (int i = 0; i < iterations; ++i) {
         for (Vertex &v : vertices_) {
-            disp[&v] = QVector2D(0, 0);
+            v.disp_ = QVector2D(0, 0);
 
             for (Vertex &u : vertices_) {
                 if (&u != &v) {
                     QVector2D delta(v.position() - u.position());
-                    disp[&v] += delta.normalized() * k * k / delta.length();
+                    v.disp_ += delta.normalized() * k * k / delta.length();
                 }
             }
         }
@@ -91,13 +90,17 @@ void Graph::calcCoords() {
             Vertex &u = e.vertex2();
             QVector2D delta(v.position() - u.position());
 
-            disp[&v] -= delta.normalized() * delta.length() * delta.length() / k;
-            disp[&u] += delta.normalized() * delta.length() * delta.length() / k;
+            v.disp_ -= delta.normalized() * delta.length() * delta.length() / k;
+            u.disp_ += delta.normalized() * delta.length() * delta.length() / k;
         }
 
         for (Vertex &v : vertices_) {
-            v.setPosition(v.position() + disp[&v].normalized().toPointF() * std::min(disp[&v].length(), t));
-            v.setPosition(QPointF(std::max(0.0f, std::min(W, (float) v.position().x())), std::max(0.0f, std::min(H, (float) v.position().y()))));
+            QVector2D newPos(v.position() + v.disp_.normalized() * std::min(v.disp_.length(), t));
+
+            newPos.setX(std::max(0.0f, std::min(W, newPos.x())));
+            newPos.setY(std::max(0.0f, std::min(H, newPos.y())));
+
+            v.setPosition(newPos);
         }
 
         t /= coolK;
