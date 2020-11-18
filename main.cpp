@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
     w.show();
 
     try {
-        QFile file("big_graph.json");
+        QFile file("../Circumflex/tests/big_graph.json");
 
         if (!file.open(QIODevice::ReadOnly))
             throw std::runtime_error("Couldn't open save file.");
