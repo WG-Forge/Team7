@@ -63,11 +63,11 @@ std::vector<Edge>& Graph::edges() {
 
 void Graph::calcCoords(float aspectRatio) {
     const float W = aspectRatio, H = 1;
-    const float iterations = 800;
-    const float coolK = 1.01;
+    const float iterations = 500;
 
     const float k = 0.2 * sqrt(W * H / vertices_.size());
-    float t = W / 50;
+    const float initialT = W / 10;
+    float t = initialT;
 
     for (Vertex &v : vertices_) {
         v.setPosition(QVector2D(Rand::floatInRange(-W / 2, W / 2), Rand::floatInRange(-H / 2, H / 2)));
@@ -103,6 +103,6 @@ void Graph::calcCoords(float aspectRatio) {
             v.setPosition(newPos);
         }
 
-        t /= coolK;
+        t -= initialT / iterations;
     }
 }
