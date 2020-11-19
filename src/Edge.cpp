@@ -1,5 +1,6 @@
 #include "Edge.h"
 #include <QJsonArray>
+#include <stdexcept>
 
 Edge::Edge(const QJsonObject &edge, const QMap<int, Vertex*> &vertices) {
     if (!edge.contains("idx") || !edge["idx"].isDouble() || !edge.contains("length") || !edge["length"].isDouble() || !edge.contains("points") || !edge["points"].isArray())

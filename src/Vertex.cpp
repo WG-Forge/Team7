@@ -1,5 +1,6 @@
 #include "Vertex.h"
 #include "Edge.h"
+#include <stdexcept>
 
 Vertex::Vertex(const QJsonObject &vertex) {
     if (!vertex.contains("idx") || !vertex["idx"].isDouble() || !vertex.contains("post_idx") || !(vertex["post_idx"].isNull() || vertex["post_idx"].isDouble()))
