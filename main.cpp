@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
             throw std::runtime_error("Couldn't open save file.");
 
         Graph *g = new Graph(QJsonDocument::fromJson(file.readAll()).object());
-        g->calcCoords();
+        g->calcCoords(16.0f / 9);
         w.setGraph(g);
     }
     catch (std::exception &e) {

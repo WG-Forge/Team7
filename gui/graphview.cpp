@@ -11,9 +11,16 @@ void GraphView::setGraph(Graph *graph) {
 }
 
 void GraphView::paintEvent(QPaintEvent *event) {
-    QPainter painter(this);
+    if (graph_) {
+        QPainter painter(this);
+        float W = painter.device()->width();
+        float H = painter.device()->height();
+        float scale = std::min(W / 16 * 9, H);
 
-    for (Edge &edge : graph_->edges()) {
-        painter.drawLine(edge.vertex1().position().toPointF(), edge.vertex2().position().toPointF());
+        painter.translate(W / 2, H / 2);
+
+        for (Edge &edge : graph_->edges()) {
+            painter.drawLine(edge.vertex1().position().toPointF() * scale, edge.vertex2().position().toPointF() * scale);
+        }
     }
 }

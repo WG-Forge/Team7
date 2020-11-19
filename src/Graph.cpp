@@ -61,8 +61,8 @@ std::vector<Edge>& Graph::edges() {
     return edges_;
 }
 
-void Graph::calcCoords() {
-    const float W = 1800, H = 950;
+void Graph::calcCoords(float aspectRatio) {
+    const float W = aspectRatio, H = 1;
     const float iterations = 400;
     const float coolK = 1.02;
 
@@ -70,7 +70,7 @@ void Graph::calcCoords() {
     float t = W / 10;
 
     for (Vertex &v : vertices_) {
-        v.setPosition(QVector2D(Rand::floatInRange(W / 4, W * 3 / 4), Rand::floatInRange(H / 4, H * 3 / 4)));
+        v.setPosition(QVector2D(Rand::floatInRange(-W / 2, W / 2), Rand::floatInRange(-H / 2, H / 2)));
     }
 
     for (int i = 0; i < iterations; ++i) {
@@ -97,8 +97,8 @@ void Graph::calcCoords() {
         for (Vertex &v : vertices_) {
             QVector2D newPos(v.position() + v.disp_.normalized() * std::min(v.disp_.length(), t));
 
-            newPos.setX(std::max(0.0f, std::min(W, newPos.x())));
-            newPos.setY(std::max(0.0f, std::min(H, newPos.y())));
+            newPos.setX(std::max(-W / 2, std::min(W / 2, newPos.x())));
+            newPos.setY(std::max(-H / 2, std::min(H / 2, newPos.y())));
 
             v.setPosition(newPos);
         }

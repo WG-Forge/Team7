@@ -10,7 +10,7 @@ class Graph{
         explicit Graph(const QJsonObject &graph);
 
         void print();
-        void calcCoords();
+        void calcCoords(float aspectRatio);
 
         std::vector<Vertex>& vertices();
         std::vector<Edge>& edges();

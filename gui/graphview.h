@@ -13,12 +13,10 @@ class GraphView : public QWidget {
         void setGraph(Graph *graph);
 
     protected:
-        void paintEvent(QPaintEvent *event);
+        void paintEvent(QPaintEvent *event) override;
 
     private:
-        Graph *graph_;
-
-        QVector2D size_;
+        Graph *graph_ = nullptr;
 };
 
 #endif // GRAPHVIEW_H
