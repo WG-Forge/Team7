@@ -15,7 +15,7 @@ void GraphView::paintEvent(QPaintEvent *event) {
         QPainter painter(this);
         float W = painter.device()->width();
         float H = painter.device()->height();
-        float scale = std::min(W / 16 * 9, H);
+        float scale = std::min(W / 16 * 9, H) * 0.95;
 
         painter.translate(W / 2, H / 2);
 
