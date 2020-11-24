@@ -1,6 +1,5 @@
 #include "gui/mainwindow.h"
 #include "src/Graph.h"
-#include "src/rand.h"
 #include <QApplication>
 #include <QFile>
 #include <QJsonDocument>
@@ -8,7 +7,6 @@
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
-    Rand::init();
 
     MainWindow w;
     w.setWindowState(Qt::WindowMaximized);
@@ -22,6 +20,7 @@ int main(int argc, char *argv[]) {
 
         Graph *g = new Graph(QJsonDocument::fromJson(file.readAll()).object());
         g->calcCoords(16.0f / 9);
+        w.setGraph(g);
     }
     catch (std::exception &e) {
         std::cout << e.what() << std::endl;

@@ -1,5 +1,4 @@
 #include "Graph.h"
-#include "rand.h"
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -10,6 +9,7 @@
 #include <QVector2D>
 #include <algorithm>
 #include <QLineF>
+#include <QtMath>
 
 Graph::Graph(const QJsonObject &graph) {
     if (!graph.contains("lines") || !graph["lines"].isArray() || !graph.contains("points") || !graph["points"].isArray())
@@ -64,7 +64,7 @@ std::vector<Edge>& Graph::edges() {
 
 void Graph::calcCoords(float aspectRatio) {
     const float W = aspectRatio, H = 1;
-    const int placeMaxAttempts = 20;
+    const int placeMaxAttempts = 8;
 
     for (int i = 0; i < placeMaxAttempts; ++i) {
         placeVertices(W, H);
@@ -72,10 +72,8 @@ void Graph::calcCoords(float aspectRatio) {
         if (!isSelfIntersecting())
             break;
 
-        if (i >= placeMaxAttempts - 1) {
+        if (i >= placeMaxAttempts - 1)
             qWarning("Warning: Can't create non-self-intersecting graph layout. Graph is probably non planar");
-            break;
-        }
     }
 
     fitToSize(W, H);
@@ -88,8 +86,10 @@ void Graph::placeVertices(float W, float H) {
 
     float t = initialT;
 
+    float angle = 0;
     for (Vertex &v : vertices_) {
-        v.setPosition(QVector2D(Rand::floatInRange(-W / 2, W / 2), Rand::floatInRange(-H / 2, H / 2)));
+        v.setPosition(QVector2D(W / 2 * sin(angle), H / 2 * cos(angle)));
+        angle += 2 * M_PI / vertices_.size();
     }
 
     for (int i = 0; i < iterations; ++i) {
@@ -134,9 +134,8 @@ bool Graph::isSelfIntersecting() {
             if (&edges_[i].vertex2() == &edges_[j].vertex1() || &edges_[i].vertex2() == &edges_[j].vertex2())
                 continue;
 
-            if (edgeLines[i].intersects(edgeLines[j], nullptr) == QLineF::BoundedIntersection) {
+            if (edgeLines[i].intersects(edgeLines[j], nullptr) == QLineF::BoundedIntersection)
                 return true;
-            }
         }
     }
 
