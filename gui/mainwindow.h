@@ -15,7 +15,7 @@ class MainWindow : public QMainWindow {
         explicit MainWindow(QWidget *parent = nullptr);
         ~MainWindow();
 
-        void setGraph(Graph *graph);
+        void setGraph(std::unique_ptr<Graph> graph);
 
     private:
         Ui::MainWindow *ui;

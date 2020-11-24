@@ -9,7 +9,6 @@ class Graph{
     public:
         explicit Graph(const QJsonObject &graph);
 
-        void print();
         void calcCoords(float aspectRatio);
 
         std::vector<Vertex>& vertices();
