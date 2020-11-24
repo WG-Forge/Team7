@@ -18,6 +18,10 @@ class Graph{
     private:
         std::vector<Vertex> vertices_;
         std::vector<Edge> edges_;
+
+        bool isSelfIntersecting();
+        void placeVertices(float W, float H);
+        void fitToSize(float W, float H);
 };
 
 #endif // GRAPH_H

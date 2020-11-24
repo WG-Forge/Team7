@@ -8,8 +8,6 @@
 class Edge;
 
 class Vertex{
-    friend class Graph;
-
     public:
         explicit Vertex(const QJsonObject &vertex);
         explicit Vertex(int idx, int postIdx, bool postIdxNull);
@@ -24,14 +22,13 @@ class Vertex{
         std::vector<Edge*>& edges();
 
 
+
     private:
         int idx_ = 0;
         int postIdx_ = 0;
         bool postIdxNull_ = false;
         QVector2D pos_;
         std::vector<Edge*> edges_;
-
-        QVector2D disp_;
 };
 
 #endif // POINTS_H

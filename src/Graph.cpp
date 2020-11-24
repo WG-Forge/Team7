@@ -9,6 +9,7 @@
 #include <exception>
 #include <QVector2D>
 #include <algorithm>
+#include <QLineF>
 
 Graph::Graph(const QJsonObject &graph) {
     if (!graph.contains("lines") || !graph["lines"].isArray() || !graph.contains("points") || !graph["points"].isArray())
@@ -63,10 +64,28 @@ std::vector<Edge>& Graph::edges() {
 
 void Graph::calcCoords(float aspectRatio) {
     const float W = aspectRatio, H = 1;
-    const float iterations = 500;
+    const int placeMaxAttempts = 20;
 
+    for (int i = 0; i < placeMaxAttempts; ++i) {
+        placeVertices(W, H);
+
+        if (!isSelfIntersecting())
+            break;
+
+        if (i >= placeMaxAttempts - 1) {
+            qWarning("Warning: Can't create non-self-intersecting graph layout. Graph is probably non planar");
+            break;
+        }
+    }
+
+    fitToSize(W, H);
+}
+
+void Graph::placeVertices(float W, float H) {
+    const float iterations = 400;
     const float k = 0.2 * sqrt(W * H / vertices_.size());
     const float initialT = W / 10;
+
     float t = initialT;
 
     for (Vertex &v : vertices_) {
@@ -75,34 +94,74 @@ void Graph::calcCoords(float aspectRatio) {
 
     for (int i = 0; i < iterations; ++i) {
         for (Vertex &v : vertices_) {
-            v.disp_ = QVector2D(0, 0);
+            QVector2D disp(0, 0);
 
             for (Vertex &u : vertices_) {
                 if (&u != &v) {
                     QVector2D delta(v.position() - u.position());
-                    v.disp_ += delta.normalized() * k * k / delta.length();
+                    disp += delta.normalized() * k * k / delta.length();
                 }
             }
-        }
 
-        for (Edge &e : edges_) {
-            Vertex &v = e.vertex1();
-            Vertex &u = e.vertex2();
-            QVector2D delta(v.position() - u.position());
+            for (Edge *e : v.edges()) {
+                Vertex &u = (&e->vertex1() != &v) ? e->vertex1() : e->vertex2();
 
-            v.disp_ -= delta.normalized() * delta.length() * delta.length() / k;
-            u.disp_ += delta.normalized() * delta.length() * delta.length() / k;
-        }
+                QVector2D delta(v.position() - u.position());
+                disp -= delta.normalized() * delta.length() * delta.length() / k;
+            }
 
-        for (Vertex &v : vertices_) {
-            QVector2D newPos(v.position() + v.disp_.normalized() * std::min(v.disp_.length(), t));
-
-            newPos.setX(std::max(-W / 2, std::min(W / 2, newPos.x())));
-            newPos.setY(std::max(-H / 2, std::min(H / 2, newPos.y())));
-
-            v.setPosition(newPos);
+            v.setPosition(v.position() + disp.normalized() * std::min(disp.length(), t));
         }
 
         t -= initialT / iterations;
+    }
+}
+
+
+bool Graph::isSelfIntersecting() {
+    std::vector<QLineF> edgeLines;
+    edgeLines.reserve(edges_.size());
+
+    for (Edge &e : edges_) {
+        edgeLines.push_back(QLineF(e.vertex1().position().toPointF(), e.vertex2().position().toPointF()));
+    }
+
+    for (int i = 0; i < edges_.size(); ++i) {
+        for (int j = i + 1; j < edges_.size(); ++j) {
+            if (&edges_[i].vertex1() == &edges_[j].vertex1() || &edges_[i].vertex1() == &edges_[j].vertex2())
+                continue;
+
+            if (&edges_[i].vertex2() == &edges_[j].vertex1() || &edges_[i].vertex2() == &edges_[j].vertex2())
+                continue;
+
+            if (edgeLines[i].intersects(edgeLines[j], nullptr) == QLineF::BoundedIntersection) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+void Graph::fitToSize(float W, float H) {
+    float minX = FLT_MAX;
+    float minY = FLT_MAX;
+    float maxX = -FLT_MAX;
+    float maxY = -FLT_MAX;
+
+    for (Vertex &v : vertices_) {
+        minX = std::min(minX, v.position().x());
+        minY = std::min(minY, v.position().y());
+        maxX = std::max(maxX, v.position().x());
+        maxY = std::max(maxY, v.position().y());
+    }
+
+    QVector2D center((minX + maxX) / 2, (minY + maxY) / 2);
+    float dx = maxX - minX;
+    float dy = maxY - minY;
+    float scale = (dx / dy < W / H) ? (H / dy) : (W / dx);
+
+    for (Vertex &v : vertices_) {
+        v.setPosition((v.position() - center) * scale);
     }
 }
