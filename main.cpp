@@ -19,9 +19,9 @@ int main(int argc, char *argv[]) {
         if (!file.open(QIODevice::ReadOnly))
             throw std::runtime_error("Couldn't open save file.");
 
-        Graph *g = new Graph(QJsonDocument::fromJson(file.readAll()).object());
+        std::unique_ptr<Graph> g = std::make_unique<Graph>(QJsonDocument::fromJson(file.readAll()).object());
         g->calcCoords(16.0f / 9);
-        w.setGraph(g);
+        w.setGraph(std::move(g));
     }
     catch (std::exception &e) {
         std::cout << e.what() << std::endl;

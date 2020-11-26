@@ -6,8 +6,8 @@ GraphView::GraphView(QWidget *parent) : QWidget(parent) {
 
 }
 
-void GraphView::setGraph(Graph *graph) {
-    graph_ = graph;
+void GraphView::setGraph(std::unique_ptr<Graph> graph) {
+    graph_ = std::move(graph);
 }
 
 void GraphView::paintEvent(QPaintEvent *event) {

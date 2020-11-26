@@ -3,11 +3,10 @@
 
 #include "Vertex.h"
 #include <QJsonObject>
-#include <QMap>
 
 class Edge{
     public:
-        explicit Edge(const QJsonObject &edge, const QMap<int, Vertex*> &vertices);
+        explicit Edge(const QJsonObject &edge, const std::map<int, std::reference_wrapper<Vertex>> &vertices);
         explicit Edge(int idx, int length, Vertex &v1, Vertex &v2);
 
         int idx();

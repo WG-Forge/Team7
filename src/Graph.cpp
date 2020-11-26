@@ -3,7 +3,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-#include <QMap>
+#include <map>
 #include <iostream>
 #include <exception>
 #include <QVector2D>
@@ -17,7 +17,7 @@ Graph::Graph(const QJsonObject &graph) {
 
     QJsonArray edgesJsonArray = graph["lines"].toArray();
     QJsonArray verticesJsonArray = graph["points"].toArray();
-    QMap<int, Vertex*> verticesMap;
+    std::map<int, std::reference_wrapper<Vertex>> verticesMap;
 
     for (auto vertex : verticesJsonArray) {
         if (!vertex.isObject())
@@ -27,7 +27,7 @@ Graph::Graph(const QJsonObject &graph) {
     }
 
     for (Vertex &v : vertices_)
-        verticesMap[v.idx()] = &v;
+        verticesMap.emplace(v.idx(), v);
 
     for (auto edge : edgesJsonArray) {
         if (!edge.isObject())
@@ -37,20 +37,8 @@ Graph::Graph(const QJsonObject &graph) {
     }
 
     for (Edge &e : edges_) {
-        e.vertex1().addEdge(&e);
-        e.vertex2().addEdge(&e);
-    }
-}
-
-void Graph::print() {
-    std::cout << "Vertices: " << std::endl;
-    for (auto &v : vertices_) {
-        std::cout << "idx: " << v.idx() << " degree: " << v.edges().size() << std::endl;
-    }
-
-    std::cout << std::endl << std::endl << "Edges:" << std::endl;
-    for (auto &e : edges_) {
-        std::cout << "1: " << e.vertex1().idx() << " 2: " << e.vertex2().idx() << std::endl;
+        e.vertex1().addEdge(e);
+        e.vertex2().addEdge(e);
     }
 }
 
@@ -103,8 +91,8 @@ void Graph::placeVertices(float W, float H) {
                 }
             }
 
-            for (Edge *e : v.edges()) {
-                Vertex &u = (&e->vertex1() != &v) ? e->vertex1() : e->vertex2();
+            for (Edge &e : v.edges()) {
+                Vertex &u = (&e.vertex1() != &v) ? e.vertex1() : e.vertex2();
 
                 QVector2D delta(v.position() - u.position());
                 disp -= delta.normalized() * delta.length() * delta.length() / k;
@@ -117,13 +105,12 @@ void Graph::placeVertices(float W, float H) {
     }
 }
 
-
 bool Graph::isSelfIntersecting() {
     std::vector<QLineF> edgeLines;
     edgeLines.reserve(edges_.size());
 
     for (Edge &e : edges_) {
-        edgeLines.push_back(QLineF(e.vertex1().position().toPointF(), e.vertex2().position().toPointF()));
+        edgeLines.emplace_back(e.vertex1().position().toPointF(), e.vertex2().position().toPointF());
     }
 
     for (int i = 0; i < edges_.size(); ++i) {

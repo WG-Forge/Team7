@@ -16,7 +16,7 @@ Vertex::Vertex(const QJsonObject &vertex) {
 
 Vertex::Vertex(int idx, int postIdx, bool postIdxNull) : idx_(idx), postIdx_(postIdx), postIdxNull_(postIdxNull), pos_() {};
 
-void Vertex::addEdge(Edge *edge) {
+void Vertex::addEdge(Edge &edge) {
     edges_.push_back(edge);
 }
 
@@ -40,6 +40,6 @@ QVector2D Vertex::position() {
     return pos_;
 }
 
-std::vector<Edge*>& Vertex::edges() {
+std::vector<std::reference_wrapper<Edge>>& Vertex::edges() {
     return edges_;
 }

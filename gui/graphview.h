@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QVector2D>
+#include <memory>
 #include "../src/Graph.h"
 
 class GraphView : public QWidget {
@@ -10,13 +11,13 @@ class GraphView : public QWidget {
     public:
         explicit GraphView(QWidget *parent = nullptr);
 
-        void setGraph(Graph *graph);
+        void setGraph(std::unique_ptr<Graph> graph);
 
     protected:
         void paintEvent(QPaintEvent *event) override;
 
     private:
-        Graph *graph_ = nullptr;
+        std::unique_ptr<Graph> graph_ = nullptr;
 };
 
 #endif // GRAPHVIEW_H
