@@ -11,15 +11,27 @@ int main(int argc, char *argv[]) {
 
     MainWindow w;
     w.setWindowState(Qt::WindowMaximized);
-//    w.show();
+    w.show();
 
+    SocketTest cTest;
+    cTest.Connect();
+    QJsonObject data;
+    data["name"] = "Boris";
+    cTest.sendData(Request(LOGIN,data));
+    QJsonObject response = cTest.getData();
+    QJsonObject data1;
+    data1["layer"] = 0;
+    cTest.sendData(Request(MAP,data1));
+    response = cTest.getData();
+    cTest.Close();
     try {
-        QFile file("../Circumflex/tests/big_graph.json");
+        QFile file("../QtProjects/tests/big_graph.json");
 
         if (!file.open(QIODevice::ReadOnly))
             throw std::runtime_error("Couldn't open save file.");
 
-        std::unique_ptr<Graph> g = std::make_unique<Graph>(QJsonDocument::fromJson(file.readAll()).object());
+       // std::unique_ptr<Graph> g = std::make_unique<Graph>(QJsonDocument::fromJson(file.readAll()).object());
+       std::unique_ptr<Graph> g = std::make_unique<Graph>(response);
         g->calcCoords(16.0f / 9);
         w.setGraph(std::move(g));
     }
@@ -27,16 +39,8 @@ int main(int argc, char *argv[]) {
         std::cout << e.what() << std::endl;
     }
 
-    SocketTest cTest;
-    cTest.Connect();
 
-    cTest.sendData("{\"name\":\"Boris\"}", 1);
-    cTest.getData();
 
-    cTest.sendData("{\"layer\":0}", 10);
-    cTest.getData();
-
-    cTest.Close();
 
     return a.exec();
 }

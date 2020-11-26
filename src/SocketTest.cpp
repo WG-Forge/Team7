@@ -11,64 +11,53 @@ SocketTest::SocketTest(QObject *parent) : QObject(parent)
 
 void SocketTest::Connect() {
     socket = new QTcpSocket(this);
-
     socket->connectToHost(SERVER_ADDR, SERVER_PORT);
+    if(!socket->waitForConnected()){
+        qDebug() << "Not Connected!";
+    }
 }
 
 void SocketTest::Close() {
     socket->close();
 }
 
-void SocketTest::sendData(QString data, qint32 actionCode)
+void SocketTest::sendData(Request request)
 {
     QByteArray sData;
-    qint32 size = data.size();
-
-    int index = 0;
-
-    //конверт action кода
-    for (int i = 0; i < 4; ++i, ++index)
+    QJsonDocument doc(request.getData());
+    qint32 size = doc.toJson(QJsonDocument::Compact).size();
+    int actionCode = request.getAction();
+    for (int i = 0; i < 4; ++i)
     {
 //        qDebug() << (unsigned char)(code & 0xFF);
-
         sData.append((unsigned char)(actionCode & 0xFF));
         actionCode >>= 8;
     }
 
     // конверт размера
-    for (int i = 0; i < 4; ++i, ++index)
+    for (int i = 0; i < 4; ++i)
     {
 //        qDebug() << (unsigned char)(size & 0xFF);
-
         sData.append((unsigned char)(size & 0xFF));
         size >>= 8;
     }
 
-    sData.append(data.toUtf8());
-
-    if (socket->waitForConnected())
-    {
-        socket->write(sData);
-        qDebug() << "sent: " << socket->waitForBytesWritten();
-    }
-    else
-    {
-        qDebug() << "Not Connected!";
-    }
+    sData.append(doc.toJson(QJsonDocument::Compact));
+    socket->write(sData);
+    socket->waitForBytesWritten(3000);
+    //qDebug() << "sent: " << socket->waitForBytesWritten();
 }
 
-void SocketTest::getData() {
-    // респонс код
-    socket->waitForReadyRead();
-    QString responseCode = socket->readAll();
-
-//    qDebug() << "Response Code: " << socket->readAll();
-
-
-    // дата
-    socket->waitForReadyRead();
-    QString responseData = socket->readAll();
-
-//    qDebug() << "Response Data: " << socket->readAll();
-
+QJsonObject SocketTest::getData() {
+    if(socket->waitForReadyRead(5000)){
+        QByteArray response(socket->readAll());
+        QString DataAsString = QTextCodec::codecForMib(106)->toUnicode(response);
+        int k = DataAsString.indexOf('{');
+        DataAsString.remove(0,k);
+        QJsonDocument doc = QJsonDocument::fromJson(DataAsString.toUtf8());
+        return doc.object();
+    }
+    else{
+       qDebug() << "No data!\n";
+    }
 }

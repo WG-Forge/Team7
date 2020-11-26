@@ -4,7 +4,9 @@
 #include <QObject>
 #include <QTcpSocket>
 #include <QtDebug>
-
+#include "Request.h"
+#include "Response.h"
+#include <QTextCodec>
 class SocketTest : public QObject
 {
     Q_OBJECT
@@ -13,30 +15,11 @@ public:
 
     void Connect();
     void Close();
-    void sendData(QString data, qint32 actionCode);
-    void getData();
+    void sendData(Request request);
+    QJsonObject getData();
 
-    enum Action
-    {
-        LOGIN = 1,
-        LOGOUT = 2,
-        MOVE = 3,
-        UPGRADE = 4,
-        TURN = 5,
-        PLAYER = 6,
-        GAMES = 7,
-        MAP = 10
-    };
-    enum Result
-    {
-        OKEY = 0,
-        BAD_COMMAND = 1,
-        RESOURCE_NOT_FOUND = 2,
-        ACCESS_DENIED = 3,
-        INAPPROPRIATE_GAME_STATE = 4,
-        TIMEOUT = 5,
-        INTERNAL_SERVER_ERROR = 500
-    };
+    
+ 
 
 private:
     QTcpSocket *socket;
