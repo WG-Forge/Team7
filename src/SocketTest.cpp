@@ -60,15 +60,15 @@ void SocketTest::sendData(QString data, qint32 actionCode)
 void SocketTest::getData() {
     // респонс код
     socket->waitForReadyRead();
-//    QString responseCode = socket->readAll();
+    QString responseCode = socket->readAll();
 
-    qDebug() << "Response Code: " << socket->readAll();
+//    qDebug() << "Response Code: " << socket->readAll();
 
 
     // дата
     socket->waitForReadyRead();
-//    QString responseData = socket->readAll();
+    QString responseData = socket->readAll();
 
-    qDebug() << "Response Data: " << socket->readAll();
+//    qDebug() << "Response Data: " << socket->readAll();
 
 }
