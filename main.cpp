@@ -4,13 +4,14 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <iostream>
+#include "src/SocketTest.h"
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
     MainWindow w;
     w.setWindowState(Qt::WindowMaximized);
-    w.show();
+//    w.show();
 
     try {
         QFile file("../Circumflex/tests/big_graph.json");
@@ -25,6 +26,17 @@ int main(int argc, char *argv[]) {
     catch (std::exception &e) {
         std::cout << e.what() << std::endl;
     }
+
+    SocketTest cTest;
+    cTest.Connect();
+
+    cTest.sendData("{\"name\":\"Boris\"}", 1);
+    cTest.getData();
+
+    cTest.sendData("{\"layer\":0}", 10);
+    cTest.getData();
+
+    cTest.Close();
 
     return a.exec();
 }
