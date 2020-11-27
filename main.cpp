@@ -18,17 +18,17 @@ int main(int argc, char *argv[]) {
     QJsonObject data;
     data["name"] = "Boris";
     cTest.sendData(Request(LOGIN,data));
-    QJsonObject response = cTest.getData();
+    cTest.getData();
     QJsonObject data1;
     data1["layer"] = 0;
     cTest.sendData(Request(MAP,data1));
-    response = cTest.getData();
+    QJsonObject response = cTest.getData();
     cTest.Close();
     try {
-        QFile file("../QtProjects/tests/big_graph.json");
+//        QFile file("../QtProjects/tests/big_graph.json");
 
-        if (!file.open(QIODevice::ReadOnly))
-            throw std::runtime_error("Couldn't open save file.");
+//        if (!file.open(QIODevice::ReadOnly))
+//            throw std::runtime_error("Couldn't open save file.");
 
        // std::unique_ptr<Graph> g = std::make_unique<Graph>(QJsonDocument::fromJson(file.readAll()).object());
        std::unique_ptr<Graph> g = std::make_unique<Graph>(response);

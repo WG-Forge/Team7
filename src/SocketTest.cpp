@@ -49,15 +49,16 @@ void SocketTest::sendData(Request request)
 }
 
 QJsonObject SocketTest::getData() {
-    if(socket->waitForReadyRead(5000)){
-        QByteArray response(socket->readAll());
-        QString DataAsString = QTextCodec::codecForMib(106)->toUnicode(response);
-        int k = DataAsString.indexOf('{');
-        DataAsString.remove(0,k);
-        QJsonDocument doc = QJsonDocument::fromJson(DataAsString.toUtf8());
-        return doc.object();
+    QByteArray response;
+    QJsonDocument doc;
+
+    do {
+        socket->waitForReadyRead();
+        response += socket->readAll();
+
+        doc = QJsonDocument::fromJson(response.mid(8));
     }
-    else{
-       qDebug() << "No data!\n";
-    }
+    while (doc.isNull());
+
+    return doc.object();
 }
