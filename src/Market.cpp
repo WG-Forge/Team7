@@ -8,11 +8,11 @@ Market::Market(const QJsonObject& market){
         if(!market["events"].isArray()){
             throw std::invalid_argument("Wrong JSON graph format.");
         }
-        QJsonArray postsJsonArray = market["events"].toArray();
-        for(auto post: postsJsonArray){
-            if (!post.isObject())
+        QJsonArray eventsJsonArray = market["events"].toArray();
+        for(auto const &event: eventsJsonArray){
+            if (!event.isObject())
                 throw std::invalid_argument("Wrong JSON graph format.");
-            events_.emplace_back(post.toObject());
+            events_.emplace_back(event.toObject());
         }
     }
     idx_ = market["idx"].toInt();

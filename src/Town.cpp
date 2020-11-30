@@ -9,7 +9,7 @@ Town::Town(const QJsonObject& town){
             throw std::invalid_argument("Wrong JSON graph format.");
         }
         QJsonArray eventsJsonArray = town["events"].toArray();
-        for(auto event: eventsJsonArray){
+        for(auto const &event: eventsJsonArray){
             if (!event.isObject())
                 throw std::invalid_argument("Wrong JSON graph format.");
             events_.emplace_back(event.toObject());

@@ -9,7 +9,7 @@ Graph::Graph(const QJsonObject &graph) {
     QJsonArray verticesJsonArray = graph["points"].toArray();
     std::map<int, std::reference_wrapper<Vertex>> verticesMap;
 
-    for (auto vertex : verticesJsonArray) {
+    for (auto const &vertex : verticesJsonArray) {
         if (!vertex.isObject())
             throw std::invalid_argument("Wrong JSON graph format.");
 
@@ -19,7 +19,7 @@ Graph::Graph(const QJsonObject &graph) {
     for (Vertex &v : vertices_)
         verticesMap.emplace(v.idx(), v);
 
-    for (auto edge : edgesJsonArray) {
+    for (auto const &edge : edgesJsonArray) {
         if (!edge.isObject())
             throw std::invalid_argument("Wrong JSON graph format.");
 
