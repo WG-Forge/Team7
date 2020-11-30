@@ -1,15 +1,5 @@
 #include "Graph.h"
-#include <QFile>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <map>
-#include <iostream>
-#include <exception>
-#include <QVector2D>
-#include <algorithm>
-#include <QLineF>
-#include <QtMath>
+
 
 Graph::Graph(const QJsonObject &graph) {
     if (!graph.contains("lines") || !graph["lines"].isArray() || !graph.contains("points") || !graph["points"].isArray())

@@ -1,13 +1,8 @@
 #include "SocketTest.h"
 
-#include <iostream>
-#include <iomanip>
-#include <cstdint>
 
-SocketTest::SocketTest(QObject *parent) : QObject(parent)
-{
 
-}
+SocketTest::SocketTest(QObject *parent) : QObject(parent){}
 
 void SocketTest::Connect() {
     socket = new QTcpSocket(this);
@@ -24,9 +19,9 @@ void SocketTest::Close() {
 void SocketTest::sendData(Request request)
 {
     QByteArray sData;
-    QJsonDocument doc(request.getData());
+    QJsonDocument doc(request.data());
     qint32 size = doc.toJson(QJsonDocument::Compact).size();
-    int actionCode = request.getAction();
+    int actionCode = static_cast<int>(request.action());
     for (int i = 0; i < 4; ++i)
     {
 //        qDebug() << (unsigned char)(code & 0xFF);

@@ -1,12 +1,17 @@
 #ifndef SOCKETTEST_H
 #define SOCKETTEST_H
 
+#include "Request.h"
+#include "Response.h"
+
 #include <QObject>
 #include <QTcpSocket>
 #include <QtDebug>
-#include "Request.h"
-#include "Response.h"
 #include <QTextCodec>
+#include <iostream>
+#include <iomanip>
+#include <cstdint>
+
 class SocketTest : public QObject
 {
     Q_OBJECT

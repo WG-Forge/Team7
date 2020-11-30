@@ -1,21 +1,17 @@
 #include "Request.h"
 
-Request::Request()
-{
-
-}
-Request::Request(Action actionCode, QJsonObject data){
+Request::Request(enum Action actionCode,const QJsonObject& data){
     QJsonDocument doc(data);
-    this->actionCode = actionCode;
-    this->data = data;
-    this->dataLength = doc.toJson(QJsonDocument::Compact).size();
+    actionCode_ = actionCode;
+    data_ = data;
+    dataLength_ = doc.toJson(QJsonDocument::Compact).size();
 }
-Action Request::getAction(){
-    return this->actionCode;
+Action& Request::action(){
+    return actionCode_;
 }
-size_t Request::getSize(){
-    return this->dataLength;
+size_t& Request::size(){
+    return dataLength_;
 }
-QJsonObject Request::getData(){
-    return this->data;
+QJsonObject& Request::data(){
+    return data_;
 }

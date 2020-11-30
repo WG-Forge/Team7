@@ -1,14 +1,14 @@
 #ifndef RESPONSE_H
 #define RESPONSE_H
 #include <QJsonObject>
-#include "ResultEnum.h"
+#include "Enums/ResultEnum.h"
 class Response
 {
 public:
-    Response();
-    Response(QJsonObject response);
+   explicit Response() = default;
+   explicit Response(const QJsonObject &response);
 private:
-    QJsonObject response;
+    QJsonObject response_;
 };
 
 #endif // RESPONSE_H

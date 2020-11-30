@@ -4,6 +4,7 @@
 #include <QJsonObject>
 #include <QVector2D>
 #include <functional>
+#include <stdexcept>
 
 class Edge;
 

@@ -1,21 +1,21 @@
 #ifndef REQUEST_H
 #define REQUEST_H
-#include "ActionEnum.h"
+#include "Enums/ActionEnum.h"
 #include <QJsonObject>
 #include <QJsonDocument>
 
 class Request
 {
 public:
-    Request();
-    Request(Action actionCode, QJsonObject data);
-    Action getAction();
-    size_t getSize();
-    QJsonObject getData();
+    explicit Request() = default;
+    explicit Request(Action actionCode,const QJsonObject& data);
+    Action& action();
+    size_t& size();
+    QJsonObject& data();
 private:
-    Action actionCode;
-    size_t dataLength;
-    QJsonObject data;
+    enum Action actionCode_;
+    size_t dataLength_;
+    QJsonObject data_;
 };
 
 #endif // REQUEST_H

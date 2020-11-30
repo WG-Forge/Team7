@@ -1,9 +1,5 @@
 #include "Response.h"
 
-Response::Response()
-{
-
-}
-Response::Response(QJsonObject response){
-    this->response = response;
+Response::Response(const QJsonObject &response){
+    response_ = response;
 }

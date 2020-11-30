@@ -3,7 +3,18 @@
 
 #include "Vertex.h"
 #include "Edge.h"
+
 #include <QJsonObject>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <map>
+#include <iostream>
+#include <exception>
+#include <QVector2D>
+#include <algorithm>
+#include <QLineF>
+#include <QtMath>
 
 class Graph{
     public:
