@@ -1,6 +1,6 @@
 #ifndef RESULTENUM_H
 #define RESULTENUM_H
-enum Result
+enum class Result
 {
     OKEY = 0,
     BAD_COMMAND = 1,

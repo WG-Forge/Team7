@@ -1,6 +1,6 @@
 #ifndef ACTIONENUM_H
 #define ACTIONENUM_H
-enum Action
+enum class Action
 {
     LOGIN = 1,
     LOGOUT = 2,
