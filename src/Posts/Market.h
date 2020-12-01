@@ -1,7 +1,7 @@
 #ifndef MARKET_H
 #define MARKET_H
 
-#include "Post.h"
+#include "src/Post.h"
 
 class Market: public Post
 {
