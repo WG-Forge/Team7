@@ -1,6 +1,11 @@
 #ifndef TRAIN_H
 #define TRAIN_H
 #include "Event.h"
+#include "Enums/GoodsType.h"
+#include "Events/HijackersAssault.h"
+#include "Events/RefugeesArrival.h"
+#include "Events/TrainCollision.h"
+#include "Events/ParasitesAssault.h"
 
 #include <QJsonObject>
 #include <QJsonArray>
@@ -12,13 +17,13 @@ public:
     explicit Train(const QJsonObject &train);
 
     int cooldown();
-    std::vector<Event>& events();
+    std::vector<Event*>& events();
     int fuel();
     int fuel_capacity();
     int fuel_consumption();
     int goods();
     int goods_capacity();
-    //enum GoodsType goods_type();
+    enum GoodsType goods_type();
     int idx();
     int level();
     int line_idx();
@@ -29,13 +34,13 @@ public:
 
 private:
     int cooldown_;
-    std::vector<Event> events_;
+    std::vector<Event*> events_;
     int fuel_;
     int fuel_capacity_;
     int fuel_consumption_;
     int goods_;
     int goods_capacity_;
-    //enum GoodsType goods_type_;
+    enum GoodsType goods_type_;
     int idx_;
     int level_;
     int line_idx_;

@@ -4,15 +4,13 @@
 #include "Enums/EventType.h"
 
 #include <QJsonObject>
+#include <stdexcept>
 
 class Event
 {
 public:
     explicit Event() = default;
-    explicit Event(const QJsonObject& event);
-
-private:
-    enum EventType event_;
+    ~Event() = default;
 };
 
 #endif // EVENT_H

@@ -9,6 +9,7 @@
 #include "src/Market.h"
 #include "src/Storage.h"
 #include "src/Town.h"
+#include "src/Map.h"
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
@@ -27,7 +28,7 @@ int main(int argc, char *argv[]) {
     data1["layer"] = 0;
     cTest.sendData(Request(Action::MAP,data1));
     QJsonObject response = cTest.getData();
-    cTest.Close();
+
     try {
 //        QFile file("../QtProjects/tests/big_graph.json");
 
@@ -42,6 +43,12 @@ int main(int argc, char *argv[]) {
     catch (std::exception &e) {
         std::cout << e.what() << std::endl;
     }
+    QJsonObject layer1;
+    layer1["layer"] = 1;
+    cTest.sendData(Request(Action::MAP,layer1));
+    response = cTest.getData();
+    Map map(response);
+    cTest.Close();
 
     return a.exec();
 }

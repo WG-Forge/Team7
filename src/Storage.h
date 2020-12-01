@@ -8,6 +8,8 @@ class Storage: public Post
 public:
     explicit Storage() = default;
     explicit Storage(const QJsonObject& market);
+    ~Storage() = default;
+
 
     int point_idx();
     int armor();
@@ -18,7 +20,7 @@ private:
     int idx_;
     QString name_;
     enum PostType type_;
-    std::vector<Event> events_;
+    std::vector<Event*> events_;
     int point_idx_;
     int armor_;
     int armor_capacity_;

@@ -12,7 +12,7 @@ enum PostType Post::type(){
     return type_;
 }
 
-std::vector<Event>& Post::events(){
+std::vector<Event*>& Post::events(){
     return events_;
 }
 

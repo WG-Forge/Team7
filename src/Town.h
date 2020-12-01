@@ -5,8 +5,9 @@
 class Town: public Post
 {
 public:
-   explicit Town() = default;
-   explicit Town(const QJsonObject& town);
+    explicit Town() = default;
+    explicit Town(const QJsonObject& town);
+    ~Town() = default;
 
     int armor();
     int armor_capacity();
@@ -23,7 +24,7 @@ public:
 private:
     int armor_;
     int armor_capacity_;
-    std::vector<Event> events_;
+    std::vector<Event*> events_;
     int idx_;
     int level_;
     QString name_;
