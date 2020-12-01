@@ -1,9 +1,9 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include "Market.h"
-#include "Storage.h"
-#include "Town.h"
+#include "Posts/Market.h"
+#include "Posts/Storage.h"
+#include "Posts/Town.h"
 #include "Train.h"
 
 class Map

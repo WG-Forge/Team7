@@ -21,6 +21,9 @@ HEADERS += \
     $$PWD/ParasitesAssault.h \
     $$PWD/Post.h \
     $$PWD/PostType.h \
+    $$PWD/Posts/Market.h \
+    $$PWD/Posts/Storage.h \
+    $$PWD/Posts/Town.h \
     $$PWD/RefugeesArrival.h \
     $$PWD/Request.h \
     $$PWD/Response.h \

@@ -6,9 +6,9 @@
 #include <iostream>
 #include "src/SocketTest.h"
 #include "src/Post.h"
-#include "src/Market.h"
-#include "src/Storage.h"
-#include "src/Town.h"
+#include "src/Posts/Market.h"
+#include "src/Posts/Storage.h"
+#include "src/Posts/Town.h"
 #include "src/Map.h"
 
 int main(int argc, char *argv[]) {
