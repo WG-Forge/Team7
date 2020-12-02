@@ -1,4 +1,4 @@
-#include "Market.h"
+#include "Posts/Market.h"
 
 Market::Market(const QJsonObject& market){
     if(!market.contains("idx") || !market.contains("name") || !market.contains("type")){
@@ -64,4 +64,20 @@ int Market::replenishment(){
     if(product_ == -1)
         throw std::invalid_argument("No product");
     return replenishment_;
+}
+
+int Market::idx(){
+    return idx_;
+}
+
+QString Market::name(){
+    return name_;
+}
+
+enum PostType Market::type(){
+    return type_;
+}
+
+std::vector<Event*>& Market::events(){
+    return events_;
 }

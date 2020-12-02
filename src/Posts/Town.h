@@ -20,6 +20,10 @@ public:
     int product();
     int product_capacity();
     int train_cooldown();
+    int idx();
+    QString name();
+    enum PostType type();
+    std::vector<Event*>& events();
 
 private:
     int armor_;

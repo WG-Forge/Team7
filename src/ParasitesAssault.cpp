@@ -8,3 +8,4 @@ ParasitesAssault::ParasitesAssault(const QJsonObject &event){
     tick_ = event["tick"].toInt();
     type_ = static_cast<EventType>(event["type"].toInt());
 }
+

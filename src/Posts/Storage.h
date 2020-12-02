@@ -15,6 +15,10 @@ public:
     int armor();
     int armor_capacity();
     int replenishment();
+    int idx();
+    QString name();
+    enum PostType type();
+    std::vector<Event*>& events();
 
 private:
     int idx_;

@@ -1,4 +1,4 @@
-#include "Storage.h"
+#include "Posts/Storage.h"
 
 Storage::Storage(const QJsonObject& storage){
     if(!storage.contains("idx") || !storage.contains("name") || !storage.contains("type")){
@@ -63,4 +63,20 @@ int Storage::replenishment(){
     if(armor_ == -1)
         throw std::invalid_argument("No armor");
     return replenishment_;
+}
+
+int Storage::idx(){
+    return idx_;
+}
+
+QString Storage::name(){
+    return name_;
+}
+
+enum PostType Storage::type(){
+    return type_;
+}
+
+std::vector<Event*>& Storage::events(){
+    return events_;
 }

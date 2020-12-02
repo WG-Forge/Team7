@@ -11,6 +11,7 @@ class Map
 public:
     explicit Map() = default;
     explicit Map(const QJsonObject &map);
+    std::vector<Town>& towns();
 
 private:
     std::vector<Market> markets_;

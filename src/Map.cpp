@@ -28,3 +28,7 @@ Map::Map(const QJsonObject &map){
     }
     idx_ = map["idx"].toInt();
 }
+
+std::vector<Town>& Map::towns(){
+    return towns_;
+}

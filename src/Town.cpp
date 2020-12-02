@@ -1,4 +1,4 @@
-#include "Town.h"
+#include "Posts/Town.h"
 
 Town::Town(const QJsonObject& town){
     if(!town.contains("idx") || !town.contains("name") || !town.contains("type")){
@@ -137,4 +137,20 @@ int Town::train_cooldown(){
     if(train_cooldown_ == -1)
         throw std::invalid_argument("No train_cooldown");
    return train_cooldown_;
+}
+
+int Town::idx(){
+    return idx_;
+}
+
+QString Town::name(){
+    return name_;
+}
+
+enum PostType Town::type(){
+    return type_;
+}
+
+std::vector<Event*>& Town::events(){
+    return events_;
 }

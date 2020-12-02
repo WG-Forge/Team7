@@ -17,18 +17,10 @@ class Post
 public:
     explicit Post() = default;
     virtual ~Post() = default;
-    int idx();
-    QString name();
-    enum PostType type();
-    std::vector<Event*>& events();
-
-private:
-    int idx_;
-    QString name_;
-    enum PostType type_;
-    std::vector<Event*> events_;
-
-
+    virtual int idx() = 0;
+    virtual QString name() = 0;
+    virtual enum PostType type() = 0;
+    virtual std::vector<Event*>& events() = 0;
 };
 
 #endif // POST_H

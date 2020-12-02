@@ -48,6 +48,7 @@ int main(int argc, char *argv[]) {
     cTest.sendData(Request(Action::MAP,layer1));
     response = cTest.getData();
     Map map(response);
+    qDebug() << map.towns()[0].name();
     cTest.Close();
 
     return a.exec();

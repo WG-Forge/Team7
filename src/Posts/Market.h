@@ -14,6 +14,10 @@ public:
     int product();
     int product_capacity();
     int replenishment();
+    int idx()override;
+    QString name()override;
+    enum PostType type()override;
+    std::vector<Event*>& events()override;
 
 private:
     int idx_;
