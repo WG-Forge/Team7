@@ -16,11 +16,21 @@ class Post
 {
 public:
     explicit Post() = default;
+    explicit Post(const QJsonObject &post);
     virtual ~Post() = default;
-    virtual int idx() = 0;
-    virtual QString name() = 0;
-    virtual enum PostType type() = 0;
-    virtual std::vector<Event*>& events() = 0;
+
+    int idx() { return idx_; };
+    QString name() { return name_; };
+    enum PostType type() { return type_; };
+    std::vector<Event*>& events() { return events_; };
+    int point_idx() { return point_idx_; };
+
+protected:
+    int idx_;
+    int point_idx_;
+    QString name_;
+    enum PostType type_;
+    std::vector<Event*> events_;
 };
 
 #endif // POST_H

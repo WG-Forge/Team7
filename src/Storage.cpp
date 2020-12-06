@@ -4,14 +4,17 @@ Storage::Storage(const QJsonObject& storage){
     if(!storage.contains("idx") || !storage.contains("name") || !storage.contains("type")){
         throw std::invalid_argument("Wrong JSON graph format.");
     }
+
     if (storage.contains("events")){
         if(!storage["events"].isArray()){
             throw std::invalid_argument("Wrong JSON graph format.");
         }
+
         QJsonArray eventsJsonArray = storage["events"].toArray();
         for(auto const &event: eventsJsonArray){
             if (!event.isObject())
                 throw std::invalid_argument("Wrong JSON graph format.");
+
             int k = event.toObject()["type"].toInt();
             switch(k){
             case 1:
@@ -29,9 +32,11 @@ Storage::Storage(const QJsonObject& storage){
             }
         }
     }
+
     idx_ = storage["idx"].toInt();
     name_ = storage["name"].toString();
     point_idx_ = storage["point_idx"].toInt();
+
     if(storage.contains("armor")){
         armor_ = storage["armor"].toInt();
         armor_capacity_ = storage["armor_capacity"].toInt();
@@ -40,12 +45,13 @@ Storage::Storage(const QJsonObject& storage){
     else{
         armor_ = -1;
     }
+
     type_ = static_cast<PostType>(storage["type"].toInt());
 }
 
-int Storage::point_idx(){
-    return point_idx_;
-}
+//int Storage::point_idx(){
+//    return point_idx_;
+//}
 
 int Storage::armor(){
     if(armor_ == -1)
@@ -65,18 +71,18 @@ int Storage::replenishment(){
     return replenishment_;
 }
 
-int Storage::idx(){
-    return idx_;
-}
+//int Storage::idx(){
+//    return idx_;
+//}
 
-QString Storage::name(){
-    return name_;
-}
+//QString Storage::name(){
+//    return name_;
+//}
 
-enum PostType Storage::type(){
-    return type_;
-}
+//enum PostType Storage::type(){
+//    return type_;
+//}
 
-std::vector<Event*>& Storage::events(){
-    return events_;
-}
+//std::vector<Event*>& Storage::events(){
+//    return events_;
+//}

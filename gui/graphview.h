@@ -5,6 +5,8 @@
 #include <QVector2D>
 #include <memory>
 #include "../src/Graph.h"
+#include "../src/Post.h"
+#include "../src/Enums/PostType.h";
 
 class GraphView : public QWidget {
     Q_OBJECT

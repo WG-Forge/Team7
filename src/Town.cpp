@@ -29,8 +29,10 @@ Town::Town(const QJsonObject& town){
             }
         }
     }
+
     idx_ = town["idx"].toInt();
     name_ = town["name"].toString();
+
     if(town.contains("armor")){
         armor_ = town["armor"].toInt();
         armor_capacity_ = town["armor_capacity"].toInt();
@@ -51,7 +53,9 @@ Town::Town(const QJsonObject& town){
     else{
         player_idx_ = nullptr;
     }
+
     point_idx_ = town["point_idx"].toInt();
+
     if(town.contains("population")){
         population_ = town["population"].toInt();
         population_capacity_ = town["population_capacity"].toInt();
@@ -72,6 +76,7 @@ Town::Town(const QJsonObject& town){
     else{
         train_cooldown_ = -1;
     }
+
     type_ = static_cast<PostType>(town["type"].toInt());
 }
 
@@ -105,9 +110,9 @@ QString Town::player_idx(){
     return player_idx_;
 }
 
-int Town::point_idx(){
-    return point_idx_;
-}
+//int Town::point_idx(){
+//    return point_idx_;
+//}
 
 int Town::population(){
     if(population_ == -1)
@@ -139,18 +144,18 @@ int Town::train_cooldown(){
    return train_cooldown_;
 }
 
-int Town::idx(){
-    return idx_;
-}
+//int Town::idx(){
+//    return idx_;
+//}
 
-QString Town::name(){
-    return name_;
-}
+//QString Town::name(){
+//    return name_;
+//}
 
-enum PostType Town::type(){
-    return type_;
-}
+//enum PostType Town::type(){
+//    return type_;
+//}
 
-std::vector<Event*>& Town::events(){
-    return events_;
-}
+//std::vector<Event*>& Town::events(){
+//    return events_;
+//}

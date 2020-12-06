@@ -3,6 +3,7 @@
 
 #include "Vertex.h"
 #include "Edge.h"
+#include "Post.h"
 
 #include <QJsonObject>
 #include <QFile>
@@ -18,7 +19,7 @@
 
 class Graph{
     public:
-        explicit Graph(const QJsonObject &graph);
+        explicit Graph(const QJsonObject &graph, const std::vector<Post> &posts);
 
         void calcCoords(float aspectRatio);
 

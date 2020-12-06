@@ -8,10 +8,12 @@ Market::Market(const QJsonObject& market){
         if(!market["events"].isArray()){
             throw std::invalid_argument("Wrong JSON graph format.");
         }
+
         QJsonArray eventsJsonArray = market["events"].toArray();
         for(auto const &event: eventsJsonArray){
             if (!event.isObject())
                 throw std::invalid_argument("Wrong JSON graph format.");
+
             int k = event.toObject()["type"].toInt();
             switch(k){
             case 1:
@@ -29,9 +31,11 @@ Market::Market(const QJsonObject& market){
             }
         }
     }
+
     idx_ = market["idx"].toInt();
     name_ = market["name"].toString();
     point_idx_ = market["point_idx"].toInt();
+
     if(market.contains("product")){
         product_ = market["product"].toInt();
         product_capacity_ = market["product_capacity"].toInt();
@@ -40,12 +44,8 @@ Market::Market(const QJsonObject& market){
     else{
         product_ = -1;
     }
+
     type_ = static_cast<PostType>(market["type"].toInt());
-}
-
-
-int Market::point_idx(){
-    return point_idx_;
 }
 
 int Market::product(){
@@ -64,20 +64,4 @@ int Market::replenishment(){
     if(product_ == -1)
         throw std::invalid_argument("No product");
     return replenishment_;
-}
-
-int Market::idx(){
-    return idx_;
-}
-
-QString Market::name(){
-    return name_;
-}
-
-enum PostType Market::type(){
-    return type_;
-}
-
-std::vector<Event*>& Market::events(){
-    return events_;
 }
