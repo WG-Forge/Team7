@@ -21,7 +21,8 @@ class Graph{
     public:
         explicit Graph(const QJsonObject &graph, const std::vector<Post> &posts);
 
-        void calcCoords(float aspectRatio);
+        void calcCoords(float aspectRatio, const QJsonObject coordsData);
+        void setCoords(const QJsonObject coords);
 
         std::vector<Vertex>& vertices();
         std::vector<Edge>& edges();

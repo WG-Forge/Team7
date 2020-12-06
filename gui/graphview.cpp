@@ -51,7 +51,7 @@ void GraphView::paintEvent(QPaintEvent *event) {
             painter.setBrush(Qt::white);
             painter.drawRect(posX - 2 - (rectSizeW * nameLength)/2,  posY - 20, rectSizeW * nameLength, rectSizeH);
             painter.drawText(posX - (rectSizeW * nameLength)/2, posY - 10, vertex.post().name());
-            qDebug() << painter.font();
+//            qDebug() << painter.font();
         }
     }
 }

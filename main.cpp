@@ -56,10 +56,16 @@ int main(int argc, char *argv[]) {
 
     Map map(layer_1);
 
+    QJsonObject data3;
+    data3["layer"] = 10;
+    cTest.sendData(Request(Action::MAP, data3));
+    QJsonObject layer_2 = cTest.getData();
+
     cTest.Close();
 
     std::unique_ptr<Graph> g = std::make_unique<Graph>(layer_0, map.posts());
-    g->calcCoords(16.0f / 9);
+//    g->setCoords(layer_2);
+    g->calcCoords(16.0f / 9, layer_2);
     w.setGraph(std::move(g));
 
     return a.exec();

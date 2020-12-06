@@ -25,6 +25,7 @@ Graph::Graph(const QJsonObject &graph, const std::vector<Post> &posts) {
         for (Post &post : postsCopy) {
             if (post.point_idx() == v.idx() && post.idx() == v.postIdx()) {
                 v.setPost(post);
+                continue;
             }
         }
     }
@@ -50,7 +51,25 @@ std::vector<Edge>& Graph::edges() {
     return edges_;
 }
 
-void Graph::calcCoords(float aspectRatio) {
+void Graph::setCoords(const QJsonObject coordsData) {
+    if (!coordsData.contains("coordinates") || !coordsData["coordinates"].isArray())
+        throw std::invalid_argument("Wrong JSON graph format.");
+
+    QJsonArray coordsJsonArray = coordsData["coordinates"].toArray();
+    for (Vertex &vertex : vertices_) {
+        for (auto const &coords : coordsJsonArray) {
+            QJsonObject coord = coords.toObject();
+
+            if (coord["idx"].toInt() == vertex.idx()) {
+                int coordX = coord["x"].toInt(), coordY = coord["y"].toInt();
+                vertex.setPosition(QVector2D(coordX, coordY));
+                continue;
+            }
+        }
+    }
+}
+
+void Graph::calcCoords(float aspectRatio, const QJsonObject coordsData) {
     const float W = aspectRatio, H = 1;
     const int placeMaxAttempts = 8;
 
@@ -64,6 +83,7 @@ void Graph::calcCoords(float aspectRatio) {
             qWarning("Warning: Can't create non-self-intersecting graph layout. Graph is probably non planar");
     }
 
+//    this->setCoords(coordsData);
     fitToSize(W, H);
 }
 
