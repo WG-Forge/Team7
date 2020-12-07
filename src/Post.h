@@ -12,6 +12,9 @@
 #include <QJsonArray>
 #include <stdexcept>
 
+class Graph;
+class Vertex;
+
 class Post
 {
 public:
@@ -19,15 +22,19 @@ public:
     explicit Post(const QJsonObject &post);
     virtual ~Post() = default;
 
+    void setVertex(Vertex &vertex);
+
     int idx() { return idx_; };
+    int point_idx() { return point_idx_; };
     QString name() { return name_; };
     enum PostType type() { return type_; };
     std::vector<Event*>& events() { return events_; };
-    int point_idx() { return point_idx_; };
+    Vertex& vertex();
 
 protected:
     int idx_;
     int point_idx_;
+    Vertex *vertex_;
     QString name_;
     enum PostType type_;
     std::vector<Event*> events_;

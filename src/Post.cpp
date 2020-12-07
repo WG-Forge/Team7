@@ -1,4 +1,6 @@
 #include "Post.h"
+#include "Graph.h"
+#include "Vertex.h"
 
 Post::Post(const QJsonObject &post) {
     if(!post.contains("idx") || !post.contains("name") || !post.contains("type")){
@@ -34,4 +36,12 @@ Post::Post(const QJsonObject &post) {
     name_ = post["name"].toString();
     type_ = static_cast<PostType>(post["type"].toInt());
     point_idx_ = post["point_idx"].toInt();
+}
+
+void Post::setVertex(Vertex &vertex) {
+    vertex_ = &vertex;
+}
+
+Vertex &Post::vertex() {
+    return *vertex_;
 }

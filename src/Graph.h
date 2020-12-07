@@ -17,19 +17,24 @@
 #include <QLineF>
 #include <QtMath>
 
-class Graph{
+class Map;
+
+class Graph {
     public:
-        explicit Graph(const QJsonObject &graph, const std::vector<Post> &posts);
+        explicit Graph() = default;
+        explicit Graph(const QJsonObject &graph, Map &map);
 
         void calcCoords(float aspectRatio, const QJsonObject coordsData);
         void setCoords(const QJsonObject coords);
 
         std::vector<Vertex>& vertices();
         std::vector<Edge>& edges();
+        Vertex& vertex(int idx);
 
     private:
         std::vector<Vertex> vertices_;
         std::vector<Edge> edges_;
+        std::map<int, std::reference_wrapper<Vertex>> verticesMap_;
 
         bool isSelfIntersecting();
         void placeVertices(float W, float H);

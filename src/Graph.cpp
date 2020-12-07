@@ -1,14 +1,12 @@
 #include "Graph.h"
+#include "Map.h"
 
-
-Graph::Graph(const QJsonObject &graph, const std::vector<Post> &posts) {
+Graph::Graph(const QJsonObject &graph, Map &map) {
     if (!graph.contains("lines") || !graph["lines"].isArray() || !graph.contains("points") || !graph["points"].isArray())
         throw std::invalid_argument("Wrong JSON graph format.");
 
     QJsonArray edgesJsonArray = graph["lines"].toArray();
     QJsonArray verticesJsonArray = graph["points"].toArray();
-    std::map<int, std::reference_wrapper<Vertex>> verticesMap;
-    std::vector<Post> postsCopy = posts;
 
     for (auto const &vertex : verticesJsonArray) {
         if (!vertex.isObject())
@@ -19,12 +17,13 @@ Graph::Graph(const QJsonObject &graph, const std::vector<Post> &posts) {
     }
 
     for (Vertex &v : vertices_) {
-        verticesMap.emplace(v.idx(), v);
+        verticesMap_.emplace(v.idx(), v);
         if (v.isPostIdxNull()) continue;
 
-        for (Post &post : postsCopy) {
+        for (Post &post : map.posts()) {
             if (post.point_idx() == v.idx() && post.idx() == v.postIdx()) {
                 v.setPost(post);
+                post.setVertex(v);
                 continue;
             }
         }
@@ -34,7 +33,7 @@ Graph::Graph(const QJsonObject &graph, const std::vector<Post> &posts) {
         if (!edge.isObject())
             throw std::invalid_argument("Wrong JSON graph format.");
 
-        edges_.emplace_back(edge.toObject(), verticesMap);
+        edges_.emplace_back(edge.toObject(), verticesMap_);
     }
 
     for (Edge &e : edges_) {
@@ -49,6 +48,10 @@ std::vector<Vertex>& Graph::vertices() {
 
 std::vector<Edge>& Graph::edges() {
     return edges_;
+}
+
+Vertex &Graph::vertex(int idx) {
+    return verticesMap_.at(idx);
 }
 
 void Graph::setCoords(const QJsonObject coordsData) {

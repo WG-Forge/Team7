@@ -17,14 +17,14 @@ class Vertex{
 
         void addEdge(Edge &edge);
         void setPosition(const QVector2D &position);
-        void setPost(Post rpost) { post_ = rpost; };
+        void setPost(Post &post);
 
         int idx();
         int postIdx();
         bool isPostIdxNull();
         QVector2D position();
         std::vector<std::reference_wrapper<Edge>>& edges();
-        Post &post() { return post_; };
+        Post& post();
 
     private:
         int idx_ = 0;
@@ -32,7 +32,7 @@ class Vertex{
         bool postIdxNull_ = false;
         QVector2D pos_;
         std::vector<std::reference_wrapper<Edge>> edges_;
-        Post post_;
+        Post *post_ = nullptr;
 };
 
 #endif // POINTS_H

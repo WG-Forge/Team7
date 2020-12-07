@@ -2,7 +2,7 @@
 #define GRAPHVIEW_H
 
 #include <QWidget>
-#include "Graph.h"
+#include "Map.h"
 
 namespace Ui {
 class GraphView;
@@ -14,13 +14,13 @@ class GraphView : public QWidget {
         explicit GraphView(QWidget *parent = nullptr);
         ~GraphView();
 
-        void setGraph(std::unique_ptr<Graph> graph);
+        void setMap(std::unique_ptr<Map> m);
 
     protected:
         void paintEvent(QPaintEvent *event) override;
 
     private:
-        std::unique_ptr<Graph> graph_ = nullptr;
+        std::unique_ptr<Map> map_ = nullptr;
 
         Ui::GraphView *ui;
 };

@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "Graph.h"
+#include "Map.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -15,7 +15,7 @@ class MainWindow : public QMainWindow {
         explicit MainWindow(QWidget *parent = nullptr);
         ~MainWindow();
 
-        void setGraph(std::unique_ptr<Graph> graph);
+        void setMap(std::unique_ptr<Map> m);
 
     private:
         Ui::MainWindow *ui;

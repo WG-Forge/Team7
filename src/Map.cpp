@@ -1,11 +1,11 @@
 #include "Map.h"
 
-Map::Map(const QJsonObject &map){
-    if (!map.contains("trains") || !map["trains"].isArray() || !map.contains("posts") || !map["posts"].isArray() || !map.contains("idx"))
+Map::Map(const QJsonObject &staticObj, const QJsonObject &dynamicObj, const QJsonObject &pointsCoords) {
+    if (!dynamicObj.contains("trains") || !dynamicObj["trains"].isArray() || !dynamicObj.contains("posts") || !dynamicObj["posts"].isArray() || !dynamicObj.contains("idx"))
         throw std::invalid_argument("Wrong JSON graph format.");
 
-    QJsonArray trainsJsonArray = map["trains"].toArray();
-    QJsonArray postsJsonArray = map["posts"].toArray();
+    QJsonArray trainsJsonArray = dynamicObj["trains"].toArray();
+    QJsonArray postsJsonArray = dynamicObj["posts"].toArray();
 
     for (auto const &post : postsJsonArray) {
         if (!post.isObject())
@@ -34,7 +34,14 @@ Map::Map(const QJsonObject &map){
         trains_.emplace_back(train.toObject());
     }
 
-    idx_ = map["idx"].toInt();
+    idx_ = dynamicObj["idx"].toInt();
+
+    graph_ = Graph(staticObj, *this);
+    graph_.calcCoords(16.0f / 9, pointsCoords);
+}
+
+Graph &Map::graph() {
+    return graph_;
 }
 
 std::vector<Town>& Map::towns(){

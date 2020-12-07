@@ -9,6 +9,7 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::setGraph(std::unique_ptr<Graph> graph) {
-    ui->graphview->setGraph(std::move(graph));
+void MainWindow::setMap(std::unique_ptr<Map> m) {
+    ui->graphview->setMap(std::move(m));
 }
+

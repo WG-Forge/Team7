@@ -29,45 +29,19 @@ int main(int argc, char *argv[]) {
     cTest.sendData(Request(Action::LOGIN, data));
     cTest.getData();
 
-    QJsonObject data1;
-    data1["layer"] = 0;
-    cTest.sendData(Request(Action::MAP, data1));
+    cTest.sendData(Request(Action::MAP, QJsonObject({{"layer", 0}})));
     QJsonObject layer_0 = cTest.getData();
 
-//    try {
-////        QFile file("../QtProjects/tests/big_graph.json");
-
-////        if (!file.open(QIODevice::ReadOnly))
-////            throw std::runtime_error("Couldn't open save file.");
-
-//       // std::unique_ptr<Graph> g = std::make_unique<Graph>(QJsonDocument::fromJson(file.readAll()).object());
-
-//        std::unique_ptr<Graph> g = std::make_unique<Graph>(response);
-//        g->calcCoords(16.0f / 9);
-//        w.setGraph(std::move(g));
-//    }
-//    catch (std::exception &e) {
-//        std::cout << e.what() << std::endl;
-//    }
-
-    QJsonObject data2;
-    data2["layer"] = 1;
-    cTest.sendData(Request(Action::MAP, data2));
+    cTest.sendData(Request(Action::MAP, QJsonObject({{"layer", 1}})));
     QJsonObject layer_1 = cTest.getData();
 
-    Map map(layer_1);
-
-    QJsonObject data3;
-    data3["layer"] = 10;
-    cTest.sendData(Request(Action::MAP, data3));
+    cTest.sendData(Request(Action::MAP, QJsonObject({{"layer", 10}})));
     QJsonObject layer_2 = cTest.getData();
 
     cTest.Close();
 
-    std::unique_ptr<Graph> g = std::make_unique<Graph>(layer_0, map.posts());
-//    g->setCoords(layer_2);
-    g->calcCoords(16.0f / 9, layer_2);
-    w.setGraph(std::move(g));
+    std::unique_ptr<Map> m = std::make_unique<Map>(layer_0, layer_1, layer_2);
+    w.setMap(std::move(m));
     w.update();
 
     return a.exec();

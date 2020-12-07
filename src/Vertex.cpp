@@ -23,6 +23,10 @@ void Vertex::setPosition(const QVector2D &position) {
     pos_ = position;
 }
 
+void Vertex::setPost(Post &post) {
+    post_ = &post;
+}
+
 int Vertex::idx() {
     return idx_;
 }
@@ -41,4 +45,8 @@ QVector2D Vertex::position() {
 
 std::vector<std::reference_wrapper<Edge>>& Vertex::edges() {
     return edges_;
+}
+
+Post& Vertex::post() {
+    return *post_;
 }

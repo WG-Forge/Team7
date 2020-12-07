@@ -10,15 +10,16 @@ GraphView::~GraphView() {
     delete ui;
 }
 
-void GraphView::setGraph(std::unique_ptr<Graph> graph) {
-    graph_ = std::move(graph);
+void GraphView::setMap(std::unique_ptr<Map> m) {
+    map_ = std::move(m);
 }
 
 void GraphView::paintEvent(QPaintEvent *event) {
-    ui->loadingLabel->setVisible(graph_ == nullptr);
+    ui->loadingLabel->setVisible(map_ == nullptr);
 
-    if (graph_) {
+    if (map_) {
         QPainter painter(this);
+        Graph& graph = map_->graph();
         float W = painter.device()->width();
         float H = painter.device()->height();
         float scale = std::min(W / 16 * 9, H) * 0.95;
@@ -27,35 +28,37 @@ void GraphView::paintEvent(QPaintEvent *event) {
 
         painter.translate(W / 2, H / 2);
 
-        for (Edge &edge : graph_->edges()) {
+        for (Edge &edge : graph.edges()) {
             painter.drawLine(edge.vertex1().position().toPointF() * scale, edge.vertex2().position().toPointF() * scale);
         }
 
-        for (Vertex &vertex : graph_->vertices()) {
-            int posX = vertex.position().x() * scale;
-            int posY = vertex.position().y() * scale;
-            enum PostType type = vertex.post().type();
+        for (Vertex &vertex : graph.vertices()) {
+            if (!vertex.isPostIdxNull()) {
+                int posX = vertex.position().x() * scale;
+                int posY = vertex.position().y() * scale;
+                enum PostType type = vertex.post().type();
 
-            switch(type) {
-                case PostType::TOWN:
-                    painter.setBrush(Qt::green);
-                    break;
-                case PostType::STORAGE:
-                    painter.setBrush(Qt::blue);
-                    break;
-                case PostType::MARKET:
-                    painter.setBrush(Qt::red);
-                    break;
-                default:
-                    painter.setBrush(Qt::white);
+                switch(type) {
+                    case PostType::TOWN:
+                        painter.setBrush(Qt::green);
+                        break;
+                    case PostType::STORAGE:
+                        painter.setBrush(Qt::blue);
+                        break;
+                    case PostType::MARKET:
+                        painter.setBrush(Qt::red);
+                        break;
+                    default:
+                        painter.setBrush(Qt::white);
+                }
+
+                painter.drawEllipse(posX - circleSize / 2, posY - circleSize / 2, circleSize, circleSize);
             }
-
-            painter.drawEllipse(posX - circleSize / 2, posY - circleSize / 2, circleSize, circleSize);
         }
 
         QFontMetrics metrics(painter.font());
         painter.setBrush(Qt::white);
-        for (Vertex &vertex : graph_->vertices()) {
+        for (Vertex &vertex : graph.vertices()) {
             if (!vertex.isPostIdxNull()) {
                 QRectF boundingRect(metrics.boundingRect(vertex.post().name()));
                 boundingRect.setTopLeft(boundingRect.topLeft() - QPointF(textRectMargin, textRectMargin));
