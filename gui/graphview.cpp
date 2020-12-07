@@ -1,9 +1,13 @@
 #include "graphview.h"
+#include "ui_graphview.h"
 #include <QPainter>
-#include <iostream>
 
-GraphView::GraphView(QWidget *parent) : QWidget(parent) {
+GraphView::GraphView(QWidget *parent) : QWidget(parent), ui(new Ui::GraphView) {
+    ui->setupUi(this);
+}
 
+GraphView::~GraphView() {
+    delete ui;
 }
 
 void GraphView::setGraph(std::unique_ptr<Graph> graph) {
@@ -11,6 +15,8 @@ void GraphView::setGraph(std::unique_ptr<Graph> graph) {
 }
 
 void GraphView::paintEvent(QPaintEvent *event) {
+    ui->loadingLabel->setVisible(graph_ == nullptr);
+
     if (graph_) {
         QPainter painter(this);
         float W = painter.device()->width();

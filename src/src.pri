@@ -1,3 +1,5 @@
+INCLUDEPATH += $$PWD
+
 HEADERS += \
     $$PWD/ActionEnum.h \
     $$PWD/Edge.h \

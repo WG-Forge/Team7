@@ -19,6 +19,7 @@ int main(int argc, char *argv[]) {
     MainWindow w;
     w.setWindowState(Qt::WindowMaximized);
     w.show();
+    a.processEvents();
 
     SocketTest cTest;
     cTest.Connect();
@@ -67,6 +68,7 @@ int main(int argc, char *argv[]) {
 //    g->setCoords(layer_2);
     g->calcCoords(16.0f / 9, layer_2);
     w.setGraph(std::move(g));
+    w.update();
 
     return a.exec();
 }

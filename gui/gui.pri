@@ -1,4 +1,7 @@
+INCLUDEPATH += $$PWD
+
 FORMS += \
+    $$PWD/graphview.ui \
     $$PWD/mainwindow.ui
 
 HEADERS += \
