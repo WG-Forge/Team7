@@ -22,6 +22,8 @@ void GraphView::paintEvent(QPaintEvent *event) {
         float W = painter.device()->width();
         float H = painter.device()->height();
         float scale = std::min(W / 16 * 9, H) * 0.95;
+        double circleSize = 6;
+        double textRectMargin = 2;
 
         painter.translate(W / 2, H / 2);
 
@@ -32,32 +34,39 @@ void GraphView::paintEvent(QPaintEvent *event) {
         for (Vertex &vertex : graph_->vertices()) {
             int posX = vertex.position().x() * scale;
             int posY = vertex.position().y() * scale;
-            int rectSizeW = 7, rectSizeH = 13;
-            double circleSize = 6;
             enum PostType type = vertex.post().type();
 
             switch(type) {
-            case PostType::TOWN:
-                painter.setBrush(Qt::green);
-                break;
-            case PostType::STORAGE:
-                painter.setBrush(Qt::blue);
-                break;
-            case PostType::MARKET:
-                painter.setBrush(Qt::red);
-                break;
+                case PostType::TOWN:
+                    painter.setBrush(Qt::green);
+                    break;
+                case PostType::STORAGE:
+                    painter.setBrush(Qt::blue);
+                    break;
+                case PostType::MARKET:
+                    painter.setBrush(Qt::red);
+                    break;
+                default:
+                    painter.setBrush(Qt::white);
             }
 
             painter.drawEllipse(posX - circleSize / 2, posY - circleSize / 2, circleSize, circleSize);
+        }
 
-            if (vertex.isPostIdxNull()) continue;
+        QFontMetrics metrics(painter.font());
+        painter.setBrush(Qt::white);
+        for (Vertex &vertex : graph_->vertices()) {
+            if (!vertex.isPostIdxNull()) {
+                QRectF boundingRect(metrics.boundingRect(vertex.post().name()));
+                boundingRect.setTopLeft(boundingRect.topLeft() - QPointF(textRectMargin, textRectMargin));
+                boundingRect.setSize(boundingRect.size() + QSize(textRectMargin, textRectMargin));
 
-            int nameLength = vertex.post().name().size();
-
-            painter.setBrush(Qt::white);
-            painter.drawRect(posX - 2 - (rectSizeW * nameLength)/2,  posY - 20, rectSizeW * nameLength, rectSizeH);
-            painter.drawText(posX - (rectSizeW * nameLength)/2, posY - 10, vertex.post().name());
-//            qDebug() << painter.font();
+                painter.save();
+                painter.translate(vertex.position().toPointF() * scale + QPointF(circleSize / 2, -circleSize / 2) - boundingRect.bottomLeft());
+                painter.drawRect(boundingRect);
+                painter.drawText(0, 0, vertex.post().name());
+                painter.restore();
+            }
         }
     }
 }
