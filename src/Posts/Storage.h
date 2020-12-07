@@ -1,7 +1,7 @@
 #ifndef STORAGE_H
 #define STORAGE_H
 
-#include "src/Post.h"
+#include "Post.h"
 
 class Storage: public Post
 {

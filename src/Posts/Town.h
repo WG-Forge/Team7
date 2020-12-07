@@ -1,6 +1,7 @@
 #ifndef TOWN_H
 #define TOWN_H
-#include "src/Post.h"
+
+#include "Post.h"
 
 class Town: public Post
 {

@@ -1,7 +1,7 @@
 #ifndef REFUGEESARRIVAL_H
 #define REFUGEESARRIVAL_H
 
-#include "src/Event.h"
+#include "Event.h"
 
 class RefugeesArrival: public Event
 {

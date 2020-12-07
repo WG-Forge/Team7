@@ -1,7 +1,7 @@
 #ifndef TRAINCOLLISION_H
 #define TRAINCOLLISION_H
 
-#include "src/Event.h"
+#include "Event.h"
 
 class TrainCollision: public Event
 {

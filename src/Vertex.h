@@ -1,4 +1,4 @@
-#ifndef POINTS_H
+    #ifndef POINTS_H
 #define POINTS_H
 
 #include "Post.h"

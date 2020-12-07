@@ -1,7 +1,7 @@
 #ifndef HIJACKERSASSAULT_H
 #define HIJACKERSASSAULT_H
 
-#include "src/Event.h"
+#include "Event.h"
 
 class HijackersAssault: public Event
 {

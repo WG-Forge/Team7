@@ -1,7 +1,7 @@
 #ifndef PARASITESASSAULT_H
 #define PARASITESASSAULT_H
 
-#include "src/Event.h"
+#include "Event.h"
 
 class ParasitesAssault: public Event
 {
