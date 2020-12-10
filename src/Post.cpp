@@ -36,6 +36,7 @@ Post::Post(const QJsonObject &post) {
     name_ = post["name"].toString();
     type_ = static_cast<PostType>(post["type"].toInt());
     point_idx_ = post["point_idx"].toInt();
+    playerIdx_ = post["player_idx"].toString();
 }
 
 void Post::setVertex(Vertex &vertex) {

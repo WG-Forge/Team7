@@ -10,8 +10,9 @@ GraphView::~GraphView() {
     delete ui;
 }
 
-void GraphView::setMap(std::unique_ptr<Map> m) {
+void GraphView::setMap(std::unique_ptr<Map> m, Player &player) {
     map_ = std::move(m);
+    player_ = &player;
 }
 
 void GraphView::paintEvent(QPaintEvent *event) {
@@ -24,6 +25,7 @@ void GraphView::paintEvent(QPaintEvent *event) {
         float H = painter.device()->height();
         float scale = std::min(W / 16 * 9, H) * 0.95;
         double circleSize = 6;
+        double userCircleSize = 10;
         double textRectMargin = 2;
 
         painter.translate(W / 2, H / 2);
@@ -50,6 +52,12 @@ void GraphView::paintEvent(QPaintEvent *event) {
                         break;
                     default:
                         painter.setBrush(Qt::white);
+                }
+
+                if (vertex.post().playerIdx() == player_->idx()) {
+                    painter.setBrush(Qt::yellow);
+                    painter.drawEllipse(posX - userCircleSize / 2, posY - userCircleSize / 2, userCircleSize, userCircleSize);
+                    continue;
                 }
 
                 painter.drawEllipse(posX - circleSize / 2, posY - circleSize / 2, circleSize, circleSize);

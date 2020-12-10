@@ -27,6 +27,7 @@ public:
     int idx() { return idx_; };
     int point_idx() { return point_idx_; };
     QString name() { return name_; };
+    QString playerIdx() { return playerIdx_; };
     enum PostType type() { return type_; };
     std::vector<Event*>& events() { return events_; };
     Vertex& vertex();
@@ -36,6 +37,7 @@ protected:
     int point_idx_;
     Vertex *vertex_;
     QString name_;
+    QString playerIdx_;
     enum PostType type_;
     std::vector<Event*> events_;
 };

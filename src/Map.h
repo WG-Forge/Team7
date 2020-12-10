@@ -7,10 +7,11 @@
 #include "Posts/Town.h"
 #include "Train.h"
 #include "Graph.h"
+#include "Player.h"
 
 class Map {
     public:
-        explicit Map(const QJsonObject &staticObj, const QJsonObject &dynamicObj, const QJsonObject &pointsCoords);
+        explicit Map(const QJsonObject &staticObj, const QJsonObject &dynamicObj, const QJsonObject &pointsCoords, Player& player);
 
         Graph& graph();
 
@@ -18,6 +19,7 @@ class Map {
         std::vector<Market>& markets();
         std::vector<Storage>& storages();
         std::vector<Post>& posts();
+        Post& userHome() { return userPost_; };
 
     private:
         std::vector<Market> markets_;
@@ -27,6 +29,7 @@ class Map {
         std::vector<Post> posts_;
         int idx_;
         Graph graph_;
+        Post userPost_;
 };
 
 #endif // MAP_H

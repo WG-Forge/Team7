@@ -19,28 +19,34 @@ void Game::end() {
 }
 
 
-void Game::login() {
+void Game::login(QString userName) {
     qDebug() << "LogIn";
+
     QJsonObject data;
-    data["name"] = "Boris";
+    data["name"] = userName;
     socket_->sendData(Request(Action::LOGIN, data));
-    socket_->getData();
+    QJsonObject userData = socket_->getData();
+
+    player_ = new Player(userData);
 }
 
 
 void Game::logout() {
     qDebug() << "LogOut";
+
     socket_->Close();
 }
 
 void Game::connectToServer() {
     qDebug() << "Connecting";
+
     socket_ = new Socket();
     socket_->Connect();
 }
 
 void Game::disconnect() {
     qDebug() << "Connection closed";
+
     socket_->Close();
 }
 
@@ -56,8 +62,8 @@ void Game::getMap() {
 }
 
 void Game::drawMap() {
-//    map_ = std::make_unique<Map>(layer_0, layer_1, layer_2);
-//    qDebug() << map_->posts()[0].name();
+    qDebug() << "Draw map";
+    map_ = std::make_unique<Map>(layer_0, layer_1, layer_2, *player_);
 }
 
 void Game::connectToGame() {

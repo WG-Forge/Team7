@@ -22,6 +22,7 @@ HEADERS += \
     $$PWD/Map.h \
     $$PWD/Market.h \
     $$PWD/ParasitesAssault.h \
+    $$PWD/Player.h \
     $$PWD/Post.h \
     $$PWD/PostType.h \
     $$PWD/Posts/Market.h \
@@ -47,6 +48,7 @@ SOURCES += \
     $$PWD/Map.cpp \
     $$PWD/Market.cpp \
     $$PWD/ParasitesAssault.cpp \
+    $$PWD/Player.cpp \
     $$PWD/Post.cpp \
     $$PWD/RefugeesArrival.cpp \
     $$PWD/Request.cpp \
