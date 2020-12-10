@@ -1,5 +1,13 @@
 #include "gui/mainwindow.h"
 #include "src/Graph.h"
+#include "src/SocketTest.h"
+#include "src/Post.h"
+#include "src/Posts/Market.h"
+#include "src/Posts/Storage.h"
+#include "src/Posts/Town.h"
+#include "src/Map.h"
+#include "src/Enums/EventType.h"
+
 #include <QApplication>
 #include <QFile>
 #include <QJsonDocument>
@@ -11,20 +19,30 @@ int main(int argc, char *argv[]) {
     MainWindow w;
     w.setWindowState(Qt::WindowMaximized);
     w.show();
+    a.processEvents();
 
-    try {
-        QFile file("../Circumflex/tests/big_graph.json");
+    SocketTest cTest;
+    cTest.Connect();
 
-        if (!file.open(QIODevice::ReadOnly))
-            throw std::runtime_error("Couldn't open save file.");
+    QJsonObject data;
+    data["name"] = "Boris";
+    cTest.sendData(Request(Action::LOGIN, data));
+    cTest.getData();
 
-        std::unique_ptr<Graph> g = std::make_unique<Graph>(QJsonDocument::fromJson(file.readAll()).object());
-        g->calcCoords(16.0f / 9);
-        w.setGraph(std::move(g));
-    }
-    catch (std::exception &e) {
-        std::cout << e.what() << std::endl;
-    }
+    cTest.sendData(Request(Action::MAP, QJsonObject({{"layer", 0}})));
+    QJsonObject layer_0 = cTest.getData();
+
+    cTest.sendData(Request(Action::MAP, QJsonObject({{"layer", 1}})));
+    QJsonObject layer_1 = cTest.getData();
+
+    cTest.sendData(Request(Action::MAP, QJsonObject({{"layer", 10}})));
+    QJsonObject layer_2 = cTest.getData();
+
+    cTest.Close();
+
+    std::unique_ptr<Map> m = std::make_unique<Map>(layer_0, layer_1, layer_2);
+    w.setMap(std::move(m));
+    w.update();
 
     return a.exec();
 }

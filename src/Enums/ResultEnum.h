@@ -1,0 +1,13 @@
+#ifndef RESULTENUM_H
+#define RESULTENUM_H
+enum class Result
+{
+    OKEY = 0,
+    BAD_COMMAND = 1,
+    RESOURCE_NOT_FOUND = 2,
+    ACCESS_DENIED = 3,
+    INAPPROPRIATE_GAME_STATE = 4,
+    TIMEOUT = 5,
+    INTERNAL_SERVER_ERROR = 500
+};
+#endif // RESULTENUM_H
