@@ -1,5 +1,5 @@
-#ifndef SOCKETTEST_H
-#define SOCKETTEST_H
+#ifndef SOCKET_H
+#define SOCKET_H
 
 #include "Request.h"
 #include "Response.h"
@@ -12,11 +12,11 @@
 #include <iomanip>
 #include <cstdint>
 
-class SocketTest : public QObject
+class Socket : public QObject
 {
     Q_OBJECT
 public:
-    explicit SocketTest(QObject *parent = nullptr);
+    explicit Socket(QObject *parent = nullptr);
 
     void Connect();
     void Close();
@@ -33,4 +33,4 @@ private:
     const int SERVER_PORT = 443;
 };
 
-#endif // SOCKETTEST_H
+#endif // SOCKET_H

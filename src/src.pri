@@ -15,6 +15,7 @@ HEADERS += \
     $$PWD/Events/ParasitesAssault.h \
     $$PWD/Events/RefugeesArrival.h \
     $$PWD/Events/TrainCollision.h \
+    $$PWD/Game.h \
     $$PWD/GameState.h \
     $$PWD/Graph.h \
     $$PWD/HijackersAssault.h \
@@ -30,7 +31,7 @@ HEADERS += \
     $$PWD/Request.h \
     $$PWD/Response.h \
     $$PWD/ResultEnum.h \
-    $$PWD/SocketTest.h \
+    $$PWD/Socket.h \
     $$PWD/Storage.h \
     $$PWD/Town.h \
     $$PWD/Train.h \
@@ -40,6 +41,7 @@ HEADERS += \
 SOURCES += \
     $$PWD/Edge.cpp \
     $$PWD/Event.cpp \
+    $$PWD/Game.cpp \
     $$PWD/Graph.cpp \
     $$PWD/HijackersAssault.cpp \
     $$PWD/Map.cpp \
@@ -49,7 +51,7 @@ SOURCES += \
     $$PWD/RefugeesArrival.cpp \
     $$PWD/Request.cpp \
     $$PWD/Response.cpp \
-    $$PWD/SocketTest.cpp \
+    $$PWD/Socket.cpp \
     $$PWD/Storage.cpp \
     $$PWD/Town.cpp \
     $$PWD/Train.cpp \

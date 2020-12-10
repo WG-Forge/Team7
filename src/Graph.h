@@ -26,6 +26,7 @@ class Graph {
 
         void calcCoords(float aspectRatio, const QJsonObject coordsData);
         void setCoords(const QJsonObject coords);
+        void out() { qDebug() << "hello"; };
 
         std::vector<Vertex>& vertices();
         std::vector<Edge>& edges();

@@ -1,10 +1,8 @@
-#include "SocketTest.h"
+#include "Socket.h"
 
+Socket::Socket(QObject *parent) : QObject(parent){}
 
-
-SocketTest::SocketTest(QObject *parent) : QObject(parent){}
-
-void SocketTest::Connect() {
+void Socket::Connect() {
     socket = new QTcpSocket(this);
     socket->connectToHost(SERVER_ADDR, SERVER_PORT);
     if(!socket->waitForConnected()){
@@ -12,11 +10,11 @@ void SocketTest::Connect() {
     }
 }
 
-void SocketTest::Close() {
+void Socket::Close() {
     socket->close();
 }
 
-void SocketTest::sendData(Request request)
+void Socket::sendData(Request request)
 {
     QByteArray sData;
     QJsonDocument doc(request.data());
@@ -43,7 +41,7 @@ void SocketTest::sendData(Request request)
     //qDebug() << "sent: " << socket->waitForBytesWritten();
 }
 
-QJsonObject SocketTest::getData() {
+QJsonObject Socket::getData() {
     QByteArray response;
     QJsonDocument doc;
 
