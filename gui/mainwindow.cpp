@@ -4,7 +4,6 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     ui->graphview->hide();
-    ui->textEdit->setText("User Info");
 }
 
 MainWindow::~MainWindow() {
@@ -34,9 +33,9 @@ void MainWindow::on_startButton_clicked()
         this->setMap(game_->map());
         this->update();
 
-        ui->textEdit->setText("User Info");
-        ui->textEdit->append("Name: " + game_->player().name());
-        ui->textEdit->append("City: " + game_->player().town().name());
+        ui->userGameInfo->setText("User Info");
+        ui->userGameInfo->append("Name: " + game_->player().name());
+        ui->userGameInfo->append("City: " + game_->player().town().name());
         ui->userNameForm->clear();
     }
 }
