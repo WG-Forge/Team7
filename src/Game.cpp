@@ -64,6 +64,7 @@ void Game::getMap() {
 void Game::drawMap() {
     qDebug() << "Draw map";
     map_ = std::make_unique<Map>(layer_0, layer_1, layer_2, *player_);
+    map_->makeWays();
 }
 
 void Game::connectToGame() {

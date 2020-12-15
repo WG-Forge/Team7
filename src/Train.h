@@ -6,6 +6,7 @@
 #include "Events/RefugeesArrival.h"
 #include "Events/TrainCollision.h"
 #include "Events/ParasitesAssault.h"
+#include "Vertex.h"
 
 #include <QJsonObject>
 #include <QJsonArray>
@@ -17,6 +18,7 @@ public:
     explicit Train(const QJsonObject &train);
 
     int cooldown();
+    void trainWays(const std::vector<std::vector<int>>& mas, const std::vector<std::vector<int>>& p);
     std::vector<Event*>& events();
     int fuel();
     int fuel_capacity();
@@ -48,6 +50,8 @@ private:
     QString player_idx_;
     int position_;
     int speed_;
+    std::vector<std::vector<int>> waysLenght_;
+    std::vector<std::vector<int>> ways_;
 
 };
 

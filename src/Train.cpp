@@ -147,3 +147,11 @@ int Train::speed(){
     return position_;
 }
 
+void Train::trainWays(const std::vector<std::vector<int>>& mas, const std::vector<std::vector<int>>& p){
+   for(int i = 0; i < mas.size(); ++i){
+       waysLenght_.push_back(std::vector<int>(mas[i]));
+   }
+   for(int i = 0; i < p.size(); ++i){
+       ways_.push_back(std::vector<int>(p[i]));
+   }
+}

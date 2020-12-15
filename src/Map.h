@@ -21,6 +21,9 @@ class Map {
         std::vector<Post>& posts();
         Post& userHome() { return userPost_; };
 
+        std::vector<Train>& trains();
+        void makeWays();
+
     private:
         std::vector<Market> markets_;
         std::vector<Storage> storages_;

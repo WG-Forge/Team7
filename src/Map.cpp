@@ -71,3 +71,58 @@ std::vector<Storage>& Map::storages(){
 std::vector<Post>& Map::posts(){
     return posts_;
 }
+
+void Map::makeWays(){
+    int n = graph_.vertices().size();
+    std::vector<std::vector<int>> mas(n);
+    std::vector<std::vector<int>> p(n);
+    int INF = 100000200;
+    for (int i = 0 ; i < n; ++i){
+        mas[i] = std::vector<int>(n, INF);
+        p[i] = std::vector<int>(n, INF);
+        mas[i][i] = 0;
+        p[i][i] = 0;
+    }
+    for(int t = 0; t < trains_.size(); ++t){
+        for(int i = 0 ; i < n;++i){
+            int u =  graph_.vertices()[i].idx();
+            for(int j = 0; j < graph_.vertices()[i].edges().size(); ++j){
+                if(u == graph_.vertices()[i].edges()[j].get().vertex1().idx()){
+                    mas[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())]
+                        [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())] =
+                        graph_.vertices()[i].edges()[j].get().length();
+                }
+                else{
+                    mas[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())]
+                        [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())] =
+                        graph_.vertices()[i].edges()[j].get().length();
+                }
+            }
+        }
+        for(int i = 0; i < n; ++i){
+            for(int j = 0; j < n;++j){
+                p[i][j] = mas[i][j];
+                if(mas[i][j] != 0 && mas[i][j] != INF){
+                    p[i][j] = j;
+                }
+            }
+        }
+        for(int k = 0; k < n; ++k){
+            for(int i = 0; i < n; ++i){
+                for(int j = 0; j < n; ++j){
+                    if(mas[i][j] > mas[i][k] + mas[k][j]){
+                            p[i][j] = p[i][k];
+                    }
+                    mas[i][j] = std::min(mas[i][j], mas[i][k] + mas[k][j]);
+                }
+            }
+        }
+        trains_[t].trainWays(mas,p);
+    }
+}
+
+std::vector<Train>& Map::trains(){
+    return trains_;
+}
+
+

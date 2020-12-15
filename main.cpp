@@ -28,6 +28,5 @@ int main(int argc, char *argv[]) {
 //    std::unique_ptr<Map> m = std::make_unique<Map>(layer_0, layer_1, layer_2);
 //    w.setMap(std::move(m));
 //    w.update();
-
     return a.exec();
 }

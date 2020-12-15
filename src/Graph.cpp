@@ -11,12 +11,13 @@ Graph::Graph(const QJsonObject &graph, Map &map) {
     for (auto const &vertex : verticesJsonArray) {
         if (!vertex.isObject())
             throw std::invalid_argument("Wrong JSON graph format.");
-
         vertices_.emplace_back(vertex.toObject());
 
     }
-
+    int i = 0;
     for (Vertex &v : vertices_) {
+        idx_.emplace(v.idx(),i);
+        i++;
         verticesMap_.emplace(v.idx(), v);
         if (v.isPostIdxNull()) continue;
 
@@ -54,6 +55,7 @@ Vertex &Graph::vertex(int idx) {
     return verticesMap_.at(idx);
 }
 
+
 void Graph::setCoords(const QJsonObject coordsData) {
     if (!coordsData.contains("coordinates") || !coordsData["coordinates"].isArray())
         throw std::invalid_argument("Wrong JSON graph format.");
@@ -86,7 +88,7 @@ void Graph::calcCoords(float aspectRatio, const QJsonObject coordsData) {
             qWarning("Warning: Can't create non-self-intersecting graph layout. Graph is probably non planar");
     }
 
-//    this->setCoords(coordsData);
+   this->setCoords(coordsData);
     fitToSize(W, H);
 }
 
@@ -174,3 +176,8 @@ void Graph::fitToSize(float W, float H) {
         v.setPosition((v.position() - center) * scale);
     }
 }
+
+std::map<int,int>& Graph::idx(){
+    return idx_;
+}
+

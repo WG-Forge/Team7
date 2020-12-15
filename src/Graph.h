@@ -30,10 +30,12 @@ class Graph {
 
         std::vector<Vertex>& vertices();
         std::vector<Edge>& edges();
+        std::map<int,int>& idx();
         Vertex& vertex(int idx);
 
     private:
         std::vector<Vertex> vertices_;
+        std::map<int, int> idx_;
         std::vector<Edge> edges_;
         std::map<int, std::reference_wrapper<Vertex>> verticesMap_;
 
