@@ -22,10 +22,12 @@ public:
     void connectToGame();
     void disconnect();
     void getMap();
-    void drawMap();
+    void makeMap();
+    void gameCycle();
+    void tick();
 
     Socket& socket() { return *socket_; };
-    std::unique_ptr<Map> map() { return std::move(map_); };
+    std::shared_ptr<Map> map() { return map_; };
     Player& player() { return *player_; };
     std::vector<Player>& enemies() { return enemies_; };
 
@@ -33,7 +35,7 @@ signals:
 
 private:
     Socket *socket_ = nullptr;
-    std::unique_ptr<Map> map_ = nullptr;
+    std::shared_ptr<Map> map_ = nullptr;
     QJsonObject layer_0, layer_1, layer_2;
     Player *player_ = nullptr;
     std::vector<Player> enemies_;

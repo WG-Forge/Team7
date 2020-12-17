@@ -22,15 +22,12 @@ void Socket::sendData(Request request)
     int actionCode = static_cast<int>(request.action());
     for (int i = 0; i < 4; ++i)
     {
-//        qDebug() << (unsigned char)(code & 0xFF);
         sData.append((unsigned char)(actionCode & 0xFF));
         actionCode >>= 8;
     }
 
-    // конверт размера
     for (int i = 0; i < 4; ++i)
     {
-//        qDebug() << (unsigned char)(size & 0xFF);
         sData.append((unsigned char)(size & 0xFF));
         size >>= 8;
     }
@@ -38,7 +35,6 @@ void Socket::sendData(Request request)
     sData.append(doc.toJson(QJsonDocument::Compact));
     socket->write(sData);
     socket->waitForBytesWritten(3000);
-    //qDebug() << "sent: " << socket->waitForBytesWritten();
 }
 
 QJsonObject Socket::getData() {

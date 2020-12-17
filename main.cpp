@@ -17,11 +17,11 @@
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
-    Game game;
+//    Game *game = new Game();
 
     MainWindow w;
 //    w.setWindowState(Qt::WindowMaximized);
-    w.setGame(game);
+//    w.setGame(game);
     w.show();
     a.processEvents();
 

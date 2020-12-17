@@ -10,8 +10,8 @@ GraphView::~GraphView() {
     delete ui;
 }
 
-void GraphView::setMap(std::unique_ptr<Map> m, Player &player) {
-    map_ = std::move(m);
+void GraphView::setMap(std::shared_ptr<Map> m, Player &player) {
+    map_ = m;
     player_ = &player;
 }
 
@@ -32,6 +32,11 @@ void GraphView::paintEvent(QPaintEvent *event) {
 
         for (Edge &edge : graph.edges()) {
             painter.drawLine(edge.vertex1().position().toPointF() * scale, edge.vertex2().position().toPointF() * scale);
+            int posX1 = edge.vertex1().position().x() * scale;
+            int posY1 = edge.vertex1().position().y() * scale;
+            int posX2 = edge.vertex2().position().x() * scale;
+            int posY2 = edge.vertex2().position().y() * scale;
+            painter.drawText(posX1 + (posX2 - posX1) / 2, posY1 + (posY2 - posY1) / 2, QString::number(edge.length()));
         }
 
         for (Vertex &vertex : graph.vertices()) {
@@ -76,6 +81,7 @@ void GraphView::paintEvent(QPaintEvent *event) {
                 painter.translate(vertex.position().toPointF() * scale + QPointF(circleSize / 2, -circleSize / 2) - boundingRect.bottomLeft());
                 painter.drawRect(boundingRect);
                 painter.drawText(0, 0, vertex.post().name());
+                painter.drawText(0, -20, QString::number(vertex.post().vertex().idx()));
                 painter.restore();
             }
         }

@@ -16,8 +16,8 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void setMap(std::unique_ptr<Map> m);
-    void setGame(Game &game) { game_ = &game; };
+    void setMap(std::shared_ptr<Map> m);
+    void setGame(Game *game) { game_ = game; };
 
     Game& game() { return *game_; };
 

@@ -21,6 +21,8 @@ public:
     int product_capacity();
     int train_cooldown();
 
+    void setProduct(int amount) { product_ += amount; };
+
 private:
     int armor_;
     int armor_capacity_;

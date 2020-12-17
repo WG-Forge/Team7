@@ -78,17 +78,17 @@ void Graph::calcCoords(float aspectRatio, const QJsonObject coordsData) {
     const float W = aspectRatio, H = 1;
     const int placeMaxAttempts = 8;
 
-    for (int i = 0; i < placeMaxAttempts; ++i) {
-        placeVertices(W, H);
+//    for (int i = 0; i < placeMaxAttempts; ++i) {
+//        placeVertices(W, H);
 
-        if (!isSelfIntersecting())
-            break;
+//        if (!isSelfIntersecting())
+//            break;
 
-        if (i >= placeMaxAttempts - 1)
-            qWarning("Warning: Can't create non-self-intersecting graph layout. Graph is probably non planar");
-    }
+//        if (i >= placeMaxAttempts - 1)
+//            qWarning("Warning: Can't create non-self-intersecting graph layout. Graph is probably non planar");
+//    }
 
-   this->setCoords(coordsData);
+    this->setCoords(coordsData);
     fitToSize(W, H);
 }
 

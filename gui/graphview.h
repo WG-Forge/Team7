@@ -15,13 +15,13 @@ class GraphView : public QWidget {
         explicit GraphView(QWidget *parent = nullptr);
         ~GraphView();
 
-        void setMap(std::unique_ptr<Map> m, Player &player);
+        void setMap(std::shared_ptr<Map> m, Player &player);
 
     protected:
         void paintEvent(QPaintEvent *event) override;
 
     private:
-        std::unique_ptr<Map> map_ = nullptr;
+        std::shared_ptr<Map> map_ = nullptr;
         Player *player_;
 
         Ui::GraphView *ui;

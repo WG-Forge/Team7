@@ -19,7 +19,7 @@ class Map {
         std::vector<Market>& markets();
         std::vector<Storage>& storages();
         std::vector<Post>& posts();
-        Post& userHome() { return userPost_; };
+        Post& userPost() { return userPost_; };
 
         std::vector<Train>& trains();
         void makeWays();

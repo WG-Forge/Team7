@@ -34,6 +34,7 @@ HEADERS += \
     $$PWD/ResultEnum.h \
     $$PWD/Socket.h \
     $$PWD/Storage.h \
+    $$PWD/Thread.h \
     $$PWD/Town.h \
     $$PWD/Train.h \
     $$PWD/TrainCollision.h \
@@ -55,6 +56,7 @@ SOURCES += \
     $$PWD/Response.cpp \
     $$PWD/Socket.cpp \
     $$PWD/Storage.cpp \
+    $$PWD/Thread.cpp \
     $$PWD/Town.cpp \
     $$PWD/Train.cpp \
     $$PWD/TrainCollision.cpp \

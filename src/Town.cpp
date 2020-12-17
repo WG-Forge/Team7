@@ -117,7 +117,7 @@ QString Town::player_idx(){
 int Town::population(){
     if(population_ == -1)
         throw std::invalid_argument("No population");
-    return product_;
+    return population_;
 }
 
 int Town::population_capacity(){

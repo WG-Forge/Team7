@@ -32,6 +32,8 @@ public:
     int next_level_price();
     QString player_idx();
     int position();
+    std::vector<std::vector<int>> ways() { return ways_; };
+    std::vector<std::vector<int>> waysLength() { return waysLenght_; };
     int speed();
 
 private:

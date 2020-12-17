@@ -77,12 +77,14 @@ void Map::makeWays(){
     std::vector<std::vector<int>> mas(n);
     std::vector<std::vector<int>> p(n);
     int INF = 100000200;
+
     for (int i = 0 ; i < n; ++i){
         mas[i] = std::vector<int>(n, INF);
         p[i] = std::vector<int>(n, INF);
         mas[i][i] = 0;
         p[i][i] = 0;
     }
+
     for(int t = 0; t < trains_.size(); ++t){
         for(int i = 0 ; i < n;++i){
             int u =  graph_.vertices()[i].idx();
