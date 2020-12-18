@@ -82,29 +82,36 @@ void Game::gameCycle() {
 
     int wayLength = 1000000;
     int shortestIdx = 0;
-    const int USER_POST_IDX = this->player().town().point_idx();
+    const int USER_POST_IDX = this->player().town().pointIdx();
     const int USER_POST_POS = this->map()->graph().idx().at(USER_POST_IDX);
     QString shortestName = "";
 
     while(true) {
         if (this->player_->town().product() < 400) {
             for (auto &market : this->map()->markets()) {
-                int marketPos = this->map()->graph().idx().at(market.point_idx());
+                int marketPos = this->map()->graph().idx().at(market.pointIdx());
                 int currentLength = this->map()->trains()[0].waysLength()[USER_POST_POS][marketPos];
 
                 if (currentLength < wayLength) {
                     wayLength = currentLength;
-                    shortestIdx = market.idx();
+                    shortestIdx = market.pointIdx();
                     shortestName = market.name();
                 }
             }
 
             int currentPathLength = 0;
 
-
             qDebug() << shortestName << shortestIdx;
             qDebug() << this->player().town().product();
-            qDebug() << this->player().town().vertex().idx();
+
+            for (auto &vertex : this->map()->graph().vertices()) {
+                if (vertex.idx() == shortestIdx) {
+                    for (auto &edge : vertex.edges()) {
+                        qDebug() << edge.get().vertex1().idx() << edge.get().vertex2().idx();
+                    }
+                }
+            }
+
             this->player().town().addProduct(40);
             this->tick();
         } else {

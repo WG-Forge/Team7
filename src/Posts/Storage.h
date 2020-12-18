@@ -11,12 +11,12 @@ public:
     ~Storage() = default;
 
     int armor();
-    int armor_capacity();
+    int armorCapacity();
     int replenishment();
 
 private:
     int armor_;
-    int armor_capacity_;
+    int armorCapacity_;
     int replenishment_;
 
 };

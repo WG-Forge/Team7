@@ -46,7 +46,6 @@ Vertex &Graph::vertex(int idx) {
     return verticesMap_.at(idx);
 }
 
-
 void Graph::setCoords(const QJsonObject coordsData) {
     if (!coordsData.contains("coordinates") || !coordsData["coordinates"].isArray())
         throw std::invalid_argument("Wrong JSON graph format.");

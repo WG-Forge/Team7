@@ -47,12 +47,12 @@ void MainWindow::on_startButton_clicked()
 
         ui->userGameInfo->setText("User Info");
         ui->userGameInfo->append("Name: " + game_->player().name());
-//        ui->userGameInfo->append("City: " + game_->player().town().name());
+        ui->userGameInfo->append("City: " + game_->player().town().name());
         ui->userNameForm->clear();
 
 //        qDebug() << game_->map()->graph().idx();
 //        qDebug() << game_->map()->trains()[0].waysLength();
-//        qDebug() << game_->map()->graph().idx().at(game_->player().town().point_idx());
+//        qDebug() << game_->map()->graph().idx().at(game_->player().town().pointIdx());
         game_->gameCycle();
     }
 }

@@ -11,29 +11,29 @@ public:
     ~Town() = default;
 
     int armor();
-    int armor_capacity();
+    int armorCapacity();
     int level();
-    int next_level_price();
-    QString playerIdx();
+    int nextLevelPrice();
     int population();
-    int population_capacity();
+    int populationCapacity();
     int product();
-    int product_capacity();
-    int train_cooldown();
+    int productCapacity();
+    int trainCooldown();
+    QString playerIdx();
 
     void addProduct(int amount) { product_ += amount; };
 
 private:
     int armor_;
-    int armor_capacity_;
+    int armorCapacity_;
     int level_;
-    int next_level_price_;
+    int nextLevelPrice_;
     QString playerIdx_;
     int population_;
-    int population_capacity_;
+    int populationCapacity_;
     int product_;
-    int product_capacity_;
-    int train_cooldown_;
+    int productCapacity_;
+    int trainCooldown_;
 
 };
 

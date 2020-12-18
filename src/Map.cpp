@@ -37,7 +37,7 @@ Map::Map(const QJsonObject &staticObj, const QJsonObject &dynamicObj, const QJso
         if (vertex.isPostIdxNull()) continue;
 
         for (Post &post : this->posts()) {
-            if (post.point_idx() == vertex.idx() && post.idx() == vertex.postIdx()) {
+            if (post.pointIdx() == vertex.idx() && post.idx() == vertex.postIdx()) {
                 vertex.setPost(post);
                 post.setVertex(vertex);
                 continue;
@@ -48,7 +48,7 @@ Map::Map(const QJsonObject &staticObj, const QJsonObject &dynamicObj, const QJso
             switch(type) {
             case PostType::TOWN:
                 for (Town &town : this->towns()) {
-                    if (town.point_idx() == vertex.idx() && town.idx() == vertex.postIdx()) {
+                    if (town.pointIdx() == vertex.idx() && town.idx() == vertex.postIdx()) {
                         town.setVertex(vertex);
 
                         if (town.playerIdx() != nullptr) {
@@ -63,7 +63,7 @@ Map::Map(const QJsonObject &staticObj, const QJsonObject &dynamicObj, const QJso
 
             case PostType::MARKET:
                 for (Market &market : this->markets()) {
-                    if (market.point_idx() == vertex.idx() && market.idx() == vertex.postIdx()) {
+                    if (market.pointIdx() == vertex.idx() && market.idx() == vertex.postIdx()) {
                         market.setVertex(vertex);
                         break;
                     }
@@ -72,7 +72,7 @@ Map::Map(const QJsonObject &staticObj, const QJsonObject &dynamicObj, const QJso
 
             case PostType::STORAGE:
                 for (Storage &storage : this->storages()) {
-                    if (storage.point_idx() == vertex.idx() && storage.idx() == vertex.postIdx()) {
+                    if (storage.pointIdx() == vertex.idx() && storage.idx() == vertex.postIdx()) {
                         storage.setVertex(vertex);
                         break;
                     }

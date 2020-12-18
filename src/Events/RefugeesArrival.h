@@ -13,7 +13,7 @@ public:
 private:
     enum EventType type_;
     int tick_;
-    int refugees_number_;
+    int refugeesNumber_;
 };
 
 #endif // REFUGEESARRIVAL_H

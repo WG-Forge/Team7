@@ -11,12 +11,12 @@ public:
     ~Market() = default;
 
     int product();
-    int product_capacity();
+    int productCapacity();
     int replenishment();
 
 private:
     int product_;
-    int product_capacity_;
+    int productCapacity_;
     int replenishment_;
 
 };

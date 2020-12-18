@@ -13,7 +13,7 @@ public:
 private:
     enum EventType type_;
     int tick_;
-    int parasites_power_;
+    int parasitesPower_;
 };
 
 #endif // PARASITESASSAULT_H
