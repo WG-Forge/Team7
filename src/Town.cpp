@@ -48,10 +48,10 @@ Town::Town(const QJsonObject& town){
         level_ = -1;
     }
     if(town.contains("player_idx")){
-        player_idx_ = town["player_idx"].toString();
+        playerIdx_ = town["player_idx"].toString();
     }
     else{
-        player_idx_ = nullptr;
+        playerIdx_ = nullptr;
     }
 
     point_idx_ = town["point_idx"].toInt();
@@ -104,10 +104,10 @@ int Town::next_level_price(){
     return next_level_price_;
 }
 
-QString Town::player_idx(){
-    if(player_idx_ == -1)
+QString Town::playerIdx(){
+    if(playerIdx_ == -1)
         throw std::invalid_argument("No player_idx");
-    return player_idx_;
+    return playerIdx_;
 }
 
 //int Town::point_idx(){

@@ -35,7 +35,7 @@ public:
 protected:
     int idx_;
     int point_idx_;
-    Vertex *vertex_;
+    Vertex *vertex_ = nullptr;
     QString name_;
     QString playerIdx_;
     enum PostType type_;

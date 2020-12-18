@@ -15,6 +15,7 @@ public:
     explicit Player(const QJsonObject &playerData);
 
     void setTown(QJsonObject town);
+    void setTown2(Town &town) { town_ = &town; };
     void setTrain(QJsonObject train);
 
     QString name() { return name_; };

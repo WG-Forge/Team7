@@ -51,7 +51,7 @@ void Game::disconnect() {
 }
 
 void Game::tick() {
-    this->player().town().setProduct(this->player_->town().population() * (-1));
+    this->player().town().addProduct(this->player_->town().population() * (-1));
 
     socket_->sendData(Request(Action::TURN, QJsonObject()));
 }
@@ -79,13 +79,12 @@ void Game::connectToGame() {
 
 void Game::gameCycle() {
     qDebug() << "cycle";
-    qDebug() << this->player().town().product();
+
     int wayLength = 1000000;
     int shortestIdx = 0;
     const int USER_POST_IDX = this->player().town().point_idx();
     const int USER_POST_POS = this->map()->graph().idx().at(USER_POST_IDX);
     QString shortestName = "";
-    qDebug() << "pop: " << this->player().town().population();
 
     while(true) {
         if (this->player_->town().product() < 400) {
@@ -105,7 +104,8 @@ void Game::gameCycle() {
 
             qDebug() << shortestName << shortestIdx;
             qDebug() << this->player().town().product();
-            this->player().town().setProduct(15);
+            qDebug() << this->player().town().vertex().idx();
+            this->player().town().addProduct(40);
             this->tick();
         } else {
             break;

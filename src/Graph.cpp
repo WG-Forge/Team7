@@ -19,15 +19,6 @@ Graph::Graph(const QJsonObject &graph, Map &map) {
         idx_.emplace(v.idx(),i);
         i++;
         verticesMap_.emplace(v.idx(), v);
-        if (v.isPostIdxNull()) continue;
-
-        for (Post &post : map.posts()) {
-            if (post.point_idx() == v.idx() && post.idx() == v.postIdx()) {
-                v.setPost(post);
-                post.setVertex(v);
-                continue;
-            }
-        }
     }
 
     for (auto const &edge : edgesJsonArray) {

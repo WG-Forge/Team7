@@ -47,7 +47,7 @@ void MainWindow::on_startButton_clicked()
 
         ui->userGameInfo->setText("User Info");
         ui->userGameInfo->append("Name: " + game_->player().name());
-        ui->userGameInfo->append("City: " + game_->player().town().name());
+//        ui->userGameInfo->append("City: " + game_->player().town().name());
         ui->userNameForm->clear();
 
 //        qDebug() << game_->map()->graph().idx();

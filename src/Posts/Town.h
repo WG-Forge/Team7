@@ -14,21 +14,21 @@ public:
     int armor_capacity();
     int level();
     int next_level_price();
-    QString player_idx();
+    QString playerIdx();
     int population();
     int population_capacity();
     int product();
     int product_capacity();
     int train_cooldown();
 
-    void setProduct(int amount) { product_ += amount; };
+    void addProduct(int amount) { product_ += amount; };
 
 private:
     int armor_;
     int armor_capacity_;
     int level_;
     int next_level_price_;
-    QString player_idx_;
+    QString playerIdx_;
     int population_;
     int population_capacity_;
     int product_;

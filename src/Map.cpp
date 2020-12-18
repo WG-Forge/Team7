@@ -7,6 +7,11 @@ Map::Map(const QJsonObject &staticObj, const QJsonObject &dynamicObj, const QJso
     QJsonArray trainsJsonArray = dynamicObj["trains"].toArray();
     QJsonArray postsJsonArray = dynamicObj["posts"].toArray();
 
+    idx_ = dynamicObj["idx"].toInt();
+    graph_ = Graph(staticObj, *this);
+    graph_.calcCoords(16.0f / 9, pointsCoords);
+
+
     for (auto const &post : postsJsonArray) {
         if (!post.isObject())
             throw std::invalid_argument("Wrong JSON graph format.");
@@ -16,12 +21,6 @@ Map::Map(const QJsonObject &staticObj, const QJsonObject &dynamicObj, const QJso
         case 1:
             towns_.emplace_back(post.toObject());
             posts_.emplace_back(post.toObject());
-
-            if(post.toObject()["player_idx"].toString() != nullptr) {
-                if(post.toObject()["player_idx"].toString() == player.idx()) {
-                    player.setTown(post.toObject());
-                }
-            }
             break;
         case 2:
             markets_.emplace_back(post.toObject());
@@ -31,6 +30,55 @@ Map::Map(const QJsonObject &staticObj, const QJsonObject &dynamicObj, const QJso
             storages_.emplace_back(post.toObject());
             posts_.emplace_back(post.toObject());
             break;
+        }
+    }
+
+    for (auto &vertex : graph_.vertices()) {
+        if (vertex.isPostIdxNull()) continue;
+
+        for (Post &post : this->posts()) {
+            if (post.point_idx() == vertex.idx() && post.idx() == vertex.postIdx()) {
+                vertex.setPost(post);
+                post.setVertex(vertex);
+                continue;
+            }
+
+            enum PostType type = post.type();
+
+            switch(type) {
+            case PostType::TOWN:
+                for (Town &town : this->towns()) {
+                    if (town.point_idx() == vertex.idx() && town.idx() == vertex.postIdx()) {
+                        town.setVertex(vertex);
+
+                        if (town.playerIdx() != nullptr) {
+                            if (town.playerIdx() == player.idx()) {
+                                player.setTown2(town);
+                            }
+                        }
+                        break;
+                    }
+                }
+                break;
+
+            case PostType::MARKET:
+                for (Market &market : this->markets()) {
+                    if (market.point_idx() == vertex.idx() && market.idx() == vertex.postIdx()) {
+                        market.setVertex(vertex);
+                        break;
+                    }
+                }
+                break;
+
+            case PostType::STORAGE:
+                for (Storage &storage : this->storages()) {
+                    if (storage.point_idx() == vertex.idx() && storage.idx() == vertex.postIdx()) {
+                        storage.setVertex(vertex);
+                        break;
+                    }
+                }
+                break;
+            }
         }
     }
 
@@ -45,11 +93,6 @@ Map::Map(const QJsonObject &staticObj, const QJsonObject &dynamicObj, const QJso
             }
         }
     }
-
-    idx_ = dynamicObj["idx"].toInt();
-
-    graph_ = Graph(staticObj, *this);
-    graph_.calcCoords(16.0f / 9, pointsCoords);
 }
 
 Graph &Map::graph() {
