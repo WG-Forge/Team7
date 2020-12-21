@@ -32,7 +32,10 @@ public:
     };
 
     int cooldown();
-    void trainWays(const std::vector<std::vector<int>>& mas, const std::vector<std::vector<int>>& p);
+    void trainWays(const std::vector<std::vector<int>>& masMarket,
+                   const  std::vector<std::vector<Edge*>>& pMarket,
+                   const std::vector<std::vector<int>>& masStorage,
+                   const  std::vector<std::vector<Edge*>>& pStorage);
     std::vector<Event*>& events();
     int fuel();
     int fuelCapacity();
@@ -66,8 +69,10 @@ private:
     QString playerIdx_;
     int position_;
     int speed_;
-    std::vector<std::vector<int>> waysLenght_;
-    std::vector<std::vector<int>> ways_;
+    std::vector<std::vector<int>> waysLengthMarket_;
+    std::vector<std::vector<Edge*>> waysMarket_;
+    std::vector<std::vector<int>> waysLengthStorage_;
+    std::vector<std::vector<Edge*>> waysStorage_;
 
 };
 
