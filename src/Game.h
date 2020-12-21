@@ -25,12 +25,14 @@ public:
     void makeMap();
     void gameCycle();
     void tick();
-    int moveTrain(const int start, const int end);
-    void moveAction(int trainIdx, Edge &edge, int speed, Train *train, int startPosition);
+
+    int moveTrain(const int start, const int end, enum PostType type, Train *train);
+    int moveAction(Edge *edge, int speed, Train *train, int startPosition);
+    int findPostPos(PostType type, int currentPos, Train *train);
+
     int findEdge(int start, int end, int speed);
     int getIdx(int position);
     int returnToHome(int currentPosition);
-    int findPost(PostType type, int currentPos);
     void unloadTrain(Train *train);
 
     Socket& socket() { return *socket_; };

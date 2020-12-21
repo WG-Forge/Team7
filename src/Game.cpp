@@ -58,9 +58,6 @@ void Game::tick() {
 //    qDebug() << response["trains"].toArray()[0].toObject()["line_idx"].toInt()
 //            << response["trains"].toArray()[0].toObject()["position"].toInt()
 //            << response["trains"].toArray()[0].toObject()["speed"].toInt();
-
-//    this->player().trains()[0]->move(1, response["trains"].toArray()[0].toObject()["line_idx"].toInt(),
-//            response["trains"].toArray()[0].toObject()["speed"].toInt(), response["trains"].toArray()[0].toObject()["position"].toInt());
 }
 
 void Game::getMap() {
@@ -93,25 +90,17 @@ void Game::gameCycle() {
         currentPos = 0;
     QString shortestName = "";
 
-    Market *currentMarket = new Market();
     const int USER_POST_IDX = this->player().town().pointIdx();
     const int USER_POST_POS = this->map()->graph().idx().at(USER_POST_IDX);
     currentIdx = USER_POST_IDX;
     currentPos = USER_POST_POS;
 
-    for (auto &market : this->map()->markets()) {
-        qDebug() << market.name() << market.product();
-    }
+    Market *currentMarket = new Market();
+    Train *train = this->player().trains()[0];
 
     while(true) {
-        if (this->player_->town().product() < 400) {
-
-            shortestPos = this->findPost(PostType::MARKET, currentPos);
-            for (auto &market : this->map()->markets()) {
-                if (this->getIdx(shortestPos) == market.pointIdx()) {
-                    currentMarket = &market;
-                }
-            }
+        if (this->player_->town().product() < 300) {
+            shortestPos = this->findPostPos(PostType::MARKET, currentPos, train); // OK
 
             if (shortestPos == -1) {
                 qDebug() << "There is no goods any more..." <<
@@ -119,49 +108,92 @@ void Game::gameCycle() {
                             "Total population amount: " << this->player().town().population();
             }
 
-            currentPos = this->moveTrain(currentPos, shortestPos);
+            for (auto &market : this->map()->markets()) {
+                if (this->getIdx(shortestPos) == market.pointIdx()) {
+                    currentMarket = &market;
+                }
+            }
+
+            currentPos = this->moveTrain(currentPos, shortestPos, currentMarket->type(), train);
+
 
             int currentCapacity = this->player().trains()[0]->goodsCapacity() - this->player().trains()[0]->goods();
             this->player().trains()[0]->changeGoodsAmount(currentMarket->takeProduct(currentCapacity));
 
-            socket_->sendData(Request(Action::PLAYER, QJsonObject()));
-            QJsonObject response = socket_->getData();
-            qDebug() << response;
+            // посмотреть что там с городом
+//            socket_->sendData(Request(Action::PLAYER, QJsonObject()));
+//            QJsonObject response = socket_->getData();
+//            qDebug() << "Product:" << response["town"].toObject()["product"].toInt()
+//                    << "Population:" << response["town"].toObject()["population"].toInt()
+//                    << "Train: " << response["trains"].toArray()[0].toObject()["line_idx"].toInt()
+//                    << response["trains"].toArray()[0].toObject()["position"].toInt()
+//                    << response["trains"].toArray()[0].toObject()["speed"].toInt();
 
-            currentPos = this->moveTrain(currentPos, USER_POST_POS);
+            currentPos = this->moveTrain(currentPos, USER_POST_POS, currentMarket->type(), train);
 
-            socket_->sendData(Request(Action::PLAYER, QJsonObject()));
-            response = socket_->getData();
-            qDebug() << response;
+            // посмотреть что там с городом
+//            socket_->sendData(Request(Action::PLAYER, QJsonObject()));
+//            response = socket_->getData();
+//            qDebug() << "Product:" << response["town"].toObject()["product"].toInt()
+//                    << "Population:" << response["town"].toObject()["population"].toInt()
+//                    << "Train: " << response["trains"].toArray()[0].toObject()["line_idx"].toInt()
+//                    << response["trains"].toArray()[0].toObject()["position"].toInt()
+//                    << response["trains"].toArray()[0].toObject()["speed"].toInt();
 
-            this->unloadTrain(this->player().trains()[0]);
-            qDebug() << "Current town products amount: " << response["town"].toObject()["product"].toInt();
-            qDebug() << "Откуда взял: " << currentMarket->name() << currentMarket->product();
+//            this->unloadTrain(this->player().trains()[0]);
+//            qDebug() << "Current town products amount: " << response["town"].toObject()["product"].toInt();
+//            qDebug() << "Откуда взял: " << currentMarket->name() << currentMarket->product();
             // можно сделать так, чтобы после посещения магазина, если не полностью забит, поехать в другой магазин и заполнить до фулла
             // в findEdge проверять будет ли некст точка - тем типом поста, который нам нужен
             // если линия уже занята поездом или ведёт не к тому типу поста - обновлять все trains.ways, но слишком затратно...
-            break;
         } else {
             break;
         }
     }
-
-    socket_->sendData(Request(Action::PLAYER, QJsonObject()));
-    qDebug() << socket_->getData()["trains"].toArray()[0];
 //    QThread::sleep(12);
 }
 
-int Game::moveTrain(const int startPos, const int endPos) {
+int Game::moveTrain(const int startPos, const int endPos, enum PostType type, Train *train) {
     int currentPos = startPos;
     int currentIdx = this->getIdx(currentPos);
-    int toPos = this->player().trains()[0]->ways()[startPos][endPos];
-    int toIdx = this->getIdx(toPos);
+    int toPos = 0;
+    int toIdx = 0;
     int speed = 0;
+    int pathPos = 0;
+    Edge *toLine;
+
+    switch(type) {
+    case PostType::MARKET:
+        toLine = train->waysMarket()[startPos][endPos];
+        break;
+    case PostType::STORAGE:
+        toLine  = train->waysStorage()[startPos][endPos];
+        break;
+    case PostType::TOWN:
+        toLine  = train->waysMarket()[startPos][endPos];
+        break;
+    }
+
+    if (toLine->vertex1().idx() == currentIdx) {
+        toIdx = toLine->vertex2().idx();
+        toPos = this->map()->graph().idx().at(toIdx);
+        pathPos = 0;
+    } else {
+        toIdx = toLine->vertex1().idx();
+        toPos = this->map()->graph().idx().at(toIdx);
+        pathPos = toLine->length();
+    }
 
     while (true) {
+
         (currentIdx > toIdx)? speed = -1 : speed = 1;
-        qDebug() << "From: " << currentIdx << "To: " << toIdx;
-        currentPos = this->findEdge(currentPos, toPos, speed);
+//        qDebug() << "From: " << currentIdx << "(" + QString::number(currentPos) + ")"
+//                 << "To: " << toIdx << "(" + QString::number(toPos) + ")"
+//                 << "Speed: " << speed;
+
+        currentPos = this->moveAction(toLine, speed, train, pathPos);
+        currentPos = toPos;
+        currentIdx = this->getIdx(currentPos);
 
         if (currentPos == endPos) return currentPos;
         if (currentPos == -1) {
@@ -169,51 +201,49 @@ int Game::moveTrain(const int startPos, const int endPos) {
             return currentPos;
         }
 
-        toPos =  this->player().trains()[0]->ways()[currentPos][endPos];
-        toIdx = this->getIdx(toPos);
-        currentIdx = this->getIdx(currentPos);
+        switch(type) {
+        case PostType::MARKET:
+            toLine = train->waysMarket()[currentPos][endPos];
+            break;
+        case PostType::STORAGE:
+            toLine  = train->waysStorage()[currentPos][endPos];
+            break;
+        case PostType::TOWN:
+            toLine  = train->waysMarket()[currentPos][endPos];
+            break;
+        }
+
+        if (toLine->vertex1().idx() == currentIdx) {
+            toIdx = toLine->vertex2().idx();
+            toPos = this->map()->graph().idx().at(toIdx);
+            pathPos = 0;
+        } else {
+            toIdx = toLine->vertex1().idx();
+            toPos = this->map()->graph().idx().at(toIdx);
+            pathPos = toLine->length();
+        }
     }
 
    return -1;
 }
 
-void Game::moveAction(int trainIdx, Edge &edge, int speed, Train *train, int startPosition) {
+int Game::moveAction(Edge *edge, int speed, Train *train, int startPosition) {
+
     QJsonObject request;
-    request["line_idx"] = edge.idx();
+    request["line_idx"] = edge->idx();
     request["speed"] = speed;
-    request["train_idx"] = trainIdx;
+    request["train_idx"] = train->idx();
 
     socket_->sendData(Request(Action::MOVE, request));
     socket_->getData();
 
     int deadEnd = 0;
-    (speed > 0)? deadEnd = edge.length() : deadEnd = 0;
     train->setPosition(startPosition);
+    (startPosition == 0)? deadEnd = edge->length() : deadEnd = 0;
 
     while (train->position() != deadEnd) {
         this->tick();
-        train->move(1, edge.idx(), speed, train->position() + speed);
-    }
-}
-
-int Game::findEdge(int startPos, int endPos, int speed) {
-    for (auto &vertex : this->map()->graph().vertices()) {
-        if (this->map()->graph().idx().at(vertex.idx()) == startPos) {
-            for (auto &edge : vertex.edges()) {
-                if (endPos == this->map()->graph().idx().at(edge.get().vertex1().idx()) ||
-                    endPos == this->map()->graph().idx().at(edge.get().vertex2().idx()))
-                {
-                    int startPosition = 0;
-                    qDebug() << edge.get().idx();
-                    if (startPos == this->map()->graph().idx().at(edge.get().vertex2().idx())) {
-                        startPosition = edge.get().length();
-                    }
-                    this->moveAction(this->player().trains()[0]->idx(), edge, speed, this->player().trains()[0], startPosition);
-
-                    return endPos;
-                }
-            }
-        }
+        train->move(1, edge->idx(), speed, train->position() + speed);
     }
 
     return 0;
@@ -252,16 +282,16 @@ int Game::returnToHome(int currentPosition) {
     return 0;
 }
 
-int Game::findPost(PostType type, int currentPos) {
+int Game::findPostPos(PostType type, int currentPos, Train *train) {
     bool isGoods = false;
     int shortestPos = 0;
-    int wayLength = 10000;
+    int wayLength = 1000000;
 
     switch(type) {
     case PostType::TOWN:
         for (auto &town : this->map()->towns()) {
             int marketPos = this->map()->graph().idx().at(town.pointIdx());
-            int currentLength = this->map()->trains()[0].waysLength()[currentPos][marketPos];
+            int currentLength = train->waysLengthStorage()[currentPos][marketPos];
 
             if (currentLength < wayLength) {
                 wayLength = currentLength;
@@ -276,7 +306,7 @@ int Game::findPost(PostType type, int currentPos) {
             if (market.product() == 0) continue;
             isGoods = true;
             int marketPos = this->map()->graph().idx().at(market.pointIdx());
-            int currentLength = this->map()->trains()[0].waysLength()[currentPos][marketPos];
+            int currentLength = train->waysLengthMarket()[currentPos][marketPos];
 
             if (currentLength < wayLength) {
                 wayLength = currentLength;
@@ -294,7 +324,7 @@ int Game::findPost(PostType type, int currentPos) {
             if (storage.armor() == 0) continue;
             isGoods = true;
             int marketPos = this->map()->graph().idx().at(storage.pointIdx());
-            int currentLength = this->map()->trains()[0].waysLength()[currentPos][marketPos];
+            int currentLength = train->waysLengthStorage()[currentPos][marketPos];
 
             if (currentLength < wayLength) {
                 wayLength = currentLength;

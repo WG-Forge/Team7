@@ -49,8 +49,10 @@ public:
     int nextLevelPrice();
     QString playerIdx();
     int position();
-    std::vector<std::vector<int>> ways() { return ways_; };
-    std::vector<std::vector<int>> waysLength() { return waysLenght_; };
+    std::vector<std::vector<int>> waysLengthStorage() { return waysLengthStorage_; };
+    std::vector<std::vector<int>> waysLengthMarket() { return waysLengthMarket_; };
+    std::vector<std::vector<Edge *>> waysStorage() { return waysStorage_; };
+    std::vector<std::vector<Edge *>> waysMarket() { return waysMarket_; };
     int speed();
 
 private:
