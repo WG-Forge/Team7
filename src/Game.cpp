@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Enums/ActionEnum.h"
+#include <QThread>
 
 Game::Game(QObject *parent) : QObject(parent)
 {
@@ -32,7 +33,6 @@ void Game::login(QString userName) {
     data["name"] = userName;
     this->socket_->sendData(Request(Action::LOGIN, data));
     QJsonObject userData = socket_->getData();
-//    qDebug() << data;
 
     player_ = new Player(userData);
 }
@@ -50,14 +50,17 @@ void Game::disconnect() {
 }
 
 void Game::tick() {
-//    this->player().town().addProduct(this->player_->town().population() * (-1));
-
-//    this->socket_->sendData(Request(Action::TURN, char("")));
     this->socket_->sendData(Request(Action::TURN, QJsonObject()));
-//    qDebug() << socket_->getData();
-//    if(this->socket_->waitForBytesWritten(5000)) {
-//        qDebug() << "Yes" << this->socket_->getData();
-//    } else qDebug() << "No";
+    socket_->getData();
+
+//    socket_->sendData(Request(Action::PLAYER, QJsonObject()));
+//    QJsonObject response = socket_->getData();
+//    qDebug() << response["trains"].toArray()[0].toObject()["line_idx"].toInt()
+//            << response["trains"].toArray()[0].toObject()["position"].toInt()
+//            << response["trains"].toArray()[0].toObject()["speed"].toInt();
+
+//    this->player().trains()[0]->move(1, response["trains"].toArray()[0].toObject()["line_idx"].toInt(),
+//            response["trains"].toArray()[0].toObject()["speed"].toInt(), response["trains"].toArray()[0].toObject()["position"].toInt());
 }
 
 void Game::getMap() {
@@ -121,39 +124,31 @@ void Game::gameCycle() {
             int currentCapacity = this->player().trains()[0]->goodsCapacity() - this->player().trains()[0]->goods();
             this->player().trains()[0]->changeGoodsAmount(currentMarket->takeProduct(currentCapacity));
 
+            socket_->sendData(Request(Action::PLAYER, QJsonObject()));
+            QJsonObject response = socket_->getData();
+            qDebug() << response;
+
             currentPos = this->moveTrain(currentPos, USER_POST_POS);
 
+            socket_->sendData(Request(Action::PLAYER, QJsonObject()));
+            response = socket_->getData();
+            qDebug() << response;
+
             this->unloadTrain(this->player().trains()[0]);
-            qDebug() << "Current town products amount: " << this->player().town().product();
+            qDebug() << "Current town products amount: " << response["town"].toObject()["product"].toInt();
             qDebug() << "Откуда взял: " << currentMarket->name() << currentMarket->product();
             // можно сделать так, чтобы после посещения магазина, если не полностью забит, поехать в другой магазин и заполнить до фулла
             // в findEdge проверять будет ли некст точка - тем типом поста, который нам нужен
             // если линия уже занята поездом или ведёт не к тому типу поста - обновлять все trains.ways, но слишком затратно...
-            // при отправке tick и move клиент умирает, не понятно почему...
-
+            break;
         } else {
             break;
         }
     }
-    for (auto &market : this->map()->markets()) {
-        qDebug() << market.name() << market.product();
-    }
 
-//    QJsonObject request;
-//    request["line_idx"] = 610;
-//    request["speed"] = -1;
-//    request["train_idx"] = 1;
-
-//    socket_->sendData(Request(Action::MOVE, request));
-//    qDebug() << socket_->getData();
-
-//    this->tick();
-//    qDebug() << socket_->getData();
-
-//    this->tick();
-//    socket_->getData();
-//    socket_->sendData(Request(Action::PLAYER, QJsonObject()));
-//    socket_->getData();
+    socket_->sendData(Request(Action::PLAYER, QJsonObject()));
+    qDebug() << socket_->getData()["trains"].toArray()[0];
+//    QThread::sleep(12);
 }
 
 int Game::moveTrain(const int startPos, const int endPos) {
@@ -165,6 +160,7 @@ int Game::moveTrain(const int startPos, const int endPos) {
 
     while (true) {
         (currentIdx > toIdx)? speed = -1 : speed = 1;
+        qDebug() << "From: " << currentIdx << "To: " << toIdx;
         currentPos = this->findEdge(currentPos, toPos, speed);
 
         if (currentPos == endPos) return currentPos;
@@ -182,29 +178,22 @@ int Game::moveTrain(const int startPos, const int endPos) {
 }
 
 void Game::moveAction(int trainIdx, Edge &edge, int speed, Train *train, int startPosition) {
-//    qDebug() << "Move train" << "Line Idx: " << edge.idx() << "Line length: " << edge.length() << edge.vertex1().idx() << edge.vertex2().idx();
-
     QJsonObject request;
     request["line_idx"] = edge.idx();
     request["speed"] = speed;
     request["train_idx"] = trainIdx;
-//    qDebug() << request;
 
-//    socket_->sendData(Request(Action::MOVE, request));
-
-//    socket_->sendData(Request(Action::PLAYER, QJsonObject()));
-//    qDebug() << socket_->getData();
+    socket_->sendData(Request(Action::MOVE, request));
+    socket_->getData();
 
     int deadEnd = 0;
     (speed > 0)? deadEnd = edge.length() : deadEnd = 0;
-//    (speed > 0)? train->setPosition(0) : train->setPosition(edge.length());
     train->setPosition(startPosition);
 
     while (train->position() != deadEnd) {
+        this->tick();
         train->move(1, edge.idx(), speed, train->position() + speed);
     }
-
-//    this->tick();
 }
 
 int Game::findEdge(int startPos, int endPos, int speed) {
@@ -215,8 +204,8 @@ int Game::findEdge(int startPos, int endPos, int speed) {
                     endPos == this->map()->graph().idx().at(edge.get().vertex2().idx()))
                 {
                     int startPosition = 0;
-
-                    if (startPos = edge.get().vertex2().idx()) {
+                    qDebug() << edge.get().idx();
+                    if (startPos == this->map()->graph().idx().at(edge.get().vertex2().idx())) {
                         startPosition = edge.get().length();
                     }
                     this->moveAction(this->player().trains()[0]->idx(), edge, speed, this->player().trains()[0], startPosition);

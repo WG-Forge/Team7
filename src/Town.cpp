@@ -135,7 +135,7 @@ int Town::product(){
 int Town::productCapacity(){
     if(product_ == -1)
         throw std::invalid_argument("No product");
-    return productCapacity_;
+    return populationCapacity_;
 }
 
 int Town::trainCooldown(){

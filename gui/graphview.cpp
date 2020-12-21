@@ -38,7 +38,7 @@ void GraphView::paintEvent(QPaintEvent *event) {
             int posY2 = edge.vertex2().position().y() * scale;
 
             // отрисовка данных edge (помогает разбираться в путях для поезда)
-//            painter.drawText(posX1 + (posX2 - posX1) / 2, posY1 + (posY2 - posY1) / 2, QString::number(edge.idx())); // edge idx
+            painter.drawText(posX1 + (posX2 - posX1) / 2, posY1 + (posY2 - posY1) / 2, QString::number(edge.idx())); // edge idx
             painter.drawText(posX1 + (posX2 - posX1) / 2, posY1 + 15 + (posY2 - posY1) / 2, QString::number(edge.length())); // edge length
 //            painter.drawText(posX1 - 20 + (posX2 - posX1) / 2, posY1 + (posY2 - posY1) / 2, QString::number(edge.vertex1().idx())); // edge vertex 1
 //            painter.drawText(posX1 + 20 + (posX2 - posX1) / 2, posY1 + (posY2 - posY1) / 2, QString::number(edge.vertex2().idx())); // edge vertex 2

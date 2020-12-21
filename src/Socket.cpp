@@ -42,7 +42,8 @@ void Socket::sendData(Request request)
     if (defSize != 0)  {
         sData.append(doc.toJson(QJsonDocument::Compact));
     }
-    qDebug() << "Sdata:" << sData;
+
+//    qDebug() << "Sdata:" << sData;
     socket->write(sData);
     socket->waitForBytesWritten();
 }
