@@ -147,11 +147,20 @@ int Train::speed(){
     return position_;
 }
 
-void Train::trainWays(const std::vector<std::vector<int>>& mas, const std::vector<std::vector<int>>& p){
-   for(int i = 0; i < mas.size(); ++i){
-       waysLenght_.push_back(std::vector<int>(mas[i]));
+void Train::trainWays(const std::vector<std::vector<int>>& masMarket,
+                      const  std::vector<std::vector<Edge*>>& pMarket,
+                      const std::vector<std::vector<int>>& masStorage,
+                      const  std::vector<std::vector<Edge*>>& pStorage){
+   for(int i = 0; i < masMarket.size(); ++i){
+       waysLengthMarket_.push_back(std::vector<int>(masMarket[i]));
    }
-   for(int i = 0; i < p.size(); ++i){
-       ways_.push_back(std::vector<int>(p[i]));
+   for(int i = 0; i < pMarket.size(); ++i){
+       waysMarket_.push_back(pMarket[i]);
+   }
+   for(int i = 0; i < masStorage.size(); ++i){
+       waysLengthStorage_.push_back(std::vector<int>(masStorage[i]));
+   }
+   for(int i = 0; i < pStorage.size(); ++i){
+       waysStorage_.push_back(pStorage[i]);
    }
 }
