@@ -2,7 +2,10 @@
 #define LINE_H
 
 #include "Vertex.h"
+
 #include <QJsonObject>
+#include <QJsonArray>
+#include <stdexcept>
 
 class Edge{
     public:
