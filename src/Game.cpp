@@ -96,57 +96,62 @@ void Game::gameCycle() {
     currentIdx = USER_POST_IDX;
     currentPos = USER_POST_POS;
 
-//    for (auto &market : this->map()->markets()) {
-//        qDebug() << market.name() << market.product();
-//    }
+    for (auto &market : this->map()->markets()) {
+        qDebug() << market.name() << market.product();
+    }
 
-//    while(true) {
-//        if (this->player_->town().product() < 400) {
+    while(true) {
+        if (this->player_->town().product() < 400) {
 
-//            shortestPos = this->findPost(PostType::MARKET, currentPos);
-//            for (auto &market : this->map()->markets()) {
-//                if (this->getIdx(shortestPos) == market.pointIdx()) {
-//                    currentMarket = &market;
-//                }
-//            }
+            shortestPos = this->findPost(PostType::MARKET, currentPos);
+            for (auto &market : this->map()->markets()) {
+                if (this->getIdx(shortestPos) == market.pointIdx()) {
+                    currentMarket = &market;
+                }
+            }
 
-//            if (shortestPos == -1) {
-//                qDebug() << "There is no goods any more..." <<
-//                            "Total product amount: " << this->player().town().product() <<
-//                            "Total population amount: " << this->player().town().population();
-//            }
+            if (shortestPos == -1) {
+                qDebug() << "There is no goods any more..." <<
+                            "Total product amount: " << this->player().town().product() <<
+                            "Total population amount: " << this->player().town().population();
+            }
 
-////            currentPos = this->moveTrain(currentPos, shortestPos);
+            currentPos = this->moveTrain(currentPos, shortestPos);
 
-////            int currentCapacity = this->player().trains()[0]->goodsCapacity() - this->player().trains()[0]->goods();
-////            this->player().trains()[0]->changeGoodsAmount(currentMarket->takeProduct(currentCapacity));
+            int currentCapacity = this->player().trains()[0]->goodsCapacity() - this->player().trains()[0]->goods();
+            this->player().trains()[0]->changeGoodsAmount(currentMarket->takeProduct(currentCapacity));
 
-////            currentPos = this->moveTrain(currentPos, USER_POST_POS);
+            currentPos = this->moveTrain(currentPos, USER_POST_POS);
 
-////            this->unloadTrain(this->player().trains()[0]);
-////            qDebug() << "Current town products amount: " << this->player().town().product();
-////            qDebug() << "Откуда взял: " << currentMarket->name() << currentMarket->product();
-//            // можно сделать так, чтобы после посещения магазина, если не полностью забит, поехать в другой магазин и заполнить до фулла
-//            // в findEdge проверять будет ли некст точка - тем типом поста, который нам нужен
-//            // если линия уже занята поездом или ведёт не к тому типу поста - обновлять все trains.ways, но слишком затратно...
-//            // при отправке tick и move клиент умирает, не понятно почему...
+            this->unloadTrain(this->player().trains()[0]);
+            qDebug() << "Current town products amount: " << this->player().town().product();
+            qDebug() << "Откуда взял: " << currentMarket->name() << currentMarket->product();
+            // можно сделать так, чтобы после посещения магазина, если не полностью забит, поехать в другой магазин и заполнить до фулла
+            // в findEdge проверять будет ли некст точка - тем типом поста, который нам нужен
+            // если линия уже занята поездом или ведёт не к тому типу поста - обновлять все trains.ways, но слишком затратно...
+            // при отправке tick и move клиент умирает, не понятно почему...
 
-//        } else {
-//            break;
-//        }
-//    }
+        } else {
+            break;
+        }
+    }
+    for (auto &market : this->map()->markets()) {
+        qDebug() << market.name() << market.product();
+    }
 
-    QJsonObject request;
-    request["line_idx"] = 610;
-    request["speed"] = -1;
-    request["train_idx"] = 1;
+//    QJsonObject request;
+//    request["line_idx"] = 610;
+//    request["speed"] = -1;
+//    request["train_idx"] = 1;
 
-    socket_->sendData(Request(Action::MOVE, request));
-    qDebug() << socket_->getData();
+//    socket_->sendData(Request(Action::MOVE, request));
+//    qDebug() << socket_->getData();
 
+//    this->tick();
+//    qDebug() << socket_->getData();
 
-    this->tick();
-    qDebug() << socket_->getData();
+//    this->tick();
+//    socket_->getData();
 //    socket_->sendData(Request(Action::PLAYER, QJsonObject()));
 //    socket_->getData();
 }

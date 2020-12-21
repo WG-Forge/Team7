@@ -123,14 +123,13 @@ void Map::makeWays(){
     std::vector<std::vector<int>> p(n);
     int INF = 100000200;
 
-    for (int i = 0 ; i < n; ++i){
-        mas[i] = std::vector<int>(n, INF);
-        p[i] = std::vector<int>(n, INF);
-        mas[i][i] = 0;
-        p[i][i] = 0;
-    }
-
     for(int t = 0; t < trains_.size(); ++t){
+        for (int i = 0 ; i < n; ++i){
+            mas[i] = std::vector<int>(n, INF);
+            p[i] = std::vector<int>(n, INF);
+            mas[i][i] = 0;
+            p[i][i] = 0;
+        }
         for(int i = 0 ; i < n;++i){
             int u =  graph_.vertices()[i].idx();
             for(int j = 0; j < graph_.vertices()[i].edges().size(); ++j){
@@ -144,23 +143,57 @@ void Map::makeWays(){
                         [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())] =
                         graph_.vertices()[i].edges()[j].get().length();
                 }
+               if( graph_.vertices()[i].edges()[j].get().vertex1().isPostIdxNull() == false){
+                    if(static_cast<int>(graph_.vertices()[i].edges()[j].get().vertex1().post().type()) == 3){
+                        mas[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())]
+                            [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())] =
+                            -1;
+                        mas[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())]
+                            [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())] =
+                            -1;
+                    }
+                }
+                if( graph_.vertices()[i].edges()[j].get().vertex2().isPostIdxNull() == false){
+                    if(static_cast<int>(graph_.vertices()[i].edges()[j].get().vertex2().post().type()) == 3){
+                        mas[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())]
+                            [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())] =
+                            -1;
+                        mas[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())]
+                            [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())] =
+                            -1;
+                    }
+                }
             }
         }
         for(int i = 0; i < n; ++i){
             for(int j = 0; j < n;++j){
                 p[i][j] = mas[i][j];
-                if(mas[i][j] != 0 && mas[i][j] != INF){
+                if(mas[i][j] != 0 && mas[i][j] != INF && mas[i][j] != -1){
                     p[i][j] = j;
+                }
+                if(mas[i][j] == INF && graph_.vertices()[i].isPostIdxNull() == false){
+                   if(static_cast<int>(graph_.vertices()[i].post().type()) == 3){
+                        mas[i][j] = -1;
+                        p[i][j] = -1;
+                    }
+                }
+                if(mas[i][j] == INF && graph_.vertices()[j].isPostIdxNull() == false){
+                    if(static_cast<int>(graph_.vertices()[j].post().type()) == 3){
+                         mas[i][j] = -1;
+                         p[i][j] = -1;
+                     }
                 }
             }
         }
         for(int k = 0; k < n; ++k){
             for(int i = 0; i < n; ++i){
                 for(int j = 0; j < n; ++j){
-                    if(mas[i][j] > mas[i][k] + mas[k][j]){
-                            p[i][j] = p[i][k];
+                    if(mas[i][j] != -1 && mas[i][k] != -1 && mas[k][j] != -1){
+                        if(mas[i][j] > mas[i][k] + mas[k][j]){
+                                p[i][j] = p[i][k];
+                        }
+                        mas[i][j] = std::min(mas[i][j], mas[i][k] + mas[k][j]);
                     }
-                    mas[i][j] = std::min(mas[i][j], mas[i][k] + mas[k][j]);
                 }
             }
         }
