@@ -80,7 +80,6 @@ int Train::fuel(){
     if(fuel_ == -1)
         throw std::invalid_argument("No fuel");
     return fuel_;
-
 }
 
 int Train::fuelCapacity(){
@@ -99,7 +98,6 @@ int Train::goods(){
     if(goods_ == -1)
         throw std::invalid_argument("No goods");
     return goods_;
-
 }
 
 int Train::goodsCapacity(){
@@ -144,7 +142,7 @@ int Train::position(){
 }
 
 int Train::speed(){
-    return position_;
+    return speed_;
 }
 
 void Train::trainWays(const std::vector<std::vector<int>>& masMarket,

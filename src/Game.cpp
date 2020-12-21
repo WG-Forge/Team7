@@ -46,6 +46,7 @@ void Game::logout() {
 
 void Game::disconnect() {
     qDebug() << "Connection closed";
+    this->player().setInGame(false);
 
     this->socket_->close();
 }
@@ -135,6 +136,7 @@ void Game::gameCycle() {
                     currentMarket = &market;
                 }
             }
+
             currentPos = this->moveTrain(currentPos, shortestPos, currentMarket->type(), train);
 
             int currentCapacity = train->goodsCapacity() - train->goods();
@@ -144,8 +146,9 @@ void Game::gameCycle() {
 
             currentPos = this->moveTrain(currentPos, USER_POST_POS, currentMarket->type(), train);
             this->unloadTrain(train);
+
             this->userInfo();
-//            qDebug() << "Products::" << this->player().town().product();
+            qDebug() << "Products::" << this->player().town().product();
         } else {
             break;
         }
@@ -187,9 +190,9 @@ int Game::moveTrain(const int startPos, const int endPos, enum PostType type, Tr
     while (true) {
 
         (currentIdx > toIdx)? speed = -1 : speed = 1;
-        qDebug() << "From: " << currentIdx << "(" + QString::number(currentPos) + ")"
-                 << "To: " << toIdx << "(" + QString::number(toPos) + ")"
-                 << "Speed: " << speed;
+//        qDebug() << "From: " << currentIdx << "(" + QString::number(currentPos) + ")"
+//                 << "To: " << toIdx << "(" + QString::number(toPos) + ")"
+//                 << "Speed: " << speed;
 
         currentPos = this->moveAction(toLine, speed, train, pathPos);
         currentPos = toPos;
@@ -228,7 +231,6 @@ int Game::moveTrain(const int startPos, const int endPos, enum PostType type, Tr
 }
 
 int Game::moveAction(Edge *edge, int speed, Train *train, int startPosition) {
-
     QJsonObject request;
     request["line_idx"] = edge->idx();
     request["speed"] = speed;
@@ -241,9 +243,16 @@ int Game::moveAction(Edge *edge, int speed, Train *train, int startPosition) {
     train->setPosition(startPosition);
     (startPosition == 0)? deadEnd = edge->length() : deadEnd = 0;
 
+    train->movePreparation(edge->idx(), speed, startPosition);
+
     while (train->position() != deadEnd) {
         this->tick();
-        train->move(1, edge->idx(), speed, train->position() + speed);
+        train->setPosition(train->position() + speed);
+
+//        qDebug() << "Local:"
+//                << train->lineIdx()
+//                << train->position()
+//                << train->speed();
     }
 
     return 0;
@@ -259,27 +268,6 @@ int Game::getIdx(int position) {
     }
 
     return idx;
-}
-
-int Game::returnToHome(int currentPosition) {
-    qDebug() << "Go home";
-
-    int shortestIdx = 0,
-        shortestPos = 0,
-        currentIdx = 0,
-        currentPos = 0,
-        wayLength = 1000000,
-        toPos = 0,
-        toIdx = 0;
-    QString shortestName = "";
-
-    Market *currentMarket = new Market();
-    const int USER_POST_IDX = this->player().town().pointIdx();
-    const int USER_POST_POS = this->map()->graph().idx().at(USER_POST_IDX);
-    currentIdx = USER_POST_IDX;
-    currentPos = USER_POST_POS;
-
-    return 0;
 }
 
 int Game::findPostPos(PostType type, int currentPos, Train *train) {
@@ -351,6 +339,7 @@ void Game::init(const QString &username) {
     login(username);
     getMap();
     makeMap();
+    this->player().setInGame(true);
 
     emit playerChanged(*player_);
 
