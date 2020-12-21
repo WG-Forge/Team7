@@ -13,6 +13,7 @@ class Player : public QObject
 public:
     explicit Player(QObject *parent = nullptr);
     explicit Player(const QJsonObject &playerData);
+    Player(const Player &player);
 
 //    void setTown(QJsonObject town);
     void setTown(Town &town) { town_ = &town; };

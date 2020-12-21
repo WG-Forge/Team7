@@ -16,58 +16,63 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::setMap(std::shared_ptr<Map> m) {
-    ui->graphview->setMap(m, game_->player());
-}
+//void MainWindow::setMap(std::shared_ptr<Map> m) {
+//    ui->graphview->setMap(m, game_->player());
+//}
 #include "src/Thread.h"
 
-void MainWindow::on_startButton_clicked()
-{
+void MainWindow::on_startButton_clicked() {
     if (ui->userNameForm->toPlainText() != "") {
         ui->startMenu->hide();
         ui->graphview->show();
 
-        game_ = new Game();
+        Game *game = new Game();
 
         QString userName = ui->userNameForm->toPlainText();
-
-        game_->connectToServer();
-
-        game_->login(userName);
-
-        game_->getMap();
-
-        game_->makeMap();
-
-        Thread *thread = new Thread(this, game_->map());
-        thread->start();
 
 //        this->setMap(game_->map());
         this->update();
 
-        ui->userName->setText("Name: " + game_->player().name());
-        ui->userTown->setText("City: " + game_->player().town().name());
-        ui->userPopulation->setText("Population: " +
-                                    QString::number(game_->player().town().population()) +
-                                    " / " +
-                                    QString::number(game_->player().town().populationCapacity()));
-        ui->userProducts->setText("Products: " +
-                                  QString::number(game_->player().town().product()) +
-                                  " / " +
-                                  QString::number(game_->player().town().productCapacity()));
-
-        ui->userSomething->setText("Rating: " + QString::number(game_->player().rating()));
-
 //        qDebug() << game_->map()->graph().idx();
 //        qDebug() << game_->map()->trains()[0].waysLength();
 //        qDebug() << game_->map()->graph().idx().at(game_->player().town().pointIdx());
-        game_->gameCycle();
+
+        thread = new QThread;
+        game->moveToThread(thread);
+        connect(this, SIGNAL(disconnect()), game, SLOT(disconnect()));
+        connect(this, SIGNAL(init(const QString&)), game, SLOT(init(const QString&)));
+        connect(game, SIGNAL(playerChanged(Player)), this, SLOT(onPlayerChanged(Player)));
+        connect(game, SIGNAL(mapChanged(std::shared_ptr<Map>, Player)), this, SLOT(onMapChanged(std::shared_ptr<Map>, Player)));
+        thread->start();
+
+        emit init(userName);
     }
 }
 
-void MainWindow::on_logoutButton_clicked()
-{
-    game_->disconnect();
+void MainWindow::on_logoutButton_clicked() {
+    emit disconnect();
+
     ui->startMenu->show();
     ui->graphview->hide();
+}
+
+void MainWindow::onPlayerChanged(Player player) {
+    ui->userName->setText("Name: " + player.name());
+    ui->userTown->setText("City: " + player.town().name());
+    ui->userPopulation->setText("Population: " +
+                                QString::number(player.town().population()) +
+                                " / " +
+                                QString::number(player.town().populationCapacity()));
+    ui->userProducts->setText("Products: " +
+                              QString::number(player.town().product()) +
+                              " / " +
+                              QString::number(player.town().productCapacity()));
+
+    ui->userSomething->setText("Rating: " + QString::number(player.rating()));
+}
+
+void MainWindow::onMapChanged(std::shared_ptr<Map> map, Player player) {
+    ui->graphview->setMap(map, player);
+    update();
+    qDebug() << "Received map from Game thread";
 }

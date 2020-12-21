@@ -14,7 +14,13 @@
 #include <QJsonDocument>
 #include <iostream>
 
+Q_DECLARE_METATYPE(Player)
+Q_DECLARE_METATYPE(std::shared_ptr<Map>)
+
 int main(int argc, char *argv[]) {
+    qRegisterMetaType<Player>();
+    qRegisterMetaType<std::shared_ptr<Map>>();
+
     QApplication a(argc, argv);
 
 //    Game *game = new Game();

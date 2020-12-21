@@ -7,21 +7,21 @@
 #include "../gui/mainwindow.h"
 #include "Map.h"
 
-class Thread : public QThread
-{
-public:
-    Thread() = default;
-    Thread(MainWindow *window, std::shared_ptr<Map> map) { window_ = window; map_ = map; };
+class Thread : public QThread {
+    public:
+        Thread() = default;
+        Thread(MainWindow *window, std::shared_ptr<Map> map) {
+            window_ = window; map_ = map;
+        };
 
 
-    void run() {
-        qDebug() << "thread started";
+        void run() {
+            qDebug() << "thread started";
 
-        window_->setMap(map_);
-    }
-private:
-    MainWindow *window_;
-    std::shared_ptr<Map> map_;
+        }
+    private:
+        MainWindow *window_;
+        std::shared_ptr<Map> map_;
 };
 
 #endif // THREAD_H

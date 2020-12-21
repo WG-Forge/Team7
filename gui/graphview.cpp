@@ -12,7 +12,7 @@ GraphView::~GraphView() {
 
 void GraphView::setMap(std::shared_ptr<Map> m, Player &player) {
     map_ = m;
-    player_ = &player;
+    player_ = new Player(player);
 }
 
 void GraphView::paintEvent(QPaintEvent *event) {

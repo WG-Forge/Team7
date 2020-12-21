@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "Enums/ActionEnum.h"
 #include <QThread>
+#include <QApplication>
 
 Game::Game(QObject *parent) : QObject(parent)
 {
@@ -99,6 +100,8 @@ void Game::gameCycle() {
     Train *train = this->player().trains()[0];
 
     while(true) {
+        emit mapChanged(std::make_shared<Map>(*map_), *player_);
+
         if (this->player_->town().product() < 300) {
             shortestPos = this->findPostPos(PostType::MARKET, currentPos, train); // OK
 
@@ -344,5 +347,16 @@ int Game::findPostPos(PostType type, int currentPos, Train *train) {
 void Game::unloadTrain(Train *train) {
     this->player().town().addProduct(train->goods());
     train->changeGoodsAmount(train->goods() * (-1));
+}
+
+void Game::init(const QString &username) {
+    connectToServer();
+    login(username);
+    getMap();
+    makeMap();
+
+    emit playerChanged(*player_);
+
+    gameCycle();
 }
 

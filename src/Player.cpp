@@ -12,6 +12,17 @@ Player::Player(const QJsonObject &playerData) {
     inGame_ = playerData["in_game"].toBool();
 }
 
+Player::Player(const Player &player) {
+    rating_ = player.rating_;
+    town_ = new Town(*player.town_);
+    name_ = player.name_;
+    idx_ = player.idx_;
+    inGame_ = player.inGame_;
+
+    for (auto &train : player.trains_)
+        trains_.push_back(new Train(*train));
+}
+
 //void Player::setTown(QJsonObject town) {
 //    town_ = new Town(town);
 //}
