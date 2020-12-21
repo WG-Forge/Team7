@@ -30,12 +30,7 @@ void MainWindow::on_startButton_clicked() {
 
         QString userName = ui->userNameForm->toPlainText();
 
-//        this->setMap(game_->map());
         this->update();
-
-//        qDebug() << game_->map()->graph().idx();
-//        qDebug() << game_->map()->trains()[0].waysLength();
-//        qDebug() << game_->map()->graph().idx().at(game_->player().town().pointIdx());
 
         thread = new QThread;
         game->moveToThread(thread);

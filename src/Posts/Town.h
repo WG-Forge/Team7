@@ -10,6 +10,15 @@ public:
     explicit Town(const QJsonObject& town);
     ~Town() = default;
 
+    int setPopulation(int population) {
+        population_ = population;
+        return population_;
+    }
+    int setGoods(int goods) {
+        product_ = goods;
+        return product_;
+    }
+
     int armor();
     int armorCapacity();
     int level();
@@ -21,7 +30,10 @@ public:
     int trainCooldown();
     QString playerIdx();
 
-    void addProduct(int amount) { product_ += amount; };
+    void addProduct(int amount) {
+        product_ += amount;
+        if (product_ < 0) product_ = 0;
+    };
 
 private:
     int armor_;

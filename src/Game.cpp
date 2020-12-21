@@ -54,11 +54,10 @@ void Game::tick() {
     this->socket_->sendData(Request(Action::TURN, QJsonObject()));
     socket_->getData();
 
-//    socket_->sendData(Request(Action::PLAYER, QJsonObject()));
-//    QJsonObject response = socket_->getData();
-//    qDebug() << response["trains"].toArray()[0].toObject()["line_idx"].toInt()
-//            << response["trains"].toArray()[0].toObject()["position"].toInt()
-//            << response["trains"].toArray()[0].toObject()["speed"].toInt();
+    this->userInfo();
+
+//    qDebug() << "Tick:" << this->player().town().product();
+    this->player().town().addProduct(this->player().town().population() * (-1));
 }
 
 void Game::getMap() {
@@ -82,6 +81,25 @@ void Game::connectToGame() {
 
 }
 
+void Game::userInfo() {
+    socket_->sendData(Request(Action::PLAYER, QJsonObject()));
+    QJsonObject response = socket_->getData();
+
+    if (this->player().town().population() != response["town"].toObject()["population"].toInt()) {
+        this->player().town().setPopulation(response["town"].toObject()["population"].toInt());
+    }
+    if (this->player().town().product() != response["town"].toObject()["population"].toInt()) {
+        this->player().town().setGoods(response["town"].toObject()["product"].toInt());
+    }
+
+//    qDebug() << "Product:" << response["town"].toObject()["product"].toInt()
+//            << "Population:" << response["town"].toObject()["population"].toInt()
+//            << "Train: " << response["trains"].toArray()[0].toObject()["line_idx"].toInt()
+//            << response["trains"].toArray()[0].toObject()["position"].toInt()
+//            << response["trains"].toArray()[0].toObject()["speed"].toInt()
+//            << response["trains"].toArray()[0].toObject()["goods"].toInt();
+}
+
 void Game::gameCycle() {
     qDebug() << "cycle";
 
@@ -90,6 +108,7 @@ void Game::gameCycle() {
         currentIdx = 0,
         currentPos = 0;
     QString shortestName = "";
+    QJsonObject response;
 
     const int USER_POST_IDX = this->player().town().pointIdx();
     const int USER_POST_POS = this->map()->graph().idx().at(USER_POST_IDX);
@@ -116,39 +135,17 @@ void Game::gameCycle() {
                     currentMarket = &market;
                 }
             }
-
             currentPos = this->moveTrain(currentPos, shortestPos, currentMarket->type(), train);
 
+            int currentCapacity = train->goodsCapacity() - train->goods();
+            train->changeGoodsAmount(currentMarket->takeProduct(currentCapacity));
 
-            int currentCapacity = this->player().trains()[0]->goodsCapacity() - this->player().trains()[0]->goods();
-            this->player().trains()[0]->changeGoodsAmount(currentMarket->takeProduct(currentCapacity));
-
-            // посмотреть что там с городом
-//            socket_->sendData(Request(Action::PLAYER, QJsonObject()));
-//            QJsonObject response = socket_->getData();
-//            qDebug() << "Product:" << response["town"].toObject()["product"].toInt()
-//                    << "Population:" << response["town"].toObject()["population"].toInt()
-//                    << "Train: " << response["trains"].toArray()[0].toObject()["line_idx"].toInt()
-//                    << response["trains"].toArray()[0].toObject()["position"].toInt()
-//                    << response["trains"].toArray()[0].toObject()["speed"].toInt();
+            this->userInfo();
 
             currentPos = this->moveTrain(currentPos, USER_POST_POS, currentMarket->type(), train);
-
-            // посмотреть что там с городом
-//            socket_->sendData(Request(Action::PLAYER, QJsonObject()));
-//            response = socket_->getData();
-//            qDebug() << "Product:" << response["town"].toObject()["product"].toInt()
-//                    << "Population:" << response["town"].toObject()["population"].toInt()
-//                    << "Train: " << response["trains"].toArray()[0].toObject()["line_idx"].toInt()
-//                    << response["trains"].toArray()[0].toObject()["position"].toInt()
-//                    << response["trains"].toArray()[0].toObject()["speed"].toInt();
-
-//            this->unloadTrain(this->player().trains()[0]);
-//            qDebug() << "Current town products amount: " << response["town"].toObject()["product"].toInt();
-//            qDebug() << "Откуда взял: " << currentMarket->name() << currentMarket->product();
-            // можно сделать так, чтобы после посещения магазина, если не полностью забит, поехать в другой магазин и заполнить до фулла
-            // в findEdge проверять будет ли некст точка - тем типом поста, который нам нужен
-            // если линия уже занята поездом или ведёт не к тому типу поста - обновлять все trains.ways, но слишком затратно...
+            this->unloadTrain(train);
+            this->userInfo();
+//            qDebug() << "Products::" << this->player().town().product();
         } else {
             break;
         }
@@ -190,9 +187,9 @@ int Game::moveTrain(const int startPos, const int endPos, enum PostType type, Tr
     while (true) {
 
         (currentIdx > toIdx)? speed = -1 : speed = 1;
-//        qDebug() << "From: " << currentIdx << "(" + QString::number(currentPos) + ")"
-//                 << "To: " << toIdx << "(" + QString::number(toPos) + ")"
-//                 << "Speed: " << speed;
+        qDebug() << "From: " << currentIdx << "(" + QString::number(currentPos) + ")"
+                 << "To: " << toIdx << "(" + QString::number(toPos) + ")"
+                 << "Speed: " << speed;
 
         currentPos = this->moveAction(toLine, speed, train, pathPos);
         currentPos = toPos;

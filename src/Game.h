@@ -35,6 +35,8 @@ class Game : public QObject {
         int returnToHome(int currentPosition);
         void unloadTrain(Train *train);
 
+        void userInfo();
+
         Socket& socket() { return *socket_; };
         std::shared_ptr<Map> map() { return map_; };
         Player& player() { return *player_; };
