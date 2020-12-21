@@ -41,12 +41,14 @@ void Game::login(QString userName) {
 void Game::logout() {
     qDebug() << "LogOut";
 
+    connected_ = false;
     this->socket_->close();
 }
 
 void Game::disconnect() {
     qDebug() << "Connection closed";
     this->player().setInGame(false);
+    connected_ = false;
 
     this->socket_->close();
 }
@@ -119,7 +121,7 @@ void Game::gameCycle() {
     Market *currentMarket = new Market();
     Train *train = this->player().trains()[0];
 
-    while(true) {
+    while(connected_) {
         emit mapChanged(std::make_shared<Map>(*map_), *player_);
 
         if (this->player_->town().product() < 300) {
@@ -152,6 +154,8 @@ void Game::gameCycle() {
         } else {
             break;
         }
+
+        QApplication::processEvents();
     }
 //    QThread::sleep(12);
 }
@@ -343,6 +347,7 @@ void Game::init(const QString &username) {
 
     emit playerChanged(*player_);
 
+    connected_ = true;
     gameCycle();
 }
 

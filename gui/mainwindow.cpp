@@ -13,6 +13,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 }
 
 MainWindow::~MainWindow() {
+    if (thread) {
+        thread->terminate();
+        thread->wait();
+        delete thread;
+    }
+
     delete ui;
 }
 

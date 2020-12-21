@@ -31,7 +31,7 @@ class MainWindow : public QMainWindow {
     private:
         Ui::MainWindow *ui;
 
-        QThread *thread;
+        QThread *thread = nullptr;
 };
 
 #endif // MAINWINDOW_H

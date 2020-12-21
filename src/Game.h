@@ -56,6 +56,7 @@ class Game : public QObject {
         QJsonObject layer_0, layer_1, layer_2;
         Player *player_ = nullptr;
         std::vector<Player> enemies_;
+        bool connected_ = false;
 };
 
 #endif // GAME_H
