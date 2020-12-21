@@ -155,3 +155,4 @@ void Train::trainWays(const std::vector<std::vector<int>>& mas, const std::vecto
        ways_.push_back(std::vector<int>(p[i]));
    }
 }
+

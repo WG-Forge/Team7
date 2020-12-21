@@ -25,11 +25,19 @@ public:
     void makeMap();
     void gameCycle();
     void tick();
+    int moveTrain(const int start, const int end);
+    void moveAction(int trainIdx, Edge &edge, int speed, Train *train, int startPosition);
+    int findEdge(int start, int end, int speed);
+    int getIdx(int position);
+    int returnToHome(int currentPosition);
+    int findPost(PostType type, int currentPos);
+    void unloadTrain(Train *train);
 
     Socket& socket() { return *socket_; };
     std::shared_ptr<Map> map() { return map_; };
     Player& player() { return *player_; };
     std::vector<Player>& enemies() { return enemies_; };
+
 
 signals:
 

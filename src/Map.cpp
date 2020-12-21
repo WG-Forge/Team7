@@ -53,7 +53,7 @@ Map::Map(const QJsonObject &staticObj, const QJsonObject &dynamicObj, const QJso
 
                         if (town.playerIdx() != nullptr) {
                             if (town.playerIdx() == player.idx()) {
-                                player.setTown2(town);
+                                player.setTown(town);
                             }
                         }
                         break;
@@ -86,10 +86,12 @@ Map::Map(const QJsonObject &staticObj, const QJsonObject &dynamicObj, const QJso
         if (!train.isObject())
             throw std::invalid_argument("Wrong JSON graph format.");
         trains_.emplace_back(train.toObject());
+    }
 
-        if(train.toObject()["player_idx"].toString() != nullptr) {
-            if(train.toObject()["player_idx"].toString() == player.idx()) {
-                player.setTrain(train.toObject());
+    for (auto & train : trains_) {
+        if(train.playerIdx() != nullptr) {
+            if(train.playerIdx() == player.idx()) {
+                player.setTrain(train);
             }
         }
     }

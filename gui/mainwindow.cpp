@@ -45,10 +45,18 @@ void MainWindow::on_startButton_clicked()
 //        this->setMap(game_->map());
         this->update();
 
-        ui->userGameInfo->setText("User Info");
-        ui->userGameInfo->append("Name: " + game_->player().name());
-        ui->userGameInfo->append("City: " + game_->player().town().name());
-        ui->userNameForm->clear();
+        ui->userName->setText("Name: " + game_->player().name());
+        ui->userTown->setText("City: " + game_->player().town().name());
+        ui->userPopulation->setText("Population: " +
+                                    QString::number(game_->player().town().population()) +
+                                    " / " +
+                                    QString::number(game_->player().town().populationCapacity()));
+        ui->userProducts->setText("Products: " +
+                                  QString::number(game_->player().town().product()) +
+                                  " / " +
+                                  QString::number(game_->player().town().productCapacity()));
+
+        ui->userSomething->setText("Rating: " + QString::number(game_->player().rating()));
 
 //        qDebug() << game_->map()->graph().idx();
 //        qDebug() << game_->map()->trains()[0].waysLength();

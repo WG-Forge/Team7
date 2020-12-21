@@ -10,6 +10,19 @@ public:
     explicit Market(const QJsonObject& market);
     ~Market() = default;
 
+    int takeProduct(int capacity) {
+        int amount = 0;
+        if (product_ < capacity) {
+            amount = product_;
+            product_ = 0;
+        } else {
+            amount = capacity;
+            product_ -= capacity;
+        }
+
+        return amount;
+    };
+
     int product();
     int productCapacity();
     int replenishment();

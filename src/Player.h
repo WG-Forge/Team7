@@ -14,16 +14,17 @@ public:
     explicit Player(QObject *parent = nullptr);
     explicit Player(const QJsonObject &playerData);
 
-    void setTown(QJsonObject town);
-    void setTown2(Town &town) { town_ = &town; };
-    void setTrain(QJsonObject train);
+//    void setTown(QJsonObject town);
+    void setTown(Town &town) { town_ = &town; };
+    void setTrain(Train &train) { trains_.emplace_back(&train); };
+//    void setTrain(QJsonObject train);
 
     QString name() { return name_; };
     QString idx() { return idx_; };
     int rating() { return rating_; };
     bool inGame() { return inGame_; };
     Town& town() { return *town_; };
-    std::vector<Train>& trains() { return trains_; };
+    std::vector<Train *> &trains() { return trains_; };
 
 signals:
 
@@ -33,7 +34,7 @@ private:
     int rating_;
     bool inGame_;
     Town *town_;
-    std::vector<Train> trains_;
+    std::vector<Train *> trains_;
 };
 
 #endif // PLAYER_H

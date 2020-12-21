@@ -12,19 +12,17 @@
 #include <iomanip>
 #include <cstdint>
 
-class Socket : public QObject
+class Socket : public QTcpSocket
 {
     Q_OBJECT
 public:
-    explicit Socket(QObject *parent = nullptr);
+//    explicit Socket(QObject *parent = nullptr);
+    explicit Socket(QTcpSocket *parent = nullptr);
 
-    void Connect();
-    void Close();
+    void connect();
+    void close();
     void sendData(Request request);
     QJsonObject getData();
-
-    
- 
 
 private:
     QTcpSocket *socket;

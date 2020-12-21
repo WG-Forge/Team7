@@ -12,10 +12,10 @@ Player::Player(const QJsonObject &playerData) {
     inGame_ = playerData["in_game"].toBool();
 }
 
-void Player::setTown(QJsonObject town) {
-    town_ = new Town(town);
-}
+//void Player::setTown(QJsonObject town) {
+//    town_ = new Town(town);
+//}
 
-void Player::setTrain(QJsonObject train) {
-    trains_.emplace_back(train);
-}
+//void Player::setTrain(QJsonObject train) {
+//    trains_.emplace_back(train);
+//}

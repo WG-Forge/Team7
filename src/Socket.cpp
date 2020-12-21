@@ -1,16 +1,17 @@
 #include "Socket.h"
 
-Socket::Socket(QObject *parent) : QObject(parent){}
+Socket::Socket(QTcpSocket *parent) : QTcpSocket(parent){}
 
-void Socket::Connect() {
+void Socket::connect() {
     socket = new QTcpSocket(this);
     socket->connectToHost(SERVER_ADDR, SERVER_PORT);
     if(!socket->waitForConnected()){
         qDebug() << "Not Connected!";
-    }
+    } else qDebug() << "Connected!";
 }
 
-void Socket::Close() {
+void Socket::close() {
+    qDebug() << "Closed";
     socket->close();
 }
 
@@ -19,6 +20,12 @@ void Socket::sendData(Request request)
     QByteArray sData;
     QJsonDocument doc(request.data());
     qint32 size = doc.toJson(QJsonDocument::Compact).size();
+    int defSize = size;
+    if (defSize == 2) {
+        defSize = 0;
+        size = 0;
+    }
+
     int actionCode = static_cast<int>(request.action());
     for (int i = 0; i < 4; ++i)
     {
@@ -32,9 +39,12 @@ void Socket::sendData(Request request)
         size >>= 8;
     }
 
-    sData.append(doc.toJson(QJsonDocument::Compact));
+    if (defSize != 0)  {
+        sData.append(doc.toJson(QJsonDocument::Compact));
+    }
+    qDebug() << "Sdata:" << sData;
     socket->write(sData);
-    socket->waitForBytesWritten(3000);
+    socket->waitForBytesWritten();
 }
 
 QJsonObject Socket::getData() {
@@ -44,6 +54,9 @@ QJsonObject Socket::getData() {
     do {
         socket->waitForReadyRead();
         response += socket->readAll();
+
+        if (response.size() == 4) continue;
+        if (response.mid(8).size() == 0) break;
 
         doc = QJsonDocument::fromJson(response.mid(8));
     }

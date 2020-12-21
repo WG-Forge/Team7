@@ -7,6 +7,8 @@
 #include "Events/TrainCollision.h"
 #include "Events/ParasitesAssault.h"
 #include "Vertex.h"
+#include "Socket.h"
+#include "Edge.h"
 
 #include <QJsonObject>
 #include <QJsonArray>
@@ -16,6 +18,18 @@ class Train{
 public:
     explicit Train() = default;
     explicit Train(const QJsonObject &train);
+
+    void addFuel(int fuelAmount) { fuel_ += fuelAmount; };
+    void move(int distance, int lineIdx, int speed, int position) {
+        fuel_ -= distance * fuelConsumption_;
+        if (lineIdx_ != lineIdx) lineIdx_ = lineIdx;
+        if (speed_ != speed) speed_ = speed;
+        if (position_ != position) position_ = position;
+    };
+    void setPosition(int position) { position_ = position; };
+    void changeGoodsAmount(int goodsAmount) {
+        goods_ += goodsAmount;
+    };
 
     int cooldown();
     void trainWays(const std::vector<std::vector<int>>& mas, const std::vector<std::vector<int>>& p);
