@@ -22,7 +22,7 @@ class Map {
         Post& userPost() { return userPost_; };
 
         std::vector<Train>& trains();
-        void makeWays();
+        void makeWays(Town town);
 
     private:
         std::vector<Market> markets_;

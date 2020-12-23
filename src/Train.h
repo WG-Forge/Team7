@@ -31,12 +31,20 @@ public:
     void changeGoodsAmount(int goodsAmount) {
         goods_ = goodsAmount;
     };
+    void upgrade(int level, int goodsCapacity, int fuelCapacity, int nextLevelPrice){
+        level_ = level;
+        goodsCapacity_ = goodsCapacity;
+        fuelCapacity_ = fuelCapacity;
+        nextLevelPrice_ = nextLevelPrice;
+    };
 
     int cooldown();
     void trainWays(const std::vector<std::vector<int>>& masMarket,
                    const  std::vector<std::vector<Edge*>>& pMarket,
                    const std::vector<std::vector<int>>& masStorage,
-                   const  std::vector<std::vector<Edge*>>& pStorage);
+                   const  std::vector<std::vector<Edge*>>& pStorage,
+                   const std::vector<std::vector<int>>& mas,
+                   const  std::vector<std::vector<Edge*>>& p);
     std::vector<Event*>& events();
     int fuel();
     int fuelCapacity();
@@ -76,6 +84,8 @@ private:
     std::vector<std::vector<Edge*>> waysMarket_;
     std::vector<std::vector<int>> waysLengthStorage_;
     std::vector<std::vector<Edge*>> waysStorage_;
+    std::vector<std::vector<int>> waysLengthReturn_;
+    std::vector<std::vector<Edge*>> waysReturn_;
 
 };
 

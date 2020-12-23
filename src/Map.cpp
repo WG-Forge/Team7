@@ -120,12 +120,14 @@ std::vector<Post>& Map::posts(){
     return posts_;
 }
 
-void Map::makeWays(){
+void Map::makeWays(Town town){
     int verticesNumber = graph_.vertices().size();
     std::vector<std::vector<int>> masMarket(verticesNumber);
     std::vector<std::vector<Edge*>> pMarket(verticesNumber);
     std::vector<std::vector<int>> masStorage(verticesNumber);
     std::vector<std::vector<Edge*>> pStorage(verticesNumber);
+    std::vector<std::vector<int>> mas(verticesNumber);
+    std::vector<std::vector<Edge*>> p(verticesNumber);
     int INF = 100000000;
 
     for(int t = 0; t < trains_.size(); ++t){
@@ -133,9 +135,14 @@ void Map::makeWays(){
             masMarket[i] = std::vector<int>(verticesNumber, INF);
             pMarket[i] = std::vector<Edge*>(verticesNumber);
             masMarket[i][i] = 0;
+
             masStorage[i] = std::vector<int>(verticesNumber, INF);
             pStorage[i] = std::vector<Edge*>(verticesNumber);
             masStorage[i][i] = 0;
+
+            mas[i] = std::vector<int>(verticesNumber, INF);
+            p[i] = std::vector<Edge*>(verticesNumber);
+            mas[i][i] = 0;
         }
         for(int i = 0 ; i < verticesNumber;++i){
             int u =  graph_.vertices()[i].idx();
@@ -156,6 +163,13 @@ void Map::makeWays(){
                             [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())]
                             = &graph_.vertices()[i].edges()[j].get();
 
+                    mas[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())]
+                        [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())] =
+                        graph_.vertices()[i].edges()[j].get().length();
+                    p[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())]
+                            [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())]
+                            = &graph_.vertices()[i].edges()[j].get();
+
                 }
                 else{
                     masMarket[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())]
@@ -169,6 +183,13 @@ void Map::makeWays(){
                         [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())] =
                         graph_.vertices()[i].edges()[j].get().length();
                     pStorage[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())]
+                            [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())]
+                            = &graph_.vertices()[i].edges()[j].get();
+
+                    mas[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())]
+                        [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())] =
+                        graph_.vertices()[i].edges()[j].get().length();
+                    p[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())]
                             [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())]
                             = &graph_.vertices()[i].edges()[j].get();
 
@@ -190,6 +211,28 @@ void Map::makeWays(){
                            [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())] =
                            -1;
                        masMarket[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())]
+                           [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())] =
+                           -1;
+                   }
+               }
+               if( graph_.vertices()[i].edges()[j].get().vertex1().isPostIdxNull() == false){
+                    if(graph_.vertices()[i].edges()[j].get().vertex1().postIdx() != town.idx() &&
+                            static_cast<int>(graph_.vertices()[i].edges()[j].get().vertex1().post().type()) == 1){
+                        mas[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())]
+                            [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())] =
+                            -1;
+                        mas[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())]
+                            [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())] =
+                            -1;
+                    }
+                }
+               if( graph_.vertices()[i].edges()[j].get().vertex2().isPostIdxNull() == false){
+                   if(graph_.vertices()[i].edges()[j].get().vertex2().postIdx() != town.idx() &&
+                           static_cast<int>(graph_.vertices()[i].edges()[j].get().vertex2().post().type()) == 1){
+                       mas[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())]
+                           [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())] =
+                           -1;
+                       mas[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())]
                            [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())] =
                            -1;
                    }
@@ -243,6 +286,19 @@ void Map::makeWays(){
                          masStorage[j][i] = -1;
                      }
                 }
+                if(mas[i][j] == INF && graph_.vertices()[i].isPostIdxNull() == false){
+                   if(graph_.vertices()[i].postIdx() != town.idx() && static_cast<int>(graph_.vertices()[i].post().type()) == 1){
+                        mas[i][j] = -1;
+                        mas[j][i] = -1;
+
+                    }
+                }
+                if(mas[i][j] == INF && graph_.vertices()[j].isPostIdxNull() == false){
+                    if(graph_.vertices()[j].postIdx() != town.idx() && static_cast<int>(graph_.vertices()[j].post().type()) == 1){
+                         masStorage[i][j] = -1;
+                         masStorage[j][i] = -1;
+                     }
+                }
             }
         }
         for(int k = 0; k < verticesNumber; ++k){
@@ -260,10 +316,16 @@ void Map::makeWays(){
                         }
                         masStorage[i][j] = std::min(masStorage[i][j], masStorage[i][k] + masStorage[k][j]);
                     }
+                    if(mas[i][j] != -1 && mas[i][k] != -1 && mas[k][j] != -1){
+                        if(mas[i][j] > mas[i][k] + mas[k][j]){
+                                p[i][j] = p[i][k];
+                        }
+                        mas[i][j] = std::min(mas[i][j], mas[i][k] + mas[k][j]);
+                    }
                 }
             }
         }
-        trains_[t].trainWays(masMarket, pMarket, masStorage, pStorage);
+        trains_[t].trainWays(masMarket, pMarket, masStorage, pStorage, mas, p);
     }
 }
 

@@ -50,6 +50,14 @@ public:
 
         if (product_ < 0) product_ = 0;
     };
+    void upgrade(int level, int populationCapacity, int productCapacity, int armorCapacity, int trainCooldown, int nextLevelPrice){
+      armorCapacity_ = armorCapacity;
+      level_ = level;
+      populationCapacity_ = populationCapacity;
+      productCapacity_ = productCapacity;
+      trainCooldown_ = trainCooldown;
+      nextLevelPrice_ = nextLevelPrice;
+    };
 
     int armor();
     int armorCapacity();
