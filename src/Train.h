@@ -20,7 +20,7 @@ public:
     explicit Train(const QJsonObject &train);
 
     void addFuel(int fuelAmount) { fuel_ += fuelAmount; };
-    void movePreparation(int lineIdx, int speed, int position) {
+    void move(int lineIdx, int speed, int position) {
         if (lineIdx_ != lineIdx) lineIdx_ = lineIdx;
         if (speed_ != speed) speed_ = speed;
         if (position_ != position) position_ = position;
@@ -29,7 +29,7 @@ public:
         position_ = position;
     };
     void changeGoodsAmount(int goodsAmount) {
-        goods_ += goodsAmount;
+        goods_ = goodsAmount;
     };
 
     int cooldown();

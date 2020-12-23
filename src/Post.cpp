@@ -36,7 +36,12 @@ Post::Post(const QJsonObject &post) {
     name_ = post["name"].toString();
     type_ = static_cast<PostType>(post["type"].toInt());
     pointIdx_ = post["point_idx"].toInt();
-    playerIdx_ = post["player_idx"].toString();
+    if (post.contains("player_idx")) {
+        playerIdx_ = post["player_idx"].toString();
+    } else {
+        playerIdx_ = "";
+    }
+
 }
 
 void Post::setVertex(Vertex &vertex) {

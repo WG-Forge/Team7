@@ -26,9 +26,18 @@ class Game : public QObject {
         void makeMap();
         void tick();
 
+        void updatePosts();
+        void updateInfo();
+        Vertex getGoods(Train *train, PostType type, Vertex currentVertex);
+        Vertex sendTrain(Train *train, Vertex begin, Vertex end, enum PostType type);
+        void moveAction(Train *train, Edge edge, int speed, int position);
+        void printPlayerData(Train *train, Town *town);
+        void printPosts();
+        void printMap(enum PostType type);
+
         int moveTrain(const int start, const int end, enum PostType type, Train *train);
-        int moveAction(Edge *edge, int speed, Train *train, int startPosition);
-        int findPostPos(PostType type, int currentPos, Train *train);
+        Vertex& findPostVertex(PostType type, Vertex currentVertex, Train *train);
+        Edge& getLine(Train *train, Vertex start, Vertex end, enum PostType postType);
 
         int findEdge(int start, int end, int speed);
         int getIdx(int position);
@@ -41,6 +50,7 @@ class Game : public QObject {
         std::shared_ptr<Map> map() { return map_; };
         Player& player() { return *player_; };
         std::vector<Player>& enemies() { return enemies_; };
+        Edge& currentMoveLine() { return *currentMoveLine_; };
 
     public slots:
         void init(const QString &username);
@@ -57,6 +67,7 @@ class Game : public QObject {
         Player *player_ = nullptr;
         std::vector<Player> enemies_;
         bool connected_ = false;
+        Edge *currentMoveLine_;
 };
 
 #endif // GAME_H

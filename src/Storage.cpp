@@ -35,7 +35,7 @@ Storage::Storage(const QJsonObject& storage){
 
     idx_ = storage["idx"].toInt();
     name_ = storage["name"].toString();
-    pointIdx_ = storage["pointIdx"].toInt();
+    pointIdx_ = storage["point_idx"].toInt();
 
     if(storage.contains("armor")){
         armor_ = storage["armor"].toInt();
@@ -69,6 +69,18 @@ int Storage::replenishment(){
     if(armor_ == -1)
         throw std::invalid_argument("No armor");
     return replenishment_;
+}
+
+void Storage::update(const QJsonObject& data) {
+    if (data["name"].toString() != name_) {
+        qDebug() << "NE TOT STORAGE!!!!!!!!!!!!!!";
+        throw("Pizdec");
+        return;
+    }
+
+    armor_ = data["armor"].toInt();
+    armorCapacity_ = data["armor_capacity"].toInt();
+    replenishment_ = data["replenishment"].toInt();
 }
 
 //int Storage::idx(){

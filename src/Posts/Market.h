@@ -27,6 +27,7 @@ public:
     int productCapacity();
     int replenishment();
 
+    void update(const QJsonObject& data);
 private:
     int product_;
     int productCapacity_;

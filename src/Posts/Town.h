@@ -2,6 +2,7 @@
 #define TOWN_H
 
 #include "Post.h"
+#include "Enums/GoodsType.h"
 
 class Town: public Post
 {
@@ -14,10 +15,41 @@ public:
         population_ = population;
         return population_;
     }
-    int setGoods(int goods) {
-        product_ = goods;
-        return product_;
+
+    int setGoods(int goods, enum GoodsType type) {
+        switch(type) {
+        case GoodsType::armor:
+            armor_ = goods;
+            return armor_;
+            break;
+        case GoodsType::product:
+           product_ = goods;
+            return product_;
+            break;
+        }
+        return -1;
     }
+
+    int addGoods(int amount, enum GoodsType type) {
+        switch(type) {
+        case GoodsType::armor:
+            armor_ += amount;
+            return armor_;
+            break;
+        case GoodsType::product:
+            product_ += amount;
+            return product_;
+            break;
+        }
+
+        return -1;
+    };
+
+    void comsumeProduct(int amount) {
+        product_ -= amount;
+
+        if (product_ < 0) product_ = 0;
+    };
 
     int armor();
     int armorCapacity();
@@ -30,10 +62,7 @@ public:
     int trainCooldown();
     QString playerIdx();
 
-    void addProduct(int amount) {
-        product_ += amount;
-        if (product_ < 0) product_ = 0;
-    };
+    void update(const QJsonObject& data);
 
 private:
     int armor_;

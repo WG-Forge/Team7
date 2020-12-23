@@ -14,10 +14,12 @@ class Vertex{
     public:
         explicit Vertex(const QJsonObject &vertex);
         explicit Vertex(int idx, int postIdx, bool postIdxNull);
+        explicit Vertex() = default;
 
         void addEdge(Edge &edge);
         void setPosition(const QVector2D &position);
         void setPost(Post &post);
+        void setPostIdx(int idx) { postIdx_ = idx; };
 
         int idx();
         int postIdx();

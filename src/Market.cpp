@@ -65,3 +65,15 @@ int Market::replenishment(){
         throw std::invalid_argument("No product");
     return replenishment_;
 }
+
+void Market::update(const QJsonObject& data) {
+    if (data["name"].toString() != name_) {
+        qDebug() << "NE TOT MARKET!!!!!!!!!!!!!!";
+        throw("Pizdec");
+        return;
+    }
+
+    product_ = data["product"].toInt();
+    productCapacity_ = data["product_capacity"].toInt();
+    replenishment_ = data["replenishment"].toInt();
+}

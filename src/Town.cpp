@@ -83,13 +83,13 @@ Town::Town(const QJsonObject& town){
 int Town::armor(){
     if(armor_ == -1)
         throw std::invalid_argument("No armor");
-    return product_;
+    return armor_;
 }
 
 int Town::armorCapacity(){
     if(armor_ == -1)
         throw std::invalid_argument("No armor");
-    return productCapacity_;
+    return armorCapacity_;
 }
 
 int Town::level(){
@@ -123,7 +123,7 @@ int Town::population(){
 int Town::populationCapacity(){
     if(population_ == -1)
         throw std::invalid_argument("No population");
-    return productCapacity_;
+    return populationCapacity_;
 }
 
 int Town::product(){
@@ -135,13 +135,35 @@ int Town::product(){
 int Town::productCapacity(){
     if(product_ == -1)
         throw std::invalid_argument("No product");
-    return populationCapacity_;
+    return productCapacity_;
 }
 
 int Town::trainCooldown(){
     if(trainCooldown_ == -1)
         throw std::invalid_argument("No train_cooldown");
    return trainCooldown_;
+}
+
+void Town::update(const QJsonObject& data) {
+    if (data["name"].toString() != name_) {
+        qDebug() << "NE TOT TOWN!!!!!!!!!!!!!!";
+        throw("Pizdec");
+        return;
+    }
+
+    armor_ = data["armor"].toInt();
+    armorCapacity_ = data["armor_capacity"].toInt();
+
+    level_ = data["level"].toInt();
+    nextLevelPrice_ = data["next_level_price"].toInt();
+
+    population_ = data["population"].toInt();
+    populationCapacity_ = data["population_capacity"].toInt();
+
+    product_ = data["product"].toInt();
+    productCapacity_ = data["product_capacity"].toInt();
+
+    trainCooldown_ = data["train_cooldown"].toInt();
 }
 
 //int Town::idx(){

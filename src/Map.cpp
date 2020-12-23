@@ -29,6 +29,8 @@ Map::Map(const QJsonObject &staticObj, const QJsonObject &dynamicObj, const QJso
         case 3:
             storages_.emplace_back(post.toObject());
             posts_.emplace_back(post.toObject());
+
+//            qDebug() << posts_[posts_.size() - 1].name() << posts_[posts_.size() - 1].pointIdx();
             break;
         }
     }
@@ -40,8 +42,7 @@ Map::Map(const QJsonObject &staticObj, const QJsonObject &dynamicObj, const QJso
             if (post.pointIdx() == vertex.idx() && post.idx() == vertex.postIdx()) {
                 vertex.setPost(post);
                 post.setVertex(vertex);
-                continue;
-            }
+            } else continue;
 
             enum PostType type = post.type();
 
@@ -65,6 +66,7 @@ Map::Map(const QJsonObject &staticObj, const QJsonObject &dynamicObj, const QJso
                 for (Market &market : this->markets()) {
                     if (market.pointIdx() == vertex.idx() && market.idx() == vertex.postIdx()) {
                         market.setVertex(vertex);
+
                         break;
                     }
                 }
@@ -74,6 +76,7 @@ Map::Map(const QJsonObject &staticObj, const QJsonObject &dynamicObj, const QJso
                 for (Storage &storage : this->storages()) {
                     if (storage.pointIdx() == vertex.idx() && storage.idx() == vertex.postIdx()) {
                         storage.setVertex(vertex);
+
                         break;
                     }
                 }
