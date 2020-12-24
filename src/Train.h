@@ -30,8 +30,10 @@ public:
     void setNextVertex(Vertex *vertex) { nextVertex_ = vertex; };
     void setFinalVertex(Vertex *vertex) { finalVertex_ = vertex; };
     void setCurrentVertex(Vertex *vertex) { currentVertex_ = vertex; };
-    void setFinalLinePosition(int position) { finalLinePosition_ = position; };
+
     void setEdge(Edge *edge) { edge_ = edge; };
+    void setWaysType(WaysType waysType){ waysType_ = waysType; };
+    void setFinalLinePosition(int position) { finalLinePosition_ = position; };
     void update(const QJsonObject& data);
 
     int cooldown();

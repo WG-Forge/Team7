@@ -15,7 +15,7 @@ class Game : public QObject {
     public:
         explicit Game(QObject *parent = nullptr);
 
-        enum WaysType strategy(Train* trainPlayer);
+        void strategy(Train* trainPlayer);
 
         void out();
         void start();
@@ -35,9 +35,8 @@ class Game : public QObject {
         void moveAction(Train *train, Edge *edge, int speed);
 
         Vertex getGoods(Train *train, PostType type, Vertex currentVertex);
-//        Vertex sendTrain(Train *train, Vertex begin, Vertex end, enum PostType type);
         int moveTrain(const int start, const int end, enum PostType type, Train *train);
-        void sendTrain(Train *train, enum WaysType type);
+        void sendTrain(Train *train);
 
         Vertex& findPostVertex(PostType type, Vertex currentVertex, Train *train);
         Edge& getLine(Train *train, Vertex start, Vertex end, enum WaysType wayType);

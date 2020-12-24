@@ -101,14 +101,16 @@ void Game::gameCycle() {
         emit mapChanged(std::make_shared<Map>(*map_), *player_, false);
 
         for(auto &train : this->player().trains()){
-//            Train *train = this->player().trains()[i];
             if (train->idx() != this->player().trains()[0]->idx()) continue;
 
             if (train->edge() != nullptr) {
-                qDebug() << "Not noll:" << train->currentVertex()->idx() << train->nextVertex()->idx();
+                qDebug() << "Not noll:";
+                qDebug() << "Current:" << train->currentVertex()->idx()
+                         << "Next: " << train->nextVertex()->idx();
             } else qDebug() << "Null:" << tickCount;
-            WaysType type = this->strategy(train);
-            this->sendTrain(train, type);
+
+            this->strategy(train);
+            this->sendTrain(train);
         }
 
         tickCount++;
@@ -121,22 +123,26 @@ void Game::gameCycle() {
     }
 }
 // устанавливает current / next / final
-void Game::sendTrain(Train *train, enum WaysType wayType) {
+void Game::sendTrain(Train *train) {
     if (train->edge() == nullptr) {
-        qDebug() << "АТДИХАЕМ ПАЦАНВА";
+        qDebug() << "АТДИХАЕМ ПАЦАНВА"
+                 << "Current:" << train->currentVertex()->idx();
         return;
     }
 
-    qDebug() << "";
+//   if (train->nextVertex() == nullptr) return;
 
     Edge *currentLine = train->edge();
     Vertex start;
     Vertex end;
-    int speed = 0;
+    int speed = train->speed();
 
-    qDebug() << "Send train:" << train->currentVertex()->idx() << train->finalVertex()->idx();
-    qDebug() << "Line" << currentLine->idx() << currentLine->vertex1().idx() << currentLine->vertex2().idx();
-    qDebug() << "Current speed: " << train->speed();
+    qDebug() << "Start pos:" << train->currentVertex()->idx()
+             << "Final pos:" << train->finalVertex()->idx();
+    qDebug() << "Line:" << currentLine->idx()
+             << "V1:" << currentLine->vertex1().idx()
+             << "V2:" << currentLine->vertex2().idx();
+
     if (train->speed() != 0) {
         qDebug() << "Edem FROM:" << train->currentVertex()->idx()
                  << "TO:" << train->nextVertex()->idx()
@@ -158,6 +164,7 @@ void Game::sendTrain(Train *train, enum WaysType wayType) {
     if (train->currentVertex()->idx() < train->nextVertex()->idx()) {
         speed = 1;
     } else speed = -1;
+
 
     this->moveAction(train, currentLine, speed);
 }
@@ -358,8 +365,8 @@ void Game::upgradeAction(std::vector<Town*> towns, std::vector<Train*> trains){
 
 }
 
-enum WaysType Game::strategy(Train* trainPlayer){
-    if(trainPlayer->edge() == nullptr){//поезд стоит
+void Game::strategy(Train* trainPlayer){
+    if(trainPlayer->edge() == nullptr){//поезд стоит, не может ехать
         if(trainPlayer->currentVertex() == trainPlayer->finalVertex()){//Поезд достиг точки назначения
             if(trainPlayer->finalVertex()->isPostIdxNull() != false){//Мы на каком то посту
                 switch (static_cast<int>(trainPlayer->finalVertex()->post().type())) {
@@ -371,6 +378,7 @@ enum WaysType Game::strategy(Train* trainPlayer){
                     }
                     break;}
                 case 2:{//Поезд в маркете, забрал продукты, мама будет довольна
+                    trainPlayer->setCurrentVertex(trainPlayer->finalVertex());
                     trainPlayer->setFinalVertex(&player().town().vertex());
                     if(trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
                                             [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]->vertex1().idx()
@@ -380,9 +388,10 @@ enum WaysType Game::strategy(Train* trainPlayer){
                             else{trainPlayer->
                                 setEdge(trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
                                 [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]);}
-                    return static_cast<WaysType>(4);
+                    trainPlayer->setWaysType(static_cast<WaysType>(4));
                     break;}
                 case 3:{//Поезд в стораже, одевается в доспехи наверно
+                    trainPlayer->setCurrentVertex(trainPlayer->finalVertex());
                     trainPlayer->setFinalVertex(&player().town().vertex());
                     if(trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
                                             [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]->vertex1().idx()
@@ -392,7 +401,7 @@ enum WaysType Game::strategy(Train* trainPlayer){
                             else{trainPlayer->
                                 setEdge(trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
                                 [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]);}
-                    return static_cast<WaysType>(4);
+                    trainPlayer->setWaysType(static_cast<WaysType>(4));
                     break;}
                 }
 
@@ -402,19 +411,19 @@ enum WaysType Game::strategy(Train* trainPlayer){
             }
         }
         else{//Поезд НЕ достиг точки назначения, WHY или в городе нашем
-            if(trainPlayer->finalVertex() == nullptr){
+            if(trainPlayer->finalVertex() == nullptr){//Тут логика отправления поезда
                 if(this->player().town().product() <= this->player().town().productCapacity()){
                     trainPlayer->setCurrentVertex(&this->player().town().vertex());
                     trainPlayer->setFinalVertex(&findPostVertex(PostType::MARKET, this->player().town().vertex(), trainPlayer));
                     trainPlayer->setEdge(trainPlayer->waysMarket()[map()->graph().idx().at(this->player().town().vertex().idx())]
                             [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]);
-                    return static_cast<WaysType>(2);
+                    trainPlayer->setWaysType(static_cast<WaysType>(2));
                 }
             }
         }
     }
     else{//Поезд едет
-       /* for(auto train: this->map()->trains()){
+        /*for(auto train: this->map()->trains()){//Здесь ивейдим другие поезда
             if(train.idx() != trainPlayer->idx()){
                 if(trainPlayer->speed() == 0){
                     if(map()->graph().edges()[map()->graph().idxEdges().at(train.lineIdx())].length() - train.position() <=
@@ -435,12 +444,13 @@ enum WaysType Game::strategy(Train* trainPlayer){
         }*/
         if(trainPlayer->speed() == 0){
             if(trainPlayer->currentVertex() == trainPlayer->finalVertex()){
-                
+                trainPlayer->setEdge(nullptr);
+                strategy(trainPlayer);
             }
             else{
                 switch(static_cast<int>(trainPlayer->waysType())){
                 case 1:{
-                    
+
                     break;}
                 case 2:{
                     if(trainPlayer->currentVertex()->idx() == trainPlayer->edge()->vertex1().idx()){
@@ -452,18 +462,35 @@ enum WaysType Game::strategy(Train* trainPlayer){
                     trainPlayer->setEdge(trainPlayer->waysMarket()
                             [map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
                             [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]);
-                    return static_cast<WaysType>(2);
                     break;}
                 case 3:{
-                    
+                    if(trainPlayer->currentVertex()->idx() == trainPlayer->edge()->vertex1().idx()){
+                        trainPlayer->setCurrentVertex(&trainPlayer->edge()->vertex2());
+                    }
+                    else{
+                        trainPlayer->setCurrentVertex(&trainPlayer->edge()->vertex1());
+                    }
+                    trainPlayer->setEdge(trainPlayer->waysStorage()
+                            [map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
+                            [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]);
+                    break;}
+                case 4:{
+                    if(trainPlayer->currentVertex()->idx() == trainPlayer->edge()->vertex1().idx()){
+                        trainPlayer->setCurrentVertex(&trainPlayer->edge()->vertex2());
+                    }
+                    else{
+                        trainPlayer->setCurrentVertex(&trainPlayer->edge()->vertex1());
+                    }
+                    trainPlayer->setEdge(trainPlayer->waysAll()
+                            [map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
+                            [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]);
                     break;}
                 }
             }
         }
-        else{
+        else{//если поезд едет с любой скоростью != 0
             
         }
-
     }
 
 }
