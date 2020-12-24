@@ -5,6 +5,7 @@
 #include "Socket.h"
 #include "Map.h"
 #include "Player.h"
+#include "Enums/WaysType.h"
 
 #include <QDebug>
 
@@ -24,27 +25,28 @@ class Game : public QObject {
         void connectToGame();
         void getMap();
         void makeMap();
+
         void tick();
-
         void updatePosts();
-        void updateInfo();
+        void updateUser();
+        void upgrade(Town *town, std::vector<Train *> trains);
+
         Vertex getGoods(Train *train, PostType type, Vertex currentVertex);
-        Vertex sendTrain(Train *train, Vertex begin, Vertex end, enum PostType type);
-        void moveAction(Train *train, Edge edge, int speed, int position);
-        void printPlayerData(Train *train, Town *town);
-        void printPosts();
-        void printMap(enum PostType type);
-
+//        Vertex sendTrain(Train *train, Vertex begin, Vertex end, enum PostType type);
+        void moveAction(Train *train, Edge edge, int speed);
         int moveTrain(const int start, const int end, enum PostType type, Train *train);
-        Vertex& findPostVertex(PostType type, Vertex currentVertex, Train *train);
-        Edge& getLine(Train *train, Vertex start, Vertex end, enum PostType postType);
+        void sendTrain(Train *train, enum WaysType type);
 
+        Vertex& findPostVertex(PostType type, Vertex currentVertex, Train *train);
+        Edge& getLine(Train *train, Vertex start, Vertex end, enum WaysType wayType);
         int findEdge(int start, int end, int speed);
         int getIdx(int position);
         int returnToHome(int currentPosition);
         void unloadTrain(Train *train);
 
-        void userInfo();
+        void printPlayerData(Train *train, Town *town);
+        void printPosts();
+        void printMap(enum PostType type);
 
         Socket& socket() { return *socket_; };
         std::shared_ptr<Map> map() { return map_; };

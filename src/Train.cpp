@@ -172,3 +172,44 @@ void Train::trainWays(const std::vector<std::vector<int>>& masMarket,
    }
 }
 
+void Train::update(const QJsonObject &train){
+
+    if (train.contains("fuel")){
+        fuel_ = train["fuel"].toInt();
+        fuelCapacity_ = train["fuel_capacity"].toInt();
+        fuelConsumption_ = train["fuel_consumption"].toInt();
+    }
+    else{
+        fuel_ = -1;
+    }
+    if (train.contains("goods")){
+        goods_ = train["goods"].toInt();
+        goodsCapacity_ = train["goods_capacity"].toInt();
+        goodsType_ = static_cast<GoodsType>(train["goods_type"].toInt());
+    }
+    else{
+        goods_ = -1;
+    }
+    if (train.contains("level")){
+        level_ = train["level"].toInt();
+        if (level_ == 3) {
+            isMaxLevel_ = true;
+            nextLevelPrice_ = -1;
+        } else {
+            nextLevelPrice_ = train["next_level_price"].toInt();
+        }
+    }
+    else{
+        level_ = -1;
+    }
+    if (train.contains("line_idx")){
+        lineIdx_ = train["line_idx"].toInt();
+    }
+    else{
+        lineIdx_ = -1;
+    }
+
+    position_ = train["position"].toInt();
+    speed_ = train["speed"].toInt();
+}
+

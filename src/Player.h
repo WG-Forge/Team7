@@ -26,6 +26,7 @@ public:
     Town& town() { return *town_; };
     std::vector<Train *> &trains() { return trains_; };
 
+    void update(const QJsonObject &playerData);
 signals:
 
 private:

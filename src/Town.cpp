@@ -145,6 +145,8 @@ int Town::trainCooldown(){
 }
 
 void Town::update(const QJsonObject& data) {
+//    qDebug() << name_ << data["name"].toString();
+
     if (data["name"].toString() != name_) {
         qDebug() << "NE TOT TOWN!!!!!!!!!!!!!!";
         throw("Pizdec");
@@ -155,7 +157,12 @@ void Town::update(const QJsonObject& data) {
     armorCapacity_ = data["armor_capacity"].toInt();
 
     level_ = data["level"].toInt();
-    nextLevelPrice_ = data["next_level_price"].toInt();
+    if (level_ == 3) {
+        isMaxLevel_ = true;
+        nextLevelPrice_ = -1;
+    } else {
+        nextLevelPrice_ = data["next_level_price"].toInt();
+    }
 
     population_ = data["population"].toInt();
     populationCapacity_ = data["population_capacity"].toInt();

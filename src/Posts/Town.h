@@ -50,6 +50,7 @@ public:
 
         if (product_ < 0) product_ = 0;
     };
+
     void upgrade(int level, int populationCapacity, int productCapacity, int armorCapacity, int trainCooldown, int nextLevelPrice){
       armorCapacity_ = armorCapacity;
       level_ = level;
@@ -69,6 +70,7 @@ public:
     int productCapacity();
     int trainCooldown();
     QString playerIdx();
+    bool isMaxLevel() { return isMaxLevel_; };
 
     void update(const QJsonObject& data);
 
@@ -83,7 +85,7 @@ private:
     int product_;
     int productCapacity_;
     int trainCooldown_;
-
+    bool isMaxLevel_;
 };
 
 #endif // TOWN_H

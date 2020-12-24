@@ -23,6 +23,10 @@ Player::Player(const Player &player) {
         trains_.push_back(new Train(*train));
 }
 
+void Player::update(const QJsonObject &playerData) {
+    this->rating_ = playerData["rating"].toInt();
+}
+
 //void Player::setTown(QJsonObject town) {
 //    town_ = new Town(town);
 //}
