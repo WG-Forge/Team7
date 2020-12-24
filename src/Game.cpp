@@ -383,14 +383,15 @@ enum WaysType Game::strategy(Train* trainPlayer){
                 if(this->player().town().product() <= this->player().town().productCapacity()){
                     trainPlayer->setCurrentVertex(&this->player().town().vertex());
                     trainPlayer->setFinalVertex(&findPostVertex(PostType::MARKET, this->player().town().vertex(), trainPlayer));
-                    trainPlayer->setEdge(trainPlayer->waysMarket()[this->player().town().vertex().idx()][trainPlayer->finalVertex()->idx()]);
+                    trainPlayer->setEdge(trainPlayer->waysMarket()[map()->graph().idx().at(this->player().town().vertex().idx())]
+                            [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]);
                     return static_cast<WaysType>(2);
                 }
             }
         }
     }
     else{//Поезд едет
-        /*for(auto train: this->map()->trains()){
+       /* for(auto train: this->map()->trains()){
             if(train.idx() != trainPlayer->idx()){
                 if(trainPlayer->speed() == 0){
                     if(map()->graph().edges()[map()->graph().idxEdges().at(train.lineIdx())].length() - train.position() <=
@@ -409,15 +410,36 @@ enum WaysType Game::strategy(Train* trainPlayer){
                 }
             }
         }*/
-        if(trainPlayer->currentVertex()->idx() == trainPlayer->edge()->vertex1().idx()){
-            trainPlayer->setCurrentVertex(&trainPlayer->edge()->vertex2());
+        if(trainPlayer->speed() == 0){
+            if(trainPlayer->currentVertex() == trainPlayer->finalVertex()){
+                
+            }
+            else{
+                switch(static_cast<int>(trainPlayer->waysType())){
+                case 1:{
+                    
+                    break;}
+                case 2:{
+                    if(trainPlayer->currentVertex()->idx() == trainPlayer->edge()->vertex1().idx()){
+                        trainPlayer->setCurrentVertex(&trainPlayer->edge()->vertex2());
+                    }
+                    else{
+                        trainPlayer->setCurrentVertex(&trainPlayer->edge()->vertex1());
+                    }
+                    trainPlayer->setEdge(trainPlayer->waysMarket()
+                            [map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
+                            [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]);
+                    return static_cast<WaysType>(2);
+                    break;}
+                case 3:{
+                    
+                    break;}
+                }
+            }
         }
         else{
-            trainPlayer->setCurrentVertex(&trainPlayer->edge()->vertex1());
+            
         }
-        trainPlayer->setEdge(trainPlayer->waysMarket()[trainPlayer->currentVertex()->idx()]
-                [trainPlayer->finalVertex()->idx()]);
-        return static_cast<WaysType>(2);
 
     }
 

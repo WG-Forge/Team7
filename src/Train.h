@@ -65,6 +65,7 @@ public:
     std::vector<std::vector<Edge *>> waysMarket() { return waysMarket_; };
     std::vector<std::vector<Edge *>> waysReturn() { return waysReturn_; };
     std::vector<std::vector<Edge *>> waysAll() { return waysAll_; };
+    WaysType waysType(){ return waysType_; };
     void trainWays(const std::vector<std::vector<int>>& masMarket,
                    const  std::vector<std::vector<Edge*>>& pMarket,
                    const std::vector<std::vector<int>>& masStorage,
@@ -98,7 +99,7 @@ private:
     Vertex *finalVertex_ = nullptr;     // конечный вертекс (прям самый конечный, в который хочешь доехать)
     Vertex *currentVertex_ = nullptr;   // вертекс из которого выехал или в котором стоишь
     Edge *edge_ = nullptr;      // в который едешь сейчас aka промежуточный между currentVertex и finalVertex
-
+    enum WaysType waysType_;
     std::vector<std::vector<int>> waysLengthMarket_;
     std::vector<std::vector<Edge*>> waysMarket_;
     std::vector<std::vector<int>> waysLengthStorage_;
