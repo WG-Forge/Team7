@@ -24,11 +24,12 @@ Graph::Graph(const QJsonObject &graph, Map &map) {
     for (auto const &edge : edgesJsonArray) {
         if (!edge.isObject())
             throw std::invalid_argument("Wrong JSON graph format.");
-
         edges_.emplace_back(edge.toObject(), verticesMap_);
     }
-
+    i = 0;
     for (Edge &e : edges_) {
+        idxEdges_.emplace(e.idx(), i);
+        ++i;
         e.vertex1().addEdge(e);
         e.vertex2().addEdge(e);
     }
@@ -169,5 +170,9 @@ void Graph::fitToSize(float W, float H) {
 
 std::map<int,int>& Graph::idx(){
     return idx_;
+}
+
+std::map<int, int>& Graph::idxEdges(){
+    return idxEdges_;
 }
 

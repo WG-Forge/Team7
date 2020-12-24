@@ -150,7 +150,9 @@ void Train::trainWays(const std::vector<std::vector<int>>& masMarket,
                       const std::vector<std::vector<int>>& masStorage,
                       const  std::vector<std::vector<Edge*>>& pStorage,
                       const std::vector<std::vector<int>>& mas,
-                      const  std::vector<std::vector<Edge*>>& p){
+                      const  std::vector<std::vector<Edge*>>& p,
+                      const std::vector<std::vector<int>>& masAll,
+                      const  std::vector<std::vector<Edge*>>& pAll){
    for(int i = 0; i < masMarket.size(); ++i){
        waysLengthMarket_.push_back(std::vector<int>(masMarket[i]));
    }
@@ -169,6 +171,13 @@ void Train::trainWays(const std::vector<std::vector<int>>& masMarket,
    }
    for(int i = 0; i < p.size(); ++i){
        waysReturn_.push_back(p[i]);
+   }
+
+   for(int i = 0; i < masAll.size(); ++i){
+       waysLengthAll_.push_back(std::vector<int>(masAll[i]));
+   }
+   for(int i = 0; i < pAll.size(); ++i){
+       waysAll_.push_back(pAll[i]);
    }
 }
 

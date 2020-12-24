@@ -75,7 +75,7 @@ void Game::getMap() {
 void Game::makeMap() {
     qDebug() << "Draw map";
     map_ = std::make_shared<Map>(layer_0, layer_1, layer_2, *player_);
-    map_->makeWays();
+    map_->makeWays(this->player().town());
 }
 
 void Game::connectToGame() {
@@ -95,22 +95,16 @@ void Game::gameCycle() {
     currentIdx = USER_POST_IDX;
     currentPos = USER_POST_POS;
 
-    Train *train = this->player().trains()[0];
+
 
     while(connected_) {
         emit mapChanged(std::make_shared<Map>(*map_), *player_);
+    for(int i = 0; i < player().trains().size(); ++i){
 
-//        for (auto &post : this->map()->posts()) {
-//            if (post.pointIdx() == 352) {
-//                this->sendTrain(train, this->player().town().vertex(), post.vertex(), PostType::MARKET);
-//                this->sendTrain(train, post.vertex(), this->player().town().vertex(), PostType::MARKET);
-////                qDebug() << post.name();
-//            }
-//        }
-//        break;
+        Train *train = this->player().trains()[i];
 
-        this->getGoods(train, PostType::STORAGE, this->player().town().vertex());
 
+    }
         QApplication::processEvents();
     }
 }
@@ -514,3 +508,98 @@ void Game::init(const QString &username) {
     gameCycle();
 }
 
+
+void Game::upgradeAction(std::vector<Town*> towns, std::vector<Train*> trains){
+    QJsonArray townsArray;
+    QJsonArray trainsArray;
+    QJsonObject request;
+    for(auto town: towns){
+        townsArray.append(town->idx());
+    }
+    for(auto train: trains){
+        trainsArray.append(train->idx());
+    }
+    request["posts"] = townsArray;
+    request["trains"] = trainsArray;
+
+    this->socket_->sendData(Request(Action::UPGRADE, request));
+    socket_->getData();
+
+}
+
+void Game::strategy(Train* trainPlayer, Vertex* finalVertex, enum WaysType waysType, Vertex* nextVertex){
+    if(trainPlayer->nextVertex() == nullptr){//поезд стоит
+        if(trainPlayer->currentVertex() == trainPlayer->finalVertex()){//Поезд достиг точки назначения
+            if(trainPlayer->finalVertex()->isPostIdxNull() != false){//Мы на каком то посту
+                switch (static_cast<int>(trainPlayer->finalVertex()->post().type())) {
+                case 1:{//Поезд в городе
+                    if(trainPlayer->finalVertex()->postIdx() != player().town().idx()){//Поезд не дома, в городе
+
+                    }
+                    else{//Поезд дома, чисто чилит пока что
+
+                    }
+                    break;}
+                case 2:{//Поезд в маркете, забрал продукты, мама будет довольна
+                    finalVertex = &player().town().vertex();
+                    Edge* edge = trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
+                            [map()->graph().idx().at(finalVertex->idx())];
+                    if(edge->vertex1().idx() == trainPlayer->currentVertex()->idx()){ nextVertex = &trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
+                                [map()->graph().idx().at(finalVertex->idx())]->vertex2();}
+                            else{nextVertex = &trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
+                                [map()->graph().idx().at(finalVertex->idx())]->vertex1();}
+                    waysType = static_cast<WaysType>(4);
+                    break;}
+                case 3:{//Поезд в стораже, одевается в доспехи наверно
+                    finalVertex = &player().town().vertex();
+                    Edge* edge = trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
+                            [map()->graph().idx().at(finalVertex->idx())];
+                    if(edge->vertex1().idx() == trainPlayer->currentVertex()->idx()){ nextVertex = &trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
+                                [map()->graph().idx().at(finalVertex->idx())]->vertex2();}
+                            else{nextVertex = &trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
+                                [map()->graph().idx().at(finalVertex->idx())]->vertex1();}
+                    waysType = static_cast<WaysType>(4);
+                    break;}
+                }
+
+            }
+            else{//Мы не на посту, чё то соображаем полагаю
+
+            }
+        }
+        else{//Поезд НЕ достиг точки назначения, WHY или в городе нашем
+            if(trainPlayer->finalVertex() == nullptr){
+                if(this->player().town().product() < this->player().town().productCapacity()){
+                    trainPlayer->setFinalVertex(&findPostVertex(PostType::MARKET, this->player().town().vertex(), trainPlayer));
+                    waysType = static_cast<WaysType>(2);
+                    trainPlayer->setNextVertex(&trainPlayer->waysMarket()[this->player().town().vertex().idx()][finalVertex->idx()]->vertex2());
+                }
+            }
+        }
+    }
+    else{//Поезд едет
+        /*for(auto train: this->map()->trains()){
+            if(train.idx() != trainPlayer->idx()){
+                if(trainPlayer->speed() == 0){
+                    if(map()->graph().edges()[map()->graph().idxEdges().at(train.lineIdx())].length() - train.position() <=
+                            trainPlayer->waysLengthAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
+                            [map()->graph().idx().at(trainPlayer->nextVertex()->idx())]){
+
+                    }
+                }
+                else{
+                    if(trainPlayer->speed() == 1){
+
+                    }
+                    else{
+
+                    }
+                }
+            }
+        }*/
+        trainPlayer->setNextVertex(&trainPlayer->waysMarket()[trainPlayer->nextVertex()->idx()][trainPlayer->finalVertex()->idx()]->vertex2());
+
+
+    }
+
+}

@@ -43,8 +43,12 @@ class Game : public QObject {
         int getIdx(int position);
         int returnToHome(int currentPosition);
         void unloadTrain(Train *train);
+        
+        void upgradeAction(std::vector<Town*> towns, std::vector<Train*> trains);
 
         void userInfo();
+
+        void strategy(Train* trainPlayer, Vertex* finalVertex, enum WaysType waysType, Vertex* nextVertex);
 
         Socket& socket() { return *socket_; };
         std::shared_ptr<Map> map() { return map_; };

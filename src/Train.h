@@ -2,6 +2,7 @@
 #define TRAIN_H
 #include "Event.h"
 #include "Enums/GoodsType.h"
+#include "Enums/WaysType.h"
 #include "Events/HijackersAssault.h"
 #include "Events/RefugeesArrival.h"
 #include "Events/TrainCollision.h"
@@ -37,6 +38,9 @@ public:
         fuelCapacity_ = fuelCapacity;
         nextLevelPrice_ = nextLevelPrice;
     };
+    void setFinalVertex(Vertex* vertex){ finalVertex_ = vertex; };
+    void setCurrentVertex(Vertex* vertex){ currentVertex_ = vertex; };
+    void setNextVertex(Vertex* vertex){ nextVertex_ = vertex; };
 
     int cooldown();
     void trainWays(const std::vector<std::vector<int>>& masMarket,
@@ -44,7 +48,9 @@ public:
                    const std::vector<std::vector<int>>& masStorage,
                    const  std::vector<std::vector<Edge*>>& pStorage,
                    const std::vector<std::vector<int>>& mas,
-                   const  std::vector<std::vector<Edge*>>& p);
+                   const  std::vector<std::vector<Edge*>>& p,
+                   const std::vector<std::vector<int>>& masAll,
+                   const  std::vector<std::vector<Edge*>>& pAll);
     std::vector<Event*>& events();
     int fuel();
     int fuelCapacity();
@@ -60,8 +66,17 @@ public:
     int position();
     std::vector<std::vector<int>> waysLengthStorage() { return waysLengthStorage_; };
     std::vector<std::vector<int>> waysLengthMarket() { return waysLengthMarket_; };
+    std::vector<std::vector<int>> waysLengthReturn() { return waysLengthReturn_; };
+    std::vector<std::vector<int>> waysLengthAll() { return waysLengthAll_; };
     std::vector<std::vector<Edge *>> waysStorage() { return waysStorage_; };
     std::vector<std::vector<Edge *>> waysMarket() { return waysMarket_; };
+    std::vector<std::vector<Edge *>> waysReturn() { return waysReturn_; };
+    std::vector<std::vector<Edge *>> waysAll() { return waysAll_; };
+    bool cheat(){return cheat_; };
+    Vertex* finalVertex(){return finalVertex_; };
+    Vertex* currentVertex(){return currentVertex_; };
+    Vertex* nextVertex(){return nextVertex_; };
+
     int speed();
 
 private:
@@ -80,12 +95,18 @@ private:
     QString playerIdx_;
     int position_;
     int speed_;
+    bool cheat_ = false;
+    Vertex* finalVertex_ = nullptr;
+    Vertex* currentVertex_ = nullptr;
+    Vertex* nextVertex_ = nullptr;
     std::vector<std::vector<int>> waysLengthMarket_;
     std::vector<std::vector<Edge*>> waysMarket_;
     std::vector<std::vector<int>> waysLengthStorage_;
     std::vector<std::vector<Edge*>> waysStorage_;
     std::vector<std::vector<int>> waysLengthReturn_;
     std::vector<std::vector<Edge*>> waysReturn_;
+    std::vector<std::vector<int>> waysLengthAll_;
+    std::vector<std::vector<Edge*>> waysAll_;
 
 };
 

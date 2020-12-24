@@ -9,6 +9,7 @@ HEADERS += \
     $$PWD/Enums/GoodsType.h \
     $$PWD/Enums/PostType.h \
     $$PWD/Enums/ResultEnum.h \
+    $$PWD/Enums/WaysType.h \
     $$PWD/Event.h \
     $$PWD/EventType.h \
     $$PWD/Events/HijackersAssault.h \

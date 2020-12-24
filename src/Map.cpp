@@ -128,6 +128,9 @@ void Map::makeWays(Town town){
     std::vector<std::vector<Edge*>> pStorage(verticesNumber);
     std::vector<std::vector<int>> mas(verticesNumber);
     std::vector<std::vector<Edge*>> p(verticesNumber);
+    std::vector<std::vector<int>> masAll(verticesNumber);
+    std::vector<std::vector<Edge*>> pAll(verticesNumber);
+
     int INF = 100000000;
 
     for(int t = 0; t < trains_.size(); ++t){
@@ -143,6 +146,10 @@ void Map::makeWays(Town town){
             mas[i] = std::vector<int>(verticesNumber, INF);
             p[i] = std::vector<Edge*>(verticesNumber);
             mas[i][i] = 0;
+
+            masAll[i] = std::vector<int>(verticesNumber, INF);
+            pAll[i] = std::vector<Edge*>(verticesNumber);
+            masAll[i][i] = 0;
         }
         for(int i = 0 ; i < verticesNumber;++i){
             int u =  graph_.vertices()[i].idx();
@@ -170,6 +177,13 @@ void Map::makeWays(Town town){
                             [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())]
                             = &graph_.vertices()[i].edges()[j].get();
 
+                    masAll[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())]
+                        [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())] =
+                        graph_.vertices()[i].edges()[j].get().length();
+                    pAll[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())]
+                            [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())]
+                            = &graph_.vertices()[i].edges()[j].get();
+
                 }
                 else{
                     masMarket[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())]
@@ -190,6 +204,13 @@ void Map::makeWays(Town town){
                         [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())] =
                         graph_.vertices()[i].edges()[j].get().length();
                     p[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())]
+                            [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())]
+                            = &graph_.vertices()[i].edges()[j].get();
+
+                    masAll[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())]
+                        [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())] =
+                        graph_.vertices()[i].edges()[j].get().length();
+                    pAll[graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex2().idx())]
                             [graph_.idx().at(graph_.vertices()[i].edges()[j].get().vertex1().idx())]
                             = &graph_.vertices()[i].edges()[j].get();
 
@@ -215,6 +236,8 @@ void Map::makeWays(Town town){
                            -1;
                    }
                }
+
+               //NoOtherTowns
                if( graph_.vertices()[i].edges()[j].get().vertex1().isPostIdxNull() == false){
                     if(graph_.vertices()[i].edges()[j].get().vertex1().postIdx() != town.idx() &&
                             static_cast<int>(graph_.vertices()[i].edges()[j].get().vertex1().post().type()) == 1){
@@ -237,6 +260,7 @@ void Map::makeWays(Town town){
                            -1;
                    }
                }
+
                //NoMarkets
                if( graph_.vertices()[i].edges()[j].get().vertex1().isPostIdxNull() == false){
                     if(static_cast<int>(graph_.vertices()[i].edges()[j].get().vertex1().post().type()) == 2){
@@ -322,10 +346,14 @@ void Map::makeWays(Town town){
                         }
                         mas[i][j] = std::min(mas[i][j], mas[i][k] + mas[k][j]);
                     }
+                    if(masAll[i][j] > masAll[i][k] + masAll[k][j]){
+                            pAll[i][j] = pAll[i][k];
+                    }
+                    masAll[i][j] = std::min(masAll[i][j], masAll[i][k] + masAll[k][j]);
                 }
             }
         }
-        trains_[t].trainWays(masMarket, pMarket, masStorage, pStorage, mas, p);
+        trains_[t].trainWays(masMarket, pMarket, masStorage, pStorage, mas, p,  masAll, pAll);
     }
 }
 
