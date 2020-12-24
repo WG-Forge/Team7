@@ -114,8 +114,8 @@ void Game::gameCycle() {
         tickCount++;
         this->tick();
         this->updateUser();
-        this->printPlayerData(this->player().trains()[0], &this->player().town());
         this->updatePosts();
+//        this->printPlayerData(this->player().trains()[0], &this->player().town());
 
         QApplication::processEvents();
     }
@@ -127,6 +127,8 @@ void Game::sendTrain(Train *train, enum WaysType wayType) {
         return;
     }
 
+    qDebug() << "";
+
     Edge *currentLine = train->edge();
     Vertex start;
     Vertex end;
@@ -134,9 +136,15 @@ void Game::sendTrain(Train *train, enum WaysType wayType) {
 
     qDebug() << "Send train:" << train->currentVertex()->idx() << train->finalVertex()->idx();
     qDebug() << "Line" << currentLine->idx() << currentLine->vertex1().idx() << currentLine->vertex2().idx();
-
+    qDebug() << "Current speed: " << train->speed();
     if (train->speed() != 0) {
-        qDebug() << "Edem FROM:" << train->currentVertex()->idx() << "TO:" << train->nextVertex()->idx();
+        qDebug() << "Edem FROM:" << train->currentVertex()->idx()
+                 << "TO:" << train->nextVertex()->idx()
+                 << "Position:" << train->position();
+    } else {
+        qDebug() << "Stoim V:" << train->edge()->idx()
+                 << "Current:" << train->currentVertex()->idx()
+                 << "Position:" << train->position();
     }
 
     if (currentLine->vertex1().idx() == train->currentVertex()->idx()) {
@@ -162,7 +170,12 @@ void Game::moveAction(Train *train, Edge *moveLine, int speed) {
     qDebug() << request;
 
     socket_->sendData(Request(Action::MOVE, request));
-    qDebug() << socket_->getData();
+    QJsonObject response = socket_->getData();
+
+    if (response != QJsonObject()) {
+        qDebug() << "MOVEMENT ERROR" << response;
+        throw(response);
+    }
 }
 
 Vertex& Game::findPostVertex(PostType type, Vertex currentVertex, Train *train) {
