@@ -15,7 +15,7 @@ class Game : public QObject {
     public:
         explicit Game(QObject *parent = nullptr);
 
-        enum WaysType strategy(Train* trainPlayer);
+        void strategy(Train* trainPlayer);
 
         void out();
         void start();
