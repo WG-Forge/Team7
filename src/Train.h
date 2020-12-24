@@ -29,7 +29,7 @@ public:
 
     void setFinalVertex(Vertex *vertex) { finalVertex_ = vertex; };
     void setCurrentVertex(Vertex *vertex) { currentVertex_ = vertex; };
-    void setNextVertex(Vertex *vertex) { nextVertex_ = vertex; };
+    void setEdge(Edge *edge) { edge_ = edge; };
     void setFinalLinePosition(int position) { finalLinePosition_ = position; };
     void update(const QJsonObject& data);
 
@@ -54,7 +54,7 @@ public:
 
     Vertex* finalVertex(){return finalVertex_; };
     Vertex* currentVertex(){return currentVertex_; };
-    Vertex* nextVertex(){return nextVertex_; };
+    Edge* edge(){return edge_; };
     enum GoodsType goodsType();
 
     std::vector<std::vector<int>> waysLengthStorage() { return waysLengthStorage_; };
@@ -97,7 +97,7 @@ private:
      // конечная позиция на линии
     Vertex *finalVertex_ = nullptr;     // конечный вертекс (прям самый конечный, в который хочешь доехать)
     Vertex *currentVertex_ = nullptr;   // вертекс из которого выехал или в котором стоишь
-    Vertex *nextVertex_ = nullptr;      // в который едешь сейчас aka промежуточный между currentVertex и finalVertex
+    Edge *edge_ = nullptr;      // в который едешь сейчас aka промежуточный между currentVertex и finalVertex
 
     std::vector<std::vector<int>> waysLengthMarket_;
     std::vector<std::vector<Edge*>> waysMarket_;
