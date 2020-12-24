@@ -15,6 +15,8 @@ class Game : public QObject {
     public:
         explicit Game(QObject *parent = nullptr);
 
+        enum WaysType strategy(Train* trainPlayer);
+
         void out();
         void start();
         void end();
@@ -29,11 +31,11 @@ class Game : public QObject {
         void tick();
         void updatePosts();
         void updateUser();
-        void upgrade(Town *town, std::vector<Train *> trains);
+        void upgradeAction(std::vector<Town*> towns, std::vector<Train*> trains);
+        void moveAction(Train *train, Edge edge, int speed);
 
         Vertex getGoods(Train *train, PostType type, Vertex currentVertex);
 //        Vertex sendTrain(Train *train, Vertex begin, Vertex end, enum PostType type);
-        void moveAction(Train *train, Edge edge, int speed);
         int moveTrain(const int start, const int end, enum PostType type, Train *train);
         void sendTrain(Train *train, enum WaysType type);
 
@@ -44,15 +46,17 @@ class Game : public QObject {
         int returnToHome(int currentPosition);
         void unloadTrain(Train *train);
 
+
+
+        Socket& socket() { return *socket_; };
+        Player& player() { return *player_; };
+        std::shared_ptr<Map> map() { return map_; };
+        std::vector<Player>& enemies() { return enemies_; };
+        Edge& currentMoveLine() { return *currentMoveLine_; };
+
         void printPlayerData(Train *train, Town *town);
         void printPosts();
         void printMap(enum PostType type);
-
-        Socket& socket() { return *socket_; };
-        std::shared_ptr<Map> map() { return map_; };
-        Player& player() { return *player_; };
-        std::vector<Player>& enemies() { return enemies_; };
-        Edge& currentMoveLine() { return *currentMoveLine_; };
 
     public slots:
         void init(const QString &username);
