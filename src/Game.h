@@ -32,7 +32,7 @@ class Game : public QObject {
         void updatePosts();
         void updateUser();
         void upgradeAction(std::vector<Town*> towns, std::vector<Train*> trains);
-        void moveAction(Train *train, Edge edge, int speed);
+        void moveAction(Train *train, Edge *edge, int speed);
 
         Vertex getGoods(Train *train, PostType type, Vertex currentVertex);
 //        Vertex sendTrain(Train *train, Vertex begin, Vertex end, enum PostType type);

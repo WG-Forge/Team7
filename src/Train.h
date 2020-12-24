@@ -27,10 +27,11 @@ public:
         nextLevelPrice_ = nextLevelPrice;
     };
 
+    void setNextVertex(Vertex *vertex) { nextVertex_ = vertex; };
     void setFinalVertex(Vertex *vertex) { finalVertex_ = vertex; };
     void setCurrentVertex(Vertex *vertex) { currentVertex_ = vertex; };
-    void setEdge(Edge *edge) { edge_ = edge; };
     void setFinalLinePosition(int position) { finalLinePosition_ = position; };
+    void setEdge(Edge *edge) { edge_ = edge; };
     void update(const QJsonObject& data);
 
     int cooldown();
@@ -45,15 +46,16 @@ public:
     int nextLevelPrice();
     int position();
     int speed();
-    int finalLinePosition() { return finalLinePosition_; };
     int priority() { return priority_; };
     bool isMaxLevel() { return isMaxLevel_; };
     bool cheat(){return cheat_; };
     QString playerIdx();
     std::vector<Event*>& events();
 
+    Vertex* nextVertex(){return nextVertex_; };
     Vertex* finalVertex(){return finalVertex_; };
     Vertex* currentVertex(){return currentVertex_; };
+    int finalLinePosition() { return finalLinePosition_; };
     Edge* edge(){return edge_; };
     enum GoodsType goodsType();
 
@@ -88,13 +90,14 @@ private:
     int position_;
     int speed_;
     int priority_;
-    int finalLinePosition_ = -1;
     bool isMaxLevel_;
     bool cheat_ = false;
     QString playerIdx_;
     std::vector<Event*> events_;
     enum GoodsType goodsType_;
-     // конечная позиция на линии
+
+    int finalLinePosition_ = -1;
+    Vertex *nextVertex_ = nullptr;   // вертекс из которого выехал или в котором стоишь
     Vertex *finalVertex_ = nullptr;     // конечный вертекс (прям самый конечный, в который хочешь доехать)
     Vertex *currentVertex_ = nullptr;   // вертекс из которого выехал или в котором стоишь
     Edge *edge_ = nullptr;      // в который едешь сейчас aka промежуточный между currentVertex и finalVertex

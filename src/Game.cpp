@@ -90,50 +90,60 @@ void Game::gameCycle() {
     currentIdx = USER_POST_IDX;
     currentPos = USER_POST_POS;
 
-//    for (auto &train : this->player().trains()) {
-//        train->setCurrentVertex(&this->player().town().vertex());
-//    }
+    for (auto &train : this->player().trains()) {
+        train->setCurrentVertex(&this->player().town().vertex());
+    }
+
     emit mapChanged(std::make_shared<Map>(*map_), *player_, true);
+    int tickCount = 0;
     while(connected_) {
 //        emit infoChange(*player_); // замутить обнову ui
         emit mapChanged(std::make_shared<Map>(*map_), *player_, false);
 
         for(auto &train : this->player().trains()){
 //            Train *train = this->player().trains()[i];
-            train->setCurrentVertex(&this->player().town().vertex());
+            if (train->idx() != this->player().trains()[0]->idx()) continue;
+
+            if (train->edge() != nullptr) {
+                qDebug() << "Not noll:" << train->currentVertex()->idx() << train->nextVertex()->idx();
+            } else qDebug() << "Null:" << tickCount;
             WaysType type = this->strategy(train);
-//            this->sendTrain(train, type);
+            this->sendTrain(train, type);
         }
 
-//        this->tick();
-//        this->printPlayerData(this->player().trains()[0], &this->player().town());
-//        this->updateUser();
-//        this->updatePosts();
+        tickCount++;
+        this->tick();
+        this->updateUser();
+        this->printPlayerData(this->player().trains()[0], &this->player().town());
+        this->updatePosts();
+
         QApplication::processEvents();
     }
 }
 // устанавливает current / next / final
 void Game::sendTrain(Train *train, enum WaysType wayType) {
-    if (train->nextVertex() == nullptr) return;
+    if (train->edge() == nullptr) {
+        qDebug() << "АТДИХАЕМ ПАЦАНВА";
+        return;
+    }
 
-    Edge currentLine;
+    Edge *currentLine = train->edge();
     Vertex start;
     Vertex end;
     int speed = 0;
 
     qDebug() << "Send train:" << train->currentVertex()->idx() << train->finalVertex()->idx();
-    currentLine = this->getLine(train, *train->currentVertex(), *train->finalVertex(), wayType);
-    qDebug() << "Line" << currentLine.idx() << currentLine.vertex1().idx() << currentLine.vertex2().idx();
+    qDebug() << "Line" << currentLine->idx() << currentLine->vertex1().idx() << currentLine->vertex2().idx();
 
     if (train->speed() != 0) {
         qDebug() << "Edem FROM:" << train->currentVertex()->idx() << "TO:" << train->nextVertex()->idx();
     }
 
-    if (currentLine.vertex1().idx() == train->currentVertex()->idx()) {
-        train->setNextVertex(&currentLine.vertex2());
-        train->setFinalLinePosition(currentLine.length());
+    if (currentLine->vertex1().idx() == train->currentVertex()->idx()) {
+        train->setNextVertex(&currentLine->vertex2());
+        train->setFinalLinePosition(currentLine->length());
     } else {
-        train->setNextVertex(&currentLine.vertex1());
+        train->setNextVertex(&currentLine->vertex1());
         train->setFinalLinePosition(0);
     }
 
@@ -144,15 +154,15 @@ void Game::sendTrain(Train *train, enum WaysType wayType) {
     this->moveAction(train, currentLine, speed);
 }
 
-void Game::moveAction(Train *train, Edge moveLine, int speed) {
+void Game::moveAction(Train *train, Edge *moveLine, int speed) {
     QJsonObject request;
-    request["line_idx"] = moveLine.idx();
+    request["line_idx"] = moveLine->idx();
     request["speed"] = speed;
     request["train_idx"] = train->idx();
     qDebug() << request;
 
     socket_->sendData(Request(Action::MOVE, request));
-    socket_->getData();
+    qDebug() << socket_->getData();
 }
 
 Vertex& Game::findPostVertex(PostType type, Vertex currentVertex, Train *train) {
