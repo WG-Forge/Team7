@@ -15,7 +15,7 @@ class GraphView : public QWidget {
         explicit GraphView(QWidget *parent = nullptr);
         ~GraphView();
 
-        void setMap(std::shared_ptr<Map> m, Player &player);
+        void setMap(std::shared_ptr<Map> m, Player &player, bool map);
 
     protected:
         void paintEvent(QPaintEvent *event) override;

@@ -64,7 +64,7 @@ class Game : public QObject {
 
     signals:
         void playerChanged(Player player);
-        void mapChanged(std::shared_ptr<Map> map, Player player);
+        void mapChanged(std::shared_ptr<Map> map, Player player, bool ggg);
 
     private:
         Socket *socket_ = nullptr;

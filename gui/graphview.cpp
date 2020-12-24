@@ -10,8 +10,11 @@ GraphView::~GraphView() {
     delete ui;
 }
 
-void GraphView::setMap(std::shared_ptr<Map> m, Player &player) {
-    map_ = m;
+void GraphView::setMap(std::shared_ptr<Map> m, Player &player, bool ggg) {
+    if (ggg) {
+        map_ = m;
+        qDebug() << "MAP UPDATE";
+    }
     player_ = new Player(player);
 }
 

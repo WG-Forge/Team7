@@ -43,7 +43,7 @@ void MainWindow::on_startButton_clicked() {
         connect(this, SIGNAL(disconnect()), game, SLOT(disconnect()));
         connect(this, SIGNAL(init(const QString&)), game, SLOT(init(const QString&)));
         connect(game, SIGNAL(playerChanged(Player)), this, SLOT(onPlayerChanged(Player)));
-        connect(game, SIGNAL(mapChanged(std::shared_ptr<Map>, Player)), this, SLOT(onMapChanged(std::shared_ptr<Map>, Player)));
+        connect(game, SIGNAL(mapChanged(std::shared_ptr<Map>, Player, bool)), this, SLOT(onMapChanged(std::shared_ptr<Map>, Player, bool)));
         thread->start();
 
         emit init(userName);
@@ -72,8 +72,8 @@ void MainWindow::onPlayerChanged(Player player) {
     ui->userSomething->setText("Rating: " + QString::number(player.rating()));
 }
 
-void MainWindow::onMapChanged(std::shared_ptr<Map> map, Player player) {
-    ui->graphview->setMap(map, player);
+void MainWindow::onMapChanged(std::shared_ptr<Map> map, Player player, bool ggg) {
+    ui->graphview->setMap(map, player, ggg);
     update();
     qDebug() << "Received map from Game thread";
 }

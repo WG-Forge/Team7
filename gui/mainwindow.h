@@ -22,7 +22,7 @@ class MainWindow : public QMainWindow {
         void on_logoutButton_clicked();
 
         void onPlayerChanged(Player player);
-        void onMapChanged(std::shared_ptr<Map> map, Player player);
+        void onMapChanged(std::shared_ptr<Map> map, Player player, bool ggg);
 
     signals:
         void init(const QString &username);

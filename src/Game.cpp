@@ -76,7 +76,6 @@ void Game::makeMap() {
 }
 
 void Game::connectToGame() {
-
 }
 
 void Game::gameCycle() {
@@ -91,21 +90,23 @@ void Game::gameCycle() {
     currentIdx = USER_POST_IDX;
     currentPos = USER_POST_POS;
 
-    for (auto &train : this->player().trains()) {
-        train->setCurrentVertex(&this->player().town().vertex());
-    }
-
+//    for (auto &train : this->player().trains()) {
+//        train->setCurrentVertex(&this->player().town().vertex());
+//    }
+    emit mapChanged(std::make_shared<Map>(*map_), *player_, true);
     while(connected_) {
-        emit mapChanged(std::make_shared<Map>(*map_), *player_);
+//        emit infoChange(*player_); // замутить обнову ui
+        emit mapChanged(std::make_shared<Map>(*map_), *player_, false);
 
         for(auto &train : this->player().trains()){
 //            Train *train = this->player().trains()[i];
             train->setCurrentVertex(&this->player().town().vertex());
-            this->strategy(train);
-            this->sendTrain(train, WaysType::MARKET);
+            WaysType type = this->strategy(train);
+//            this->sendTrain(train, type);
         }
 
 //        this->tick();
+//        this->printPlayerData(this->player().trains()[0], &this->player().town());
 //        this->updateUser();
 //        this->updatePosts();
         QApplication::processEvents();
@@ -113,6 +114,8 @@ void Game::gameCycle() {
 }
 // устанавливает current / next / final
 void Game::sendTrain(Train *train, enum WaysType wayType) {
+    if (train->nextVertex() == nullptr) return;
+
     Edge currentLine;
     Vertex start;
     Vertex end;
