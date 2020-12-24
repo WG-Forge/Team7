@@ -48,7 +48,7 @@ class Game : public QObject {
 
         void userInfo();
 
-        void strategy(Train* trainPlayer, Vertex* finalVertex, enum WaysType waysType, Vertex* nextVertex);
+        enum WaysType strategy(Train* trainPlayer);
 
         Socket& socket() { return *socket_; };
         std::shared_ptr<Map> map() { return map_; };

@@ -102,7 +102,8 @@ void Game::gameCycle() {
     for(int i = 0; i < player().trains().size(); ++i){
 
         Train *train = this->player().trains()[i];
-
+        train->setCurrentVertex(&this->player().town().vertex());
+        this->strategy(train);
 
     }
         QApplication::processEvents();
@@ -527,7 +528,7 @@ void Game::upgradeAction(std::vector<Town*> towns, std::vector<Train*> trains){
 
 }
 
-void Game::strategy(Train* trainPlayer, Vertex* finalVertex, enum WaysType waysType, Vertex* nextVertex){
+enum WaysType Game::strategy(Train* trainPlayer){
     if(trainPlayer->nextVertex() == nullptr){//поезд стоит
         if(trainPlayer->currentVertex() == trainPlayer->finalVertex()){//Поезд достиг точки назначения
             if(trainPlayer->finalVertex()->isPostIdxNull() != false){//Мы на каком то посту
@@ -541,24 +542,24 @@ void Game::strategy(Train* trainPlayer, Vertex* finalVertex, enum WaysType waysT
                     }
                     break;}
                 case 2:{//Поезд в маркете, забрал продукты, мама будет довольна
-                    finalVertex = &player().town().vertex();
+                    trainPlayer->setFinalVertex(&player().town().vertex());
                     Edge* edge = trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
-                            [map()->graph().idx().at(finalVertex->idx())];
-                    if(edge->vertex1().idx() == trainPlayer->currentVertex()->idx()){ nextVertex = &trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
-                                [map()->graph().idx().at(finalVertex->idx())]->vertex2();}
-                            else{nextVertex = &trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
-                                [map()->graph().idx().at(finalVertex->idx())]->vertex1();}
-                    waysType = static_cast<WaysType>(4);
+                            [map()->graph().idx().at(trainPlayer->finalVertex()->idx())];
+                    if(edge->vertex1().idx() == trainPlayer->currentVertex()->idx()){ trainPlayer->setNextVertex(&trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
+                                [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]->vertex2());}
+                            else{trainPlayer->setNextVertex(&trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
+                                [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]->vertex1());}
+                    return static_cast<WaysType>(4);
                     break;}
                 case 3:{//Поезд в стораже, одевается в доспехи наверно
-                    finalVertex = &player().town().vertex();
+                    trainPlayer->setFinalVertex(&player().town().vertex());
                     Edge* edge = trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
-                            [map()->graph().idx().at(finalVertex->idx())];
-                    if(edge->vertex1().idx() == trainPlayer->currentVertex()->idx()){ nextVertex = &trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
-                                [map()->graph().idx().at(finalVertex->idx())]->vertex2();}
-                            else{nextVertex = &trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
-                                [map()->graph().idx().at(finalVertex->idx())]->vertex1();}
-                    waysType = static_cast<WaysType>(4);
+                            [map()->graph().idx().at(trainPlayer->finalVertex()->idx())];
+                    if(edge->vertex1().idx() == trainPlayer->currentVertex()->idx()){ trainPlayer->setNextVertex(&trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
+                                [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]->vertex2());}
+                            else{trainPlayer->setNextVertex(&trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
+                                [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]->vertex1());}
+                    return static_cast<WaysType>(4);
                     break;}
                 }
 
@@ -569,10 +570,11 @@ void Game::strategy(Train* trainPlayer, Vertex* finalVertex, enum WaysType waysT
         }
         else{//Поезд НЕ достиг точки назначения, WHY или в городе нашем
             if(trainPlayer->finalVertex() == nullptr){
-                if(this->player().town().product() < this->player().town().productCapacity()){
+                if(this->player().town().product() <= this->player().town().productCapacity()){
+                    trainPlayer->setCurrentVertex(&this->player().town().vertex());
                     trainPlayer->setFinalVertex(&findPostVertex(PostType::MARKET, this->player().town().vertex(), trainPlayer));
-                    waysType = static_cast<WaysType>(2);
-                    trainPlayer->setNextVertex(&trainPlayer->waysMarket()[this->player().town().vertex().idx()][finalVertex->idx()]->vertex2());
+                    trainPlayer->setNextVertex(&trainPlayer->waysMarket()[this->player().town().vertex().idx()][trainPlayer->finalVertex()->idx()]->vertex2());
+                    return static_cast<WaysType>(2);
                 }
             }
         }
@@ -597,8 +599,10 @@ void Game::strategy(Train* trainPlayer, Vertex* finalVertex, enum WaysType waysT
                 }
             }
         }*/
-        trainPlayer->setNextVertex(&trainPlayer->waysMarket()[trainPlayer->nextVertex()->idx()][trainPlayer->finalVertex()->idx()]->vertex2());
-
+        trainPlayer->setCurrentVertex(trainPlayer->nextVertex());
+        trainPlayer->setNextVertex(&trainPlayer->waysMarket()[map()->graph().idx().at(trainPlayer->nextVertex()->idx())]
+                [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]->vertex2());
+        return static_cast<WaysType>(2);
 
     }
 
