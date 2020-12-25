@@ -310,6 +310,8 @@ void Game::shortestWay(Train *train, Vertex &start, Vertex &goal) {
     cost_so_far.insert(std::pair<Vertex*, double>(&start, 0));
     came_from.insert(std::pair<Vertex*, Vertex*>(&start, &start));
 
+    this->map()->graph().setNewLength(70, 80, 1000);
+
     while (!frontier2.empty()) {
         current = frontier2.get();
         if (current->idx() == goal.idx()) break;
@@ -320,8 +322,8 @@ void Game::shortestWay(Train *train, Vertex &start, Vertex &goal) {
         }
 
         for (auto &next : neighbors) {
-            double new_cost = cost_so_far[current]
-                    + this->map()->graph().matrix()[current->idx() - minVertex][next->idx() - minVertex];
+            double new_cost = cost_so_far[current] + this->map()->graph().lengthBetween(current->idx(), next->idx());
+
             if (!cost_so_far.count(next) || new_cost < cost_so_far[next]) {
                 cost_so_far[next] = new_cost;
                 double priority = new_cost + heuristic(next, &goal);
@@ -331,6 +333,7 @@ void Game::shortestWay(Train *train, Vertex &start, Vertex &goal) {
         }
         neighbors.clear();
     }
+
 
     std::vector<Vertex *> path; // ВОТ ТУТ ПУТЬ, МОЖНО ЕГО ВЕРНУТЬ ТАМ ИЛИ ЧЁ-ТО ЕЩЁ
     current = &goal;
@@ -349,6 +352,8 @@ void Game::shortestWay(Train *train, Vertex &start, Vertex &goal) {
     }
     std::cout << "\n";
     std::cout << std::endl;
+
+    this->map()->graph().restoreMatrix(); // ТУТ ВОССТАНАВЛИВАЕТСЯ МАТРИЦА, НО МОЖНО ЭТОГО И НЕ ДЕЛАТЬ
 }
 
 Vertex& Game::findPostVertex(PostType type, Vertex currentVertex, Train *train) {
