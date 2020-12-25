@@ -98,6 +98,28 @@ void Game::updateGames() {
     this->getGamesList();
 }
 
+bool Game::isGameStarted(const QString &name, const int &players) {
+    socket_->sendData(Request(Action::GAMES, QJsonObject()));
+    QJsonObject response = socket_->getData();
+    qDebug() << "IS START?";
+
+    for (auto game : response["games"].toArray()) {
+        if (game.toObject()["name"].toString() == name) {
+            if (game.toObject()["state"].toInt() == 2) {
+                qDebug() << game.toObject()["name"].toString()
+                         << game.toObject()["num_players"].toInt()
+                         << game.toObject()["state"].toInt();
+                return true;
+            }
+        }
+        qDebug() << game.toObject()["name"].toString()
+                 << game.toObject()["num_players"].toInt()
+                 << game.toObject()["state"].toInt();
+    }
+
+    return false;
+}
+
 void Game::connectToGame(const QString &userName, const QString &password, const QString &gameName, const int &players, const int &ticks) {
     QJsonObject request;
     request["name"] = userName;
@@ -130,8 +152,13 @@ void Game::connectToGame(const QString &userName, const QString &password, const
     emit mapChanged(std::make_shared<Map>(*map_), *player_, true);
     emit showMap();
 
-    this->tick();
-    qDebug() << "IN GAME:" << player_->inGame();
+    qDebug() << this->isGameStarted(gameName, players);
+    while (!this->isGameStarted(gameName, players)) {
+        continue;
+    }
+
+    this->gameCycle();
+
 }
 
 void Game::gameCycle() {
@@ -150,12 +177,11 @@ void Game::gameCycle() {
         train->setCurrentVertex(&this->player().town().vertex());
     }
 
-    emit mapChanged(std::make_shared<Map>(*map_), *player_, true);
+//    emit mapChanged(std::make_shared<Map>(*map_), *player_, true);
     int tickCount = 0;
     this->shortestWay(this->player().trains()[0], this->player().town().vertex(), this->map()->graph().vertices()[5]);
     return;
     while(connected_) {
-        break;
 //        emit infoChange(*player_); // замутить обнову ui
         emit mapChanged(std::make_shared<Map>(*map_), *player_, false);
 

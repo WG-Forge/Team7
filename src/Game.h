@@ -59,6 +59,7 @@ class Game : public QObject {
 
         // SOCKET ACTIONS
         void tick();
+        bool isGameStarted(const QString &name, const int &players);
         void updatePosts();
         void updateUser();
         void getGamesList();
