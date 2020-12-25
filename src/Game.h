@@ -41,7 +41,7 @@ class Game : public QObject {
 
         // A* ALGORITHM
         double heuristic(Vertex *v1, Vertex *v2);
-        void shortestWay(Train *train, Vertex start, Vertex goal);
+        void shortestWay(Train *train, Vertex &start, Vertex &goal);
 
         // UNREAL STRATEGY
         void strategy(Train* trainPlayer);

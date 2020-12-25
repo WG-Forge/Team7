@@ -106,9 +106,9 @@ bool Game::isGameStarted(const QString &name, const int &players) {
     for (auto game : response["games"].toArray()) {
         if (game.toObject()["name"].toString() == name) {
             if (game.toObject()["state"].toInt() == 2) {
-//                qDebug() << game.toObject()["name"].toString()
-//                         << game.toObject()["num_players"].toInt()
-//                         << game.toObject()["state"].toInt();
+                qDebug() << game.toObject()["name"].toString()
+                         << game.toObject()["num_players"].toInt()
+                         << game.toObject()["state"].toInt();
                 return true;
             }
         }
@@ -158,7 +158,6 @@ void Game::connectToGame(const QString &userName, const QString &password, const
     }
 
     this->gameCycle();
-
 }
 
 void Game::gameCycle() {
@@ -179,8 +178,8 @@ void Game::gameCycle() {
 
 //    emit mapChanged(std::make_shared<Map>(*map_), *player_, true);
     int tickCount = 0;
-    //this->shortestWay(this->player().trains()[0], this->player().town().vertex(), this->map()->graph().vertices()[5]);
-    //return;
+    this->shortestWay(this->player().trains()[0], this->player().town().vertex(), this->map()->markets()[0].vertex());
+
     while(connected_) {
 //        emit infoChange(*player_); // замутить обнову ui
         emit mapChanged(std::make_shared<Map>(*map_), *player_, false);
@@ -288,7 +287,7 @@ double Game::heuristic(Vertex *v1, Vertex *v2) {
     return abs(x1 - x2) + abs(y1 - y2);
 };
 
-void Game::shortestWay(Train *train, Vertex start, Vertex goal) {
+void Game::shortestWay(Train *train, Vertex &start, Vertex &goal) {
     int minVertex = this->map()->graph().minVertexIdx();
     int newCost = 0;
     double priority = 0;
@@ -309,7 +308,6 @@ void Game::shortestWay(Train *train, Vertex start, Vertex goal) {
         if (current->idx() == goal.idx()) break;
 
         for (auto next : current->edges()) {
-//            qDebug() << next.get().idx();
             if (current->idx() == next.get().vertex1().idx()) neighbors.emplace_back(&next.get().vertex2());
             else neighbors.emplace_back(&next.get().vertex1());
         }
@@ -317,7 +315,6 @@ void Game::shortestWay(Train *train, Vertex start, Vertex goal) {
         for (auto &next : neighbors) {
             double new_cost = cost_so_far[current]
                     + this->map()->graph().matrix()[current->idx() - minVertex][next->idx() - minVertex];
-//            qDebug() << next->idx() << new_cost;
             if (!cost_so_far.count(next) || new_cost < cost_so_far[next]) {
                 cost_so_far[next] = new_cost;
                 double priority = new_cost + heuristic(next, &goal);
@@ -328,15 +325,7 @@ void Game::shortestWay(Train *train, Vertex start, Vertex goal) {
         neighbors.clear();
     }
 
-    for (auto &from : came_from) {
-        qDebug() << from.first->idx();
-    }
-
-    ////////////////////////////////////////////////////////// УОТ ТУТА НИХУЯ НЕ РАБОТАЕТ
-    ///
-    qDebug() << came_from[&goal];  // не выводит нужную хуйню почомутчо походу адрес меняется или чё или хуй пойми что-то с указателями или ссылками ебал я их в рот
-
-    std::vector<Vertex *> path; //  НУ И ТОТ ТОЖЕ ПОТОМУ ЧТО ДО НЕ ПОЛУЧАЕТСЯ ПОЛУЧИТЬ CAME_FROM[VERTEX]
+    std::vector<Vertex *> path; // ВОТ ТУТ ПУТЬ, МОЖНО ЕГО ВЕРНУТЬ ТАМ ИЛИ ЧЁ-ТО
     current = &goal;
     path.emplace_back(current);
 
@@ -347,7 +336,11 @@ void Game::shortestWay(Train *train, Vertex start, Vertex goal) {
     path.emplace_back(&start);
 
     std::reverse(path.begin(), path.end());
-    qDebug() << "Goal:" << current->idx();
+    for (auto &c : path) {
+        std::cout << c->idx() << " -> ";
+    }
+    std::cout << "\n";
+    std::cout << std::endl;
 }
 
 Vertex& Game::findPostVertex(PostType type, Vertex currentVertex, Train *train) {
