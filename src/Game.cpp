@@ -179,8 +179,8 @@ void Game::gameCycle() {
 
 //    emit mapChanged(std::make_shared<Map>(*map_), *player_, true);
     int tickCount = 0;
-    this->shortestWay(this->player().trains()[0], this->player().town().vertex(), this->map()->graph().vertices()[5]);
-    return;
+    //this->shortestWay(this->player().trains()[0], this->player().town().vertex(), this->map()->graph().vertices()[5]);
+    //return;
     while(connected_) {
 //        emit infoChange(*player_); // замутить обнову ui
         emit mapChanged(std::make_shared<Map>(*map_), *player_, false);
@@ -575,7 +575,7 @@ void Game::strategy(Train* trainPlayer){
         }
     }
     else{//Поезд едет
-        /*for(auto train: this->map()->trains()){//Здесь ивейдим другие поезда
+        for(auto train: this->map()->trains()){//Здесь ивейдим другие поезда
             if(train.idx() != trainPlayer->idx()){
                 if(trainPlayer->speed() == 0){
                     if(map()->graph().edges()[map()->graph().idxEdges().at(train.lineIdx())].length() - train.position() <=
@@ -593,7 +593,7 @@ void Game::strategy(Train* trainPlayer){
                     }
                 }
             }
-        }*/
+        }
         if(trainPlayer->speed() == 0){
             if(trainPlayer->edge()->vertex1().idx() == trainPlayer->finalVertex()->idx() ||
                     trainPlayer->edge()->vertex2().idx() == trainPlayer->finalVertex()->idx()){
@@ -610,7 +610,15 @@ void Game::strategy(Train* trainPlayer){
             else{
                 switch(static_cast<int>(trainPlayer->waysType())){
                 case 1:{
-
+                    if(trainPlayer->currentVertex()->idx() == trainPlayer->edge()->vertex1().idx()){
+                        trainPlayer->setCurrentVertex(&trainPlayer->edge()->vertex2());
+                    }
+                    else{
+                        trainPlayer->setCurrentVertex(&trainPlayer->edge()->vertex1());
+                    }
+                    trainPlayer->setEdge(trainPlayer->waysReturn()
+                            [map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
+                            [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]);
                     break;}
                 case 2:{
                     if(trainPlayer->currentVertex()->idx() == trainPlayer->edge()->vertex1().idx()){
@@ -649,7 +657,7 @@ void Game::strategy(Train* trainPlayer){
             }
         }
         else{//если поезд едет с любой скоростью != 0
-            
+
         }
     }
 
