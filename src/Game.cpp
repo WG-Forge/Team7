@@ -446,7 +446,7 @@ void Game::upgradeAction(std::vector<Town*> towns, std::vector<Train*> trains){
 void Game::strategy(Train* trainPlayer){
     if(trainPlayer->edge() == nullptr){//поезд стоит, не может ехать
         if(trainPlayer->currentVertex() == trainPlayer->finalVertex()){//Поезд достиг точки назначения
-            if(trainPlayer->finalVertex()->isPostIdxNull() != false){//Мы на каком то посту
+            if(trainPlayer->finalVertex()->isPostIdxNull() == false){//Мы на каком то посту
                 switch (static_cast<int>(trainPlayer->finalVertex()->post().type())) {
                 case 1:{//Поезд в городе
                     if(trainPlayer->finalVertex()->postIdx() != player().town().idx()){//Поезд не дома, в городе
@@ -521,9 +521,17 @@ void Game::strategy(Train* trainPlayer){
             }
         }*/
         if(trainPlayer->speed() == 0){
-            if(trainPlayer->currentVertex() == trainPlayer->finalVertex()){
+            if(trainPlayer->edge()->vertex1().idx() == trainPlayer->finalVertex()->idx() ||
+                    trainPlayer->edge()->vertex2().idx() == trainPlayer->finalVertex()->idx()){
+                if(trainPlayer->finalVertex()->idx() == this->player().town().vertex().idx()){
+                    trainPlayer->setFinalVertex(nullptr);
+                    trainPlayer->setCurrentVertex(&this->player().town().vertex());
+                }
+                else{
+                    trainPlayer->setCurrentVertex(trainPlayer->finalVertex());
+                }
                 trainPlayer->setEdge(nullptr);
-                strategy(trainPlayer);
+                this->strategy(trainPlayer);
             }
             else{
                 switch(static_cast<int>(trainPlayer->waysType())){
