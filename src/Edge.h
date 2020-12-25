@@ -30,4 +30,5 @@ private:
     Vertex *vertex1_;
     Vertex *vertex2_;
 };
+
 #endif // LINE_H

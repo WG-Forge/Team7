@@ -96,7 +96,10 @@ void Game::gameCycle() {
 
     emit mapChanged(std::make_shared<Map>(*map_), *player_, true);
     int tickCount = 0;
+    this->shortestWay(this->player().trains()[0], this->player().town().vertex(), this->map()->graph().vertices()[5]);
+    return;
     while(connected_) {
+        break;
 //        emit infoChange(*player_); // замутить обнову ui
         emit mapChanged(std::make_shared<Map>(*map_), *player_, false);
 
@@ -183,6 +186,81 @@ void Game::moveAction(Train *train, Edge *moveLine, int speed) {
         qDebug() << "MOVEMENT ERROR" << response;
         throw(response);
     }
+}
+
+double Game::heuristic(Vertex *v1, Vertex *v2) {
+    int mapSize = 10;
+    int min = this->map()->graph().minVertexIdx();
+    double x1, x2, y1, y2;
+    x1 = (v1->idx() - min) % mapSize;
+    x2 = (v2->idx() - min) % mapSize;
+    y1 = floor((v1->idx() - min) / mapSize);
+    y2 = floor((v2->idx() - min) / mapSize);
+
+
+    return abs(x1 - x2) + abs(y1 - y2);
+};
+
+void Game::shortestWay(Train *train, Vertex start, Vertex goal) {
+    int minVertex = this->map()->graph().minVertexIdx();
+    int newCost = 0;
+    double priority = 0;
+
+    PriorityQueue<Vertex *, double> frontier2;
+    frontier2.put(&start, 0);
+
+    std::unordered_map<Vertex *, double> cost_so_far;
+    std::unordered_map<Vertex *, Vertex *> came_from;
+    std::vector<Vertex *> neighbors;
+    Vertex *current;
+
+    cost_so_far.insert(std::pair<Vertex*, double>(&start, 0));
+    came_from.insert(std::pair<Vertex*, Vertex*>(&start, &start));
+
+    while (!frontier2.empty()) {
+        current = frontier2.get();
+        if (current->idx() == goal.idx()) break;
+
+        for (auto next : current->edges()) {
+//            qDebug() << next.get().idx();
+            if (current->idx() == next.get().vertex1().idx()) neighbors.emplace_back(&next.get().vertex2());
+            else neighbors.emplace_back(&next.get().vertex1());
+        }
+
+        for (auto &next : neighbors) {
+            double new_cost = cost_so_far[current]
+                    + this->map()->graph().matrix()[current->idx() - minVertex][next->idx() - minVertex];
+//            qDebug() << next->idx() << new_cost;
+            if (!cost_so_far.count(next) || new_cost < cost_so_far[next]) {
+                cost_so_far[next] = new_cost;
+                double priority = new_cost + heuristic(next, &goal);
+                frontier2.put(next, priority);
+                came_from[next] = current;
+            }
+        }
+        neighbors.clear();
+    }
+
+    for (auto &from : came_from) {
+        qDebug() << from.first->idx();
+    }
+
+    ////////////////////////////////////////////////////////// УОТ ТУТА НИХУЯ НЕ РАБОТАЕТ
+    ///
+    qDebug() << came_from[&goal];  // не выводит нужную хуйню почомутчо походу адрес меняется или чё или хуй пойми что-то с указателями или ссылками ебал я их в рот
+
+    std::vector<Vertex *> path; //  НУ И ТОТ ТОЖЕ ПОТОМУ ЧТО ДО НЕ ПОЛУЧАЕТСЯ ПОЛУЧИТЬ CAME_FROM[VERTEX]
+    current = &goal;
+    path.emplace_back(current);
+
+    while(current != &start) {
+        current = came_from[current];
+        path.emplace_back(current);
+    }
+    path.emplace_back(&start);
+
+    std::reverse(path.begin(), path.end());
+    qDebug() << "Goal:" << current->idx();
 }
 
 Vertex& Game::findPostVertex(PostType type, Vertex currentVertex, Train *train) {

@@ -20,9 +20,11 @@ class Vertex{
         void setPosition(const QVector2D &position);
         void setPost(Post &post);
         void setPostIdx(int idx) { postIdx_ = idx; };
+        void setPriority(double newPriority) { priority_ = newPriority; };
 
         int idx();
         int postIdx();
+        double priority() { return priority_; };
         bool isPostIdxNull();
         QVector2D position();
         std::vector<std::reference_wrapper<Edge>>& edges();
@@ -35,6 +37,7 @@ class Vertex{
         QVector2D pos_;
         std::vector<std::reference_wrapper<Edge>> edges_;
         Post *post_ = nullptr;
+        double priority_ = 0;
 };
 
 #endif // POINTS_H

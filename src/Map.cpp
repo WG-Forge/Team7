@@ -29,8 +29,6 @@ Map::Map(const QJsonObject &staticObj, const QJsonObject &dynamicObj, const QJso
         case 3:
             storages_.emplace_back(post.toObject());
             posts_.emplace_back(post.toObject());
-
-//            qDebug() << posts_[posts_.size() - 1].name() << posts_[posts_.size() - 1].pointIdx();
             break;
         }
     }

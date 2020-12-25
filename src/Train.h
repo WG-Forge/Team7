@@ -79,6 +79,10 @@ public:
                    const std::vector<std::vector<int>>& masAll,
                    const  std::vector<std::vector<Edge*>>& pAll);
 
+    Vertex start;
+    Vertex goal;
+    Vertex current;
+    Vertex next;
 private:
     int cooldown_;
     int fuel_;
