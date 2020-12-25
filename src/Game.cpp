@@ -57,7 +57,7 @@ void Game::hostGame(QString name, int players, int ticks) {
 
     socket_->sendData(Request(Action::LOGIN, request));
     QJsonObject response = socket_->getData();
-    qDebug() << response;
+//    qDebug() << response;
 }
 
 void Game::disconnect() {
@@ -106,15 +106,15 @@ bool Game::isGameStarted(const QString &name, const int &players) {
     for (auto game : response["games"].toArray()) {
         if (game.toObject()["name"].toString() == name) {
             if (game.toObject()["state"].toInt() == 2) {
-                qDebug() << game.toObject()["name"].toString()
-                         << game.toObject()["num_players"].toInt()
-                         << game.toObject()["state"].toInt();
+//                qDebug() << game.toObject()["name"].toString()
+//                         << game.toObject()["num_players"].toInt()
+//                         << game.toObject()["state"].toInt();
                 return true;
             }
         }
-        qDebug() << game.toObject()["name"].toString()
-                 << game.toObject()["num_players"].toInt()
-                 << game.toObject()["state"].toInt();
+//        qDebug() << game.toObject()["name"].toString()
+//                 << game.toObject()["num_players"].toInt()
+//                 << game.toObject()["state"].toInt();
     }
 
     return false;
