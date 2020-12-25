@@ -25,17 +25,19 @@ public:
     void setVertex(Vertex &vertex);
 
     int idx() { return idx_; };
-    int point_idx() { return point_idx_; };
+    int pointIdx() { return pointIdx_; };
     QString name() { return name_; };
+    QString playerIdx() { return playerIdx_; };
     enum PostType type() { return type_; };
     std::vector<Event*>& events() { return events_; };
     Vertex& vertex();
 
 protected:
     int idx_;
-    int point_idx_;
-    Vertex *vertex_;
+    int pointIdx_;
+    Vertex *vertex_ = nullptr;
     QString name_;
+    QString playerIdx_;
     enum PostType type_;
     std::vector<Event*> events_;
 };

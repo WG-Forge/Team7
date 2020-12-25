@@ -11,35 +11,54 @@ Graph::Graph(const QJsonObject &graph, Map &map) {
     for (auto const &vertex : verticesJsonArray) {
         if (!vertex.isObject())
             throw std::invalid_argument("Wrong JSON graph format.");
-
         vertices_.emplace_back(vertex.toObject());
 
     }
 
+    int i = 0;
+    minVertexIdx_ = vertices_[0].idx();
     for (Vertex &v : vertices_) {
+        idx_.emplace(v.idx(),i);
+        i++;
         verticesMap_.emplace(v.idx(), v);
-        if (v.isPostIdxNull()) continue;
-
-        for (Post &post : map.posts()) {
-            if (post.point_idx() == v.idx() && post.idx() == v.postIdx()) {
-                v.setPost(post);
-                post.setVertex(v);
-                continue;
-            }
-        }
+        if (v.idx() < minVertexIdx_) minVertexIdx_ = v.idx();
     }
 
     for (auto const &edge : edgesJsonArray) {
         if (!edge.isObject())
             throw std::invalid_argument("Wrong JSON graph format.");
-
         edges_.emplace_back(edge.toObject(), verticesMap_);
     }
 
+    i = 0;
     for (Edge &e : edges_) {
+        idxEdges_.emplace(e.idx(), i);
+        ++i;
         e.vertex1().addEdge(e);
         e.vertex2().addEdge(e);
     }
+
+    std::vector<int> supMatrix(vertices_.size());
+    matrix_.resize(supMatrix.size());
+
+    for (Vertex &vI : vertices_) {
+        for (Vertex &vJ : vertices_) {
+            if (vI.idx() == vJ.idx()) {
+                supMatrix[vJ.idx() - minVertexIdx_] = 0;
+                continue;
+            }
+            bool isLine = false;
+            for (Edge &edge : vJ.edges()) {
+                if (edge.vertex1().idx() == vI.idx() || edge.vertex2().idx() == vI.idx()) {
+                    supMatrix[vJ.idx() - minVertexIdx_] = edge.length();
+                    isLine = true;
+                }
+            }
+            if (!isLine) supMatrix[vJ.idx() - minVertexIdx_] = 0;
+        }
+        matrix_[vI.idx() - minVertexIdx_] = supMatrix;
+    }
+    supMatrix.clear();
 }
 
 std::vector<Vertex>& Graph::vertices() {
@@ -76,17 +95,17 @@ void Graph::calcCoords(float aspectRatio, const QJsonObject coordsData) {
     const float W = aspectRatio, H = 1;
     const int placeMaxAttempts = 8;
 
-    for (int i = 0; i < placeMaxAttempts; ++i) {
-        placeVertices(W, H);
+//    for (int i = 0; i < placeMaxAttempts; ++i) {
+//        placeVertices(W, H);
 
-        if (!isSelfIntersecting())
-            break;
+//        if (!isSelfIntersecting())
+//            break;
 
-        if (i >= placeMaxAttempts - 1)
-            qWarning("Warning: Can't create non-self-intersecting graph layout. Graph is probably non planar");
-    }
+//        if (i >= placeMaxAttempts - 1)
+//            qWarning("Warning: Can't create non-self-intersecting graph layout. Graph is probably non planar");
+//    }
 
-//    this->setCoords(coordsData);
+    this->setCoords(coordsData);
     fitToSize(W, H);
 }
 
@@ -174,3 +193,12 @@ void Graph::fitToSize(float W, float H) {
         v.setPosition((v.position() - center) * scale);
     }
 }
+
+std::map<int,int>& Graph::idx(){
+    return idx_;
+}
+
+std::map<int, int>& Graph::idxEdges(){
+    return idxEdges_;
+}
+

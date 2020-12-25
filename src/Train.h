@@ -2,10 +2,14 @@
 #define TRAIN_H
 #include "Event.h"
 #include "Enums/GoodsType.h"
+#include "Enums/WaysType.h"
 #include "Events/HijackersAssault.h"
 #include "Events/RefugeesArrival.h"
 #include "Events/TrainCollision.h"
 #include "Events/ParasitesAssault.h"
+#include "Vertex.h"
+#include "Socket.h"
+#include "Edge.h"
 
 #include <QJsonObject>
 #include <QJsonArray>
@@ -16,39 +20,103 @@ public:
     explicit Train() = default;
     explicit Train(const QJsonObject &train);
 
+    void upgrade(int level, int goodsCapacity, int fuelCapacity, int nextLevelPrice){
+        level_ = level;
+        goodsCapacity_ = goodsCapacity;
+        fuelCapacity_ = fuelCapacity;
+        nextLevelPrice_ = nextLevelPrice;
+    };
+
+    void setNextVertex(Vertex *vertex) { nextVertex_ = vertex; };
+    void setFinalVertex(Vertex *vertex) { finalVertex_ = vertex; };
+    void setCurrentVertex(Vertex *vertex) { currentVertex_ = vertex; };
+
+    void setEdge(Edge *edge) { edge_ = edge; };
+    void setWaysType(WaysType waysType){ waysType_ = waysType; };
+    void setFinalLinePosition(int position) { finalLinePosition_ = position; };
+    void update(const QJsonObject& data);
+
     int cooldown();
-    std::vector<Event*>& events();
     int fuel();
-    int fuel_capacity();
-    int fuel_consumption();
+    int fuelCapacity();
+    int fuelConsumption();
     int goods();
-    int goods_capacity();
-    enum GoodsType goods_type();
+    int goodsCapacity();
     int idx();
     int level();
-    int line_idx();
-    int next_level_price();
-    QString player_idx();
+    int lineIdx();
+    int nextLevelPrice();
     int position();
     int speed();
+    int priority() { return priority_; };
+    bool isMaxLevel() { return isMaxLevel_; };
+    bool cheat(){return cheat_; };
+    QString playerIdx();
+    std::vector<Event*>& events();
 
+    Vertex* nextVertex(){return nextVertex_; };
+    Vertex* finalVertex(){return finalVertex_; };
+    Vertex* currentVertex(){return currentVertex_; };
+    int finalLinePosition() { return finalLinePosition_; };
+    Edge* edge(){return edge_; };
+    enum GoodsType goodsType();
+
+    std::vector<std::vector<int>> waysLengthStorage() { return waysLengthStorage_; };
+    std::vector<std::vector<int>> waysLengthMarket() { return waysLengthMarket_; };
+    std::vector<std::vector<int>> waysLengthReturn() { return waysLengthReturn_; };
+    std::vector<std::vector<int>> waysLengthAll() { return waysLengthAll_; };
+    std::vector<std::vector<Edge *>> waysStorage() { return waysStorage_; };
+    std::vector<std::vector<Edge *>> waysMarket() { return waysMarket_; };
+    std::vector<std::vector<Edge *>> waysReturn() { return waysReturn_; };
+    std::vector<std::vector<Edge *>> waysAll() { return waysAll_; };
+    WaysType waysType(){ return waysType_; };
+    void trainWays(const std::vector<std::vector<int>>& masMarket,
+                   const  std::vector<std::vector<Edge*>>& pMarket,
+                   const std::vector<std::vector<int>>& masStorage,
+                   const  std::vector<std::vector<Edge*>>& pStorage,
+                   const std::vector<std::vector<int>>& mas,
+                   const  std::vector<std::vector<Edge*>>& p,
+                   const std::vector<std::vector<int>>& masAll,
+                   const  std::vector<std::vector<Edge*>>& pAll);
+
+    Vertex start;
+    Vertex goal;
+    Vertex current;
+    Vertex next;
 private:
     int cooldown_;
-    std::vector<Event*> events_;
     int fuel_;
-    int fuel_capacity_;
-    int fuel_consumption_;
+    int fuelCapacity_;
+    int fuelConsumption_;
     int goods_;
-    int goods_capacity_;
-    enum GoodsType goods_type_;
+    int goodsCapacity_;
     int idx_;
     int level_;
-    int line_idx_;
-    int next_level_price_;
-    QString player_idx_;
+    int lineIdx_;
+    int nextLevelPrice_;
     int position_;
     int speed_;
+    int priority_;
+    bool isMaxLevel_;
+    bool cheat_ = false;
+    QString playerIdx_;
+    std::vector<Event*> events_;
+    enum GoodsType goodsType_;
 
+    int finalLinePosition_ = -1;
+    Vertex *nextVertex_ = nullptr;   // вертекс из которого выехал или в котором стоишь
+    Vertex *finalVertex_ = nullptr;     // конечный вертекс (прям самый конечный, в который хочешь доехать)
+    Vertex *currentVertex_ = nullptr;   // вертекс из которого выехал или в котором стоишь
+    Edge *edge_ = nullptr;      // в который едешь сейчас aka промежуточный между currentVertex и finalVertex
+    enum WaysType waysType_;
+    std::vector<std::vector<int>> waysLengthMarket_;
+    std::vector<std::vector<Edge*>> waysMarket_;
+    std::vector<std::vector<int>> waysLengthStorage_;
+    std::vector<std::vector<Edge*>> waysStorage_;
+    std::vector<std::vector<int>> waysLengthReturn_;
+    std::vector<std::vector<Edge*>> waysReturn_;
+    std::vector<std::vector<int>> waysLengthAll_;
+    std::vector<std::vector<Edge*>> waysAll_;
 };
 
 #endif // TRAIN_H
