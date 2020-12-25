@@ -8,10 +8,6 @@ Game::Game(QObject *parent) : QObject(parent)
 
 }
 
-void Game::out() {
-    qDebug() << "hi";
-}
-
 void Game::start() {
 
 }
@@ -45,17 +41,31 @@ void Game::logout() {
     this->socket_->close();
 }
 
+void Game::init() {
+    connectToServer();
+    getGamesList();
+    connected_ = true;
+}
+
+void Game::hostGame(QString name, int players, int ticks) {
+    QJsonObject request;
+    request["name"] = name;
+    request["password"];
+    request["num_players"] = players;
+    request["num_turns"] = ticks;
+    qDebug() << request;
+
+    socket_->sendData(Request(Action::LOGIN, request));
+    QJsonObject response = socket_->getData();
+    qDebug() << response;
+}
+
 void Game::disconnect() {
     qDebug() << "Connection closed";
     this->player().setInGame(false);
     connected_ = false;
 
     this->socket_->close();
-}
-
-void Game::tick() {
-    this->socket_->sendData(Request(Action::TURN, QJsonObject()));
-    QJsonObject response = socket_->getData();
 }
 
 void Game::getMap() {
@@ -75,7 +85,53 @@ void Game::makeMap() {
     map_->makeWays(this->player().town());
 }
 
-void Game::connectToGame() {
+void Game::getGamesList() {
+    socket_->sendData(Request(Action::GAMES, QJsonObject()));
+    QJsonObject response = socket_->getData();
+    qDebug() << response;
+
+    emit getGames(response);
+}
+
+void Game::updateGames() {
+    qDebug() << "UPDATE";
+    this->getGamesList();
+}
+
+void Game::connectToGame(const QString &userName, const QString &password, const QString &gameName, const int &players, const int &ticks) {
+    QJsonObject request;
+    request["name"] = userName;
+    request["game"] = gameName;
+    request["password"] = password;
+    request["num_players"] = players;
+    request["num_turns"] = ticks;
+    qDebug() << request;
+
+    socket_->sendData(Request(Action::LOGIN, request));
+    QJsonObject response = socket_->getData();
+    if (response.contains("error")) {
+        qDebug() << "ERROR" << response;
+        return;
+    }
+
+    player_ = new Player(response);
+    player_->setPassword(password);
+
+    this->setEnemiesCount(players - 1);
+    this->setGameName(gameName);
+    this->setTotalTicks(ticks);
+    this->setCurrentTick(0);
+
+    this->getMap();
+    this->makeMap();
+    this->player().setInGame(true);
+    emit playerChanged(*player_);
+
+    emit mapChanged(std::make_shared<Map>(*map_), *player_, true);
+    emit showMap();
+
+    this->tick();
+    qDebug() << "IN GAME:" << player_->inGame();
 }
 
 void Game::gameCycle() {
@@ -186,6 +242,11 @@ void Game::moveAction(Train *train, Edge *moveLine, int speed) {
         qDebug() << "MOVEMENT ERROR" << response;
         throw(response);
     }
+}
+
+void Game::tick() {
+    this->socket_->sendData(Request(Action::TURN, QJsonObject()));
+    QJsonObject response = socket_->getData();
 }
 
 double Game::heuristic(Vertex *v1, Vertex *v2) {
@@ -410,19 +471,6 @@ int Game::getIdx(int position) {
     }
 
     return idx;
-}
-
-void Game::init(const QString &username) {
-    connectToServer();
-    login(username);
-    getMap();
-    makeMap();
-    this->player().setInGame(true);
-
-    emit playerChanged(*player_);
-
-    connected_ = true;
-    gameCycle();
 }
 
 void Game::upgradeAction(std::vector<Town*> towns, std::vector<Train*> trains){

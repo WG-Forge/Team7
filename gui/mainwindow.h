@@ -5,6 +5,7 @@
 #include "Map.h"
 #include "Game.h"
 #include <QThread>
+#include <QGroupBox>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,20 +19,40 @@ class MainWindow : public QMainWindow {
         ~MainWindow();
 
     private slots:
-        void on_startButton_clicked();
-        void on_logoutButton_clicked();
+//        void onGameConnection();
 
         void onPlayerChanged(Player player);
         void onMapChanged(std::shared_ptr<Map> map, Player player, bool ggg);
+        void onGetGames(const QJsonObject &gamesData);
+        void onShowMap();
 
-    signals:
-        void init(const QString &username);
+//        void on_startButton_clicked();
+        void on_logoutButton_clicked();
+        void on_joinButton_36_clicked();
+        void on_joinButton_35_clicked();
+        void on_joinButton_34_clicked();
+        void on_joinButton_33_clicked();
+        void on_joinButton_32_clicked();
+        void on_joinButton_31_clicked();
+        void on_joinButton_30_clicked();
+        void on_joinButton_clicked();
+
+        void on_updateServers_clicked();
+        void on_hostButton_clicked();
+
+signals:
+        void init();
         void disconnect();
+        void updateGames();
+        void connectToGame(const QString &, const QString &, const QString &, const int &, const int &);
+//        void gameConnected();
 
     private:
         Ui::MainWindow *ui;
 
         QThread *thread = nullptr;
+        QWidget *gamesList;
+        QVector<QGroupBox *> gamesBoxes;
 };
 
 #endif // MAINWINDOW_H

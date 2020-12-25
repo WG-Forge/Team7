@@ -18,9 +18,11 @@ public:
     void setTown(Town &town) { town_ = &town; };
     void setTrain(Train &train) { trains_.emplace_back(&train); };
     void setInGame(bool inGame) { inGame_ = inGame; };
+    void setPassword(const QString &pass) { password_ = pass; };
 
     QString name() { return name_; };
     QString idx() { return idx_; };
+    QString password() { return password_; };
     int rating() { return rating_; };
     bool inGame() { return inGame_; };
     Town& town() { return *town_; };
@@ -33,6 +35,7 @@ private:
     QString name_;
     QString idx_;
     int rating_;
+    QString password_;
     bool inGame_;
     Town *town_;
     std::vector<Train *> trains_;
