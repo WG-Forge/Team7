@@ -34,6 +34,7 @@ public:
     void setEdge(Edge *edge) { edge_ = edge; };
     void setWaysType(WaysType waysType){ waysType_ = waysType; };
     void setFinalLinePosition(int position) { finalLinePosition_ = position; };
+    void setWaitingTime(int x){ waitingTime_ = x;};
     void update(const QJsonObject& data);
 
     int cooldown();
@@ -50,6 +51,7 @@ public:
     int speed();
     int priority() { return priority_; };
     bool isMaxLevel() { return isMaxLevel_; };
+    int waitingTime(){return waitingTime_;};
     bool cheat(){return cheat_; };
     QString playerIdx();
     std::vector<Event*>& events();
@@ -109,6 +111,7 @@ private:
     Vertex *currentVertex_ = nullptr;   // вертекс из которого выехал или в котором стоишь
     Edge *edge_ = nullptr;      // в который едешь сейчас aka промежуточный между currentVertex и finalVertex
     enum WaysType waysType_;
+    int waitingTime_;
     std::vector<std::vector<int>> waysLengthMarket_;
     std::vector<std::vector<Edge*>> waysMarket_;
     std::vector<std::vector<int>> waysLengthStorage_;

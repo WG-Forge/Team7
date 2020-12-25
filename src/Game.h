@@ -47,6 +47,10 @@ class Game : public QObject {
         void strategy(Train* trainPlayer);
         Vertex getGoods(Train *train, PostType type, Vertex currentVertex);
 
+        void wayStrategy(Train* trainPlayer);
+        void upgradeStrategy(Train* trainPlaye, std::vector<Town*> upgradeTowns, std::vector<Train*> upgradeTrainsr);
+
+
         // GAME ACTIONS
         void start();
         void end();
