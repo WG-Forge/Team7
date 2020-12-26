@@ -41,7 +41,7 @@ class Game : public QObject {
 
         // A* ALGORITHM
         double heuristic(Vertex *v1, Vertex *v2);
-        void shortestWay(Train *train, Vertex &start, Vertex &goal);
+        std::vector<Vertex*> shortestWay(Train *train, Vertex &start, Vertex &goal);
 
         // UNREAL STRATEGY
         void strategy(Train* trainPlayer);
@@ -73,6 +73,7 @@ class Game : public QObject {
         void connectToGame(QString gameName, int players, int ticks);
         void upgradeAction(std::vector<Town*> towns, std::vector<Train*> trains);
         int moveTrain(const int start, const int end, enum PostType type, Train *train);
+        void avoidTrains(Train* train);
 
         // MOVE TRAIN
 
