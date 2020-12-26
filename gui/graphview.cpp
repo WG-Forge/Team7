@@ -32,17 +32,20 @@ void GraphView::paintEvent(QPaintEvent *event) {
         float trainY;
         float edgeX1, edgeX2, edgeY1, edgeY2;
         float partLength;
+        int position = 0;
 
         painter.translate(W / 2, H / 2);
 
         for (auto &train : player_->trains()) {
             if (train->edge() != nullptr) {
                 if (train->edge()->vertex1().idx() == train->currentVertex()->idx()) {
+                    position = train->position();
                     edgeX1 = train->edge()->vertex1().position().x() * scale;
                     edgeY1 = train->edge()->vertex1().position().y() * scale;
                     edgeX2 = train->edge()->vertex2().position().x() * scale;
                     edgeY2 = train->edge()->vertex2().position().y() * scale;
                 } else {
+                    position = train->edge()->length() - train->position();
                     edgeX1 = train->edge()->vertex2().position().x() * scale;
                     edgeY1 = train->edge()->vertex2().position().y() * scale;
                     edgeX2 = train->edge()->vertex1().position().x() * scale;
@@ -53,14 +56,14 @@ void GraphView::paintEvent(QPaintEvent *event) {
 
                 if (edgeY1 == edgeY2) {
                     if (edgeX1 < edgeX2) {
-                        trainX = (edgeX1 + partLength * train->position());
-                    } else trainX = (edgeX2 - partLength * train->position());
+                        trainX = (edgeX1 + partLength * position);
+                    } else trainX = (edgeX1 - partLength * position);
 
                     trainY = (edgeY1);
                 } else if (edgeX1 == edgeX2) {
                     if (edgeY1 < edgeY2) {
-                        trainY = (edgeY1 + partLength * train->position());
-                    } else trainY = (edgeY2 - partLength * train->position());
+                        trainY = (edgeY1 + partLength * position);
+                    } else trainY = (edgeY1 - partLength * position);
 
                     trainX = (edgeX1);
                 }
@@ -70,7 +73,7 @@ void GraphView::paintEvent(QPaintEvent *event) {
                 painter.setBrush(Qt::green);
                 painter.drawEllipse(r);
                 painter.setBrush(Qt::black);
-                painter.setFont(QFont("Times", 10, QFont::ExtraBold));
+                painter.setFont(QFont("Times", 11, QFont::Bold));
                 painter.drawText(r, Qt::AlignCenter, QString::number(train->idx()));
             }
             update();

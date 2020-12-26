@@ -135,6 +135,7 @@ void Game::connectToGame(const QString &userName, const QString &password, const
         qDebug() << "ERROR" << response;
         return;
     }
+    qDebug() << response;
 
     player_ = new Player(response);
     player_->setPassword(password);
@@ -143,6 +144,7 @@ void Game::connectToGame(const QString &userName, const QString &password, const
     this->setGameName(gameName);
     this->setTotalTicks(ticks);
     this->setCurrentTick(0);
+    player_->setTicks(0, this->totalTicks());
 
     this->getMap();
     this->makeMap();
@@ -154,6 +156,7 @@ void Game::connectToGame(const QString &userName, const QString &password, const
 
     qDebug() << this->isGameStarted(gameName, players);
     while (!this->isGameStarted(gameName, players)) {
+        qDebug() << "Waiting for players..";
         continue;
     }
 
@@ -221,6 +224,8 @@ void Game::gameCycle() {
         this->tick();
         this->updateUser();
         this->updatePosts();
+        this->setCurrentTick(this->currentTick() + 1);
+        player_->setTicks(this->currentTick(), this->totalTicks());
 
         emit mapChanged(std::make_shared<Map>(*map_), *player_, false);
         emit playerChanged(this->player());

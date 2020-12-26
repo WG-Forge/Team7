@@ -96,9 +96,9 @@ class Game : public QObject {
         int totalTicks() { return totalTicks_; };
         QString gameName() { return gameName_; };
 
-        void setCurrentTick(const int &tick) { currentTick_ = tick; };
-        void setEnemiesCount(const int &amount) { enemiesAmount_ = amount; };
-        void setTotalTicks(const int &total) { totalTicks_ = total; };
+        void setCurrentTick(const int tick) { currentTick_ = tick; };
+        void setEnemiesCount(const int amount) { enemiesAmount_ = amount; };
+        void setTotalTicks(const int total) { totalTicks_ = total; };
         void setGameName(const QString &name) { gameName_ = name; };
 
         // PRINTS

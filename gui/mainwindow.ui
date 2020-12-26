@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>893</width>
-    <height>727</height>
+    <width>941</width>
+    <height>616</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -26,10 +26,10 @@
       <widget class="QPushButton" name="logoutButton">
        <property name="geometry">
         <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>75</width>
-         <height>23</height>
+         <x>9</x>
+         <y>9</y>
+         <width>80</width>
+         <height>21</height>
         </rect>
        </property>
        <property name="text">
@@ -39,10 +39,10 @@
       <widget class="QTextEdit" name="postInfo">
        <property name="geometry">
         <rect>
-         <x>380</x>
-         <y>30</y>
-         <width>101</width>
-         <height>111</height>
+         <x>9</x>
+         <y>556</y>
+         <width>861</width>
+         <height>201</height>
         </rect>
        </property>
        <property name="html">
@@ -56,10 +56,10 @@ p, li { white-space: pre-wrap; }
       <widget class="QGroupBox" name="userGameInfo">
        <property name="geometry">
         <rect>
-         <x>0</x>
-         <y>30</y>
-         <width>121</width>
-         <height>171</height>
+         <x>9</x>
+         <y>36</y>
+         <width>150</width>
+         <height>514</height>
         </rect>
        </property>
        <property name="title">
@@ -95,10 +95,179 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="userSomething">
+         <widget class="QLabel" name="userRating">
           <property name="text">
-           <string>Something</string>
+           <string>Rating</string>
           </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="userArmor">
+          <property name="text">
+           <string>Armor</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="userLevel">
+          <property name="text">
+           <string>Town level</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="currentGameTicks">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item alignment="Qt::AlignLeft">
+         <widget class="QGroupBox" name="train_1">
+          <property name="title">
+           <string>Train 1</string>
+          </property>
+          <layout class="QFormLayout" name="formLayout_2">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_12">
+             <property name="text">
+              <string>Train level</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>Goods</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="trainLevel_1">
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLabel" name="trainGoods_1">
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item alignment="Qt::AlignLeft">
+         <widget class="QGroupBox" name="train_2">
+          <property name="title">
+           <string>Train 2</string>
+          </property>
+          <layout class="QFormLayout" name="formLayout_5">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_46">
+             <property name="text">
+              <string>Train level</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_47">
+             <property name="text">
+              <string>Goods</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="trainLevel_2">
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLabel" name="trainGoods_2">
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item alignment="Qt::AlignLeft">
+         <widget class="QGroupBox" name="train_3">
+          <property name="title">
+           <string>Train 3</string>
+          </property>
+          <layout class="QFormLayout" name="formLayout_4">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_43">
+             <property name="text">
+              <string>Train level</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_44">
+             <property name="text">
+              <string>Goods</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="trainLevel_3">
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLabel" name="trainGoods_3">
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item alignment="Qt::AlignLeft">
+         <widget class="QGroupBox" name="train_4">
+          <property name="title">
+           <string>Train 4</string>
+          </property>
+          <layout class="QFormLayout" name="formLayout_3">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_41">
+             <property name="text">
+              <string>Train level</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_10">
+             <property name="text">
+              <string>Goods</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="trainLevel_4">
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLabel" name="trainGoods_4">
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
        </layout>
@@ -299,7 +468,7 @@ p, li { white-space: pre-wrap; }
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
+            <y>-400</y>
             <width>284</width>
             <height>1164</height>
            </rect>
@@ -960,7 +1129,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>893</width>
+     <width>941</width>
      <height>20</height>
     </rect>
    </property>

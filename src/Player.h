@@ -19,11 +19,14 @@ public:
     void setTrain(Train &train) { trains_.emplace_back(&train); };
     void setInGame(bool inGame) { inGame_ = inGame; };
     void setPassword(const QString &pass) { password_ = pass; };
+    void setTicks(int current, int max) { currentTick_ = current; maxTicks_ = max; };
 
     QString name() { return name_; };
     QString idx() { return idx_; };
     QString password() { return password_; };
     int rating() { return rating_; };
+    int maxTicks() { return maxTicks_; };
+    int currentTick() { return currentTick_; };
     bool inGame() { return inGame_; };
     Town& town() { return *town_; };
     std::vector<Train *> &trains() { return trains_; };
@@ -39,6 +42,8 @@ private:
     bool inGame_;
     Town *town_;
     std::vector<Train *> trains_;
+    int maxTicks_;
+    int currentTick_;
 };
 
 #endif // PLAYER_H

@@ -123,7 +123,24 @@ void MainWindow::onPlayerChanged(Player player) {
                               " / " +
                               QString::number(player.town().productCapacity()));
 
-    ui->userSomething->setText("Rating: " + QString::number(player.rating()));
+    ui->userRating->setText("Rating: " + QString::number(player.rating()));
+    ui->userArmor->setText("Armor: " + QString::number(player.town().armor()));
+    ui->userLevel->setText("Level: " + QString::number(player.town().level()));
+    QString maxTicks = QString::number(player.maxTicks());
+    if (player.maxTicks() == -1) {
+        maxTicks = "UNLIMITED";
+    }
+    ui->currentGameTicks->setText("Ticks: " + QString::number(player.currentTick()) + " / " + maxTicks);
+
+    ui->trainLevel_1->setText(QString::number(player.trains()[0]->level()));
+    ui->trainLevel_2->setText(QString::number(player.trains()[1]->level()));
+    ui->trainLevel_3->setText(QString::number(player.trains()[2]->level()));
+    ui->trainLevel_4->setText(QString::number(player.trains()[3]->level()));
+
+    ui->trainGoods_1->setText(QString::number(player.trains()[0]->goods()));
+    ui->trainGoods_2->setText(QString::number(player.trains()[1]->goods()));
+    ui->trainGoods_3->setText(QString::number(player.trains()[2]->goods()));
+    ui->trainGoods_4->setText(QString::number(player.trains()[3]->goods()));
 }
 
 void MainWindow::onMapChanged(std::shared_ptr<Map> map, Player player, bool ggg) {
