@@ -190,6 +190,7 @@ void Game::gameCycle() {
     int tickCount = 0;
 //    this->shortestWay(this->player().trains()[0], this->player().town().vertex(), this->map()->markets()[0].vertex());
 
+
     std::vector<Town*> upgradeTowns;
     std::vector<Train*> upgradeTrains;
 
@@ -371,7 +372,9 @@ std::vector<Vertex*> Game::shortestWay(Train *train, Vertex &start, Vertex &goal
         neighbors.clear();
     }
 
+
     std::vector<Vertex *> path; // ВОТ ТУТ ПУТЬ, МОЖНО ЕГО ВЕРНУТЬ ТАМ ИЛИ ЧЁ-ТО ЕЩЁ
+
     current = &goal;
     path.emplace_back(current);
     int tt = goal.idx();
@@ -603,9 +606,8 @@ void Game::wayStrategy(Train* trainPlayer){
                     this->shortestWay(trainPlayer, *trainPlayer->currentVertex(), *trainPlayer->finalVertex());
                     trainPlayer->setCurrentIndex(1);
                     trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex()]);
-                    trainPlayer->setWaysType(static_cast<WaysType>(1));
 
-                    this->avoidTrains(trainPlayer);
+                    //this->avoidTrains(trainPlayer);
                     break;}
                 case 3:{//Поезд в стораже, одевается в доспехи наверно
                     trainPlayer->setCurrentVertex(trainPlayer->finalVertex());
@@ -613,9 +615,7 @@ void Game::wayStrategy(Train* trainPlayer){
                     this->shortestWay(trainPlayer, *trainPlayer->currentVertex(), *trainPlayer->finalVertex());
                     trainPlayer->setCurrentIndex(1);
                     trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex()]);
-                    trainPlayer->setWaysType(static_cast<WaysType>(1));
-
-                    this->avoidTrains(trainPlayer);
+                    //this->avoidTrains(trainPlayer);
                     break;}
                 }
 
@@ -654,7 +654,7 @@ void Game::wayStrategy(Train* trainPlayer){
                         trainPlayer->setWaysType(static_cast<WaysType>(2));
                     }
                 }
-                this->avoidTrains(trainPlayer);
+               // this->avoidTrains(trainPlayer);
             }
             else{
 
@@ -663,7 +663,7 @@ void Game::wayStrategy(Train* trainPlayer){
     }
     else{//Поезд едет
         if(trainPlayer->speed() == 0){
-            if(trainPlayer->nextVertex() == trainPlayer->finalVertex()){
+            if(trainPlayer->nextVertex()->idx() == trainPlayer->finalVertex()->idx()){
                 if(trainPlayer->finalVertex()->idx() == this->player().town().vertex().idx()){
                     trainPlayer->setFinalVertex(nullptr);
                     trainPlayer->setCurrentVertex(&this->player().town().vertex());
@@ -686,7 +686,7 @@ void Game::wayStrategy(Train* trainPlayer){
 
 
         }
-        this->avoidTrains(trainPlayer);
+        //this->avoidTrains(trainPlayer);
     }
 
 }
