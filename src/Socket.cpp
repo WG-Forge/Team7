@@ -1,55 +1,63 @@
-#include "SocketTest.h"
+#include "Socket.h"
 
+Socket::Socket(QTcpSocket *parent) : QTcpSocket(parent){}
 
-
-SocketTest::SocketTest(QObject *parent) : QObject(parent){}
-
-void SocketTest::Connect() {
+void Socket::connect() {
     socket = new QTcpSocket(this);
     socket->connectToHost(SERVER_ADDR, SERVER_PORT);
     if(!socket->waitForConnected()){
         qDebug() << "Not Connected!";
-    }
+    } else qDebug() << "Connected!";
 }
 
-void SocketTest::Close() {
+void Socket::close() {
+    qDebug() << "Closed";
     socket->close();
 }
 
-void SocketTest::sendData(Request request)
+void Socket::sendData(Request request)
 {
     QByteArray sData;
     QJsonDocument doc(request.data());
     qint32 size = doc.toJson(QJsonDocument::Compact).size();
+    int defSize = size;
+    if (defSize == 2) {
+        defSize = 0;
+        size = 0;
+    }
+
     int actionCode = static_cast<int>(request.action());
     for (int i = 0; i < 4; ++i)
     {
-//        qDebug() << (unsigned char)(code & 0xFF);
         sData.append((unsigned char)(actionCode & 0xFF));
         actionCode >>= 8;
     }
 
-    // конверт размера
     for (int i = 0; i < 4; ++i)
     {
-//        qDebug() << (unsigned char)(size & 0xFF);
         sData.append((unsigned char)(size & 0xFF));
         size >>= 8;
     }
 
-    sData.append(doc.toJson(QJsonDocument::Compact));
+    if (defSize != 0)  {
+        sData.append(doc.toJson(QJsonDocument::Compact));
+    }
+
+//    qDebug() << "Sdata:" << sData;
     socket->write(sData);
-    socket->waitForBytesWritten(3000);
-    //qDebug() << "sent: " << socket->waitForBytesWritten();
+    socket->waitForBytesWritten();
 }
 
-QJsonObject SocketTest::getData() {
+QJsonObject Socket::getData() {
     QByteArray response;
     QJsonDocument doc;
 
     do {
         socket->waitForReadyRead();
         response += socket->readAll();
+
+        if (response.size() == 4) continue;
+        if (response.mid(8).size() == 0) break;
 
         doc = QJsonDocument::fromJson(response.mid(8));
     }

@@ -13,7 +13,7 @@ public:
 private:
     enum EventType type_;
     int tick_;
-    int hijackers_power_;
+    int hijackersPower_;
 };
 
 #endif // HIJACKERSASSAULT_H

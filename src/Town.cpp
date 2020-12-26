@@ -35,46 +35,46 @@ Town::Town(const QJsonObject& town){
 
     if(town.contains("armor")){
         armor_ = town["armor"].toInt();
-        armor_capacity_ = town["armor_capacity"].toInt();
+        armorCapacity_ = town["armor_capacity"].toInt();
     }
     else{
         armor_ = -1;
     }
     if(town.contains("level")){
         level_ = town["level"].toInt();
-        next_level_price_ = town["next_level_price"].toInt();
+        nextLevelPrice_ = town["next_level_price"].toInt();
     }
     else{
         level_ = -1;
     }
     if(town.contains("player_idx")){
-        player_idx_ = town["player_idx"].toString();
+        playerIdx_ = town["player_idx"].toString();
     }
     else{
-        player_idx_ = nullptr;
+        playerIdx_ = nullptr;
     }
 
-    point_idx_ = town["point_idx"].toInt();
+    pointIdx_ = town["point_idx"].toInt();
 
     if(town.contains("population")){
         population_ = town["population"].toInt();
-        population_capacity_ = town["population_capacity"].toInt();
+        populationCapacity_ = town["population_capacity"].toInt();
     }
     else{
         population_ = -1;
     }
     if(town.contains("product")){
         product_ = town["product"].toInt();
-        product_capacity_ = town["product_capacity"].toInt();
+        productCapacity_ = town["product_capacity"].toInt();
     }
     else{
         product_ = -1;
     }
     if(town.contains("train_cooldown")){
-        train_cooldown_ = town["trani_cooldown"].toInt();
+        trainCooldown_ = town["trani_cooldown"].toInt();
     }
     else{
-        train_cooldown_ = -1;
+        trainCooldown_ = -1;
     }
 
     type_ = static_cast<PostType>(town["type"].toInt());
@@ -83,13 +83,13 @@ Town::Town(const QJsonObject& town){
 int Town::armor(){
     if(armor_ == -1)
         throw std::invalid_argument("No armor");
-    return product_;
+    return armor_;
 }
 
-int Town::armor_capacity(){
+int Town::armorCapacity(){
     if(armor_ == -1)
         throw std::invalid_argument("No armor");
-    return product_capacity_;
+    return armorCapacity_;
 }
 
 int Town::level(){
@@ -98,32 +98,32 @@ int Town::level(){
     return level_;
 }
 
-int Town::next_level_price(){
+int Town::nextLevelPrice(){
     if(level_ == -1)
         throw std::invalid_argument("No level");
-    return next_level_price_;
+    return nextLevelPrice_;
 }
 
-QString Town::player_idx(){
-    if(player_idx_ == -1)
+QString Town::playerIdx(){
+    if(playerIdx_ == -1)
         throw std::invalid_argument("No player_idx");
-    return player_idx_;
+    return playerIdx_;
 }
 
-//int Town::point_idx(){
-//    return point_idx_;
+//int Town::pointIdx(){
+//    return pointIdx_;
 //}
 
 int Town::population(){
     if(population_ == -1)
         throw std::invalid_argument("No population");
-    return product_;
+    return population_;
 }
 
-int Town::population_capacity(){
+int Town::populationCapacity(){
     if(population_ == -1)
         throw std::invalid_argument("No population");
-    return product_capacity_;
+    return populationCapacity_;
 }
 
 int Town::product(){
@@ -132,16 +132,45 @@ int Town::product(){
     return product_;
 }
 
-int Town::product_capacity(){
+int Town::productCapacity(){
     if(product_ == -1)
         throw std::invalid_argument("No product");
-    return product_capacity_;
+    return productCapacity_;
 }
 
-int Town::train_cooldown(){
-    if(train_cooldown_ == -1)
+int Town::trainCooldown(){
+    if(trainCooldown_ == -1)
         throw std::invalid_argument("No train_cooldown");
-   return train_cooldown_;
+   return trainCooldown_;
+}
+
+void Town::update(const QJsonObject& data) {
+//    qDebug() << name_ << data["name"].toString();
+
+    if (data["name"].toString() != name_) {
+        qDebug() << "NE TOT TOWN!!!!!!!!!!!!!!";
+        throw("Pizdec");
+        return;
+    }
+
+    armor_ = data["armor"].toInt();
+    armorCapacity_ = data["armor_capacity"].toInt();
+
+    level_ = data["level"].toInt();
+    if (level_ == 3) {
+        isMaxLevel_ = true;
+        nextLevelPrice_ = -1;
+    } else {
+        nextLevelPrice_ = data["next_level_price"].toInt();
+    }
+
+    population_ = data["population"].toInt();
+    populationCapacity_ = data["population_capacity"].toInt();
+
+    product_ = data["product"].toInt();
+    productCapacity_ = data["product_capacity"].toInt();
+
+    trainCooldown_ = data["train_cooldown"].toInt();
 }
 
 //int Town::idx(){

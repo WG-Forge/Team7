@@ -35,35 +35,35 @@ Train::Train(const QJsonObject &train){
     }
     if (train.contains("fuel")){
         fuel_ = train["fuel"].toInt();
-        fuel_capacity_ = train["fuel_capacity"].toInt();
-        fuel_consumption_ = train["fuel_consumption"].toInt();
+        fuelCapacity_ = train["fuel_capacity"].toInt();
+        fuelConsumption_ = train["fuel_consumption"].toInt();
     }
     else{
         fuel_ = -1;
     }
     if (train.contains("goods")){
         goods_ = train["goods"].toInt();
-        goods_capacity_ = train["goods_capacity"].toInt();
-        goods_type_ = static_cast<GoodsType>(train["goods_type"].toInt());
+        goodsCapacity_ = train["goods_capacity"].toInt();
+        goodsType_ = static_cast<GoodsType>(train["goods_type"].toInt());
     }
     else{
         goods_ = -1;
     }
     if (train.contains("level")){
         level_ = train["level"].toInt();
-        next_level_price_ = train["next_level_price"].toInt();
+        nextLevelPrice_ = train["next_level_price"].toInt();
     }
     else{
         level_ = -1;
     }
     if (train.contains("line_idx")){
-        line_idx_ = train["line_idx"].toInt();
+        lineIdx_ = train["line_idx"].toInt();
     }
     else{
-        line_idx_ = -1;
+        lineIdx_ = -1;
     }
     idx_ = train["idx"].toInt();
-    player_idx_ = train["player_idx"].toString();
+    playerIdx_ = train["player_idx"].toString();
     position_ = train["position"].toInt();
     speed_ = train["speed"].toInt();
 }
@@ -80,38 +80,36 @@ int Train::fuel(){
     if(fuel_ == -1)
         throw std::invalid_argument("No fuel");
     return fuel_;
-
 }
 
-int Train::fuel_capacity(){
+int Train::fuelCapacity(){
     if(fuel_ == -1)
         throw std::invalid_argument("No fuel");
-    return fuel_capacity_;
+    return fuelCapacity_;
 }
 
-int Train::fuel_consumption(){
+int Train::fuelConsumption(){
     if(fuel_ == -1)
         throw std::invalid_argument("No fuel");
-    return fuel_consumption_;
+    return fuelConsumption_;
 }
 
 int Train::goods(){
     if(goods_ == -1)
         throw std::invalid_argument("No goods");
     return goods_;
-
 }
 
-int Train::goods_capacity(){
+int Train::goodsCapacity(){
     if(goods_ == -1)
         throw std::invalid_argument("No goods");
-    return goods_capacity_;
+    return goodsCapacity_;
 }
 
-enum GoodsType Train::goods_type(){
+enum GoodsType Train::goodsType(){
     if(goods_ == -1)
         throw std::invalid_argument("No goods");
-    return goods_type_;
+    return goodsType_;
 }
 
 int Train::idx(){
@@ -124,19 +122,19 @@ int Train::level(){
     return level_;
 }
 
-int Train::line_idx(){
-    if(line_idx_ == -1)
+int Train::lineIdx(){
+    if(lineIdx_ == -1)
        throw std::invalid_argument("No line_idx");
-    return line_idx_;
+    return lineIdx_;
 }
 
-int Train::next_level_price(){
+int Train::nextLevelPrice(){
     if(level_ == -1)
         throw std::invalid_argument("No level");
-    return next_level_price_;
+    return nextLevelPrice_;
 }
-QString Train::player_idx(){
-    return player_idx_;
+QString Train::playerIdx(){
+    return playerIdx_;
 }
 
 int Train::position(){
@@ -144,6 +142,83 @@ int Train::position(){
 }
 
 int Train::speed(){
-    return position_;
+    return speed_;
+}
+
+void Train::trainWays(const std::vector<std::vector<int>>& masMarket,
+                      const  std::vector<std::vector<Edge*>>& pMarket,
+                      const std::vector<std::vector<int>>& masStorage,
+                      const  std::vector<std::vector<Edge*>>& pStorage,
+                      const std::vector<std::vector<int>>& mas,
+                      const  std::vector<std::vector<Edge*>>& p,
+                      const std::vector<std::vector<int>>& masAll,
+                      const  std::vector<std::vector<Edge*>>& pAll){
+   for(int i = 0; i < masMarket.size(); ++i){
+       waysLengthMarket_.push_back(std::vector<int>(masMarket[i]));
+   }
+   for(int i = 0; i < pMarket.size(); ++i){
+       waysMarket_.push_back(pMarket[i]);
+   }
+   for(int i = 0; i < masStorage.size(); ++i){
+       waysLengthStorage_.push_back(std::vector<int>(masStorage[i]));
+   }
+   for(int i = 0; i < pStorage.size(); ++i){
+       waysStorage_.push_back(pStorage[i]);
+   }
+
+   for(int i = 0; i < mas.size(); ++i){
+       waysLengthReturn_.push_back(std::vector<int>(mas[i]));
+   }
+   for(int i = 0; i < p.size(); ++i){
+       waysReturn_.push_back(p[i]);
+   }
+
+   for(int i = 0; i < masAll.size(); ++i){
+       waysLengthAll_.push_back(std::vector<int>(masAll[i]));
+   }
+   for(int i = 0; i < pAll.size(); ++i){
+       waysAll_.push_back(pAll[i]);
+   }
+}
+
+void Train::update(const QJsonObject &train){
+
+    if (train.contains("fuel")){
+        fuel_ = train["fuel"].toInt();
+        fuelCapacity_ = train["fuel_capacity"].toInt();
+        fuelConsumption_ = train["fuel_consumption"].toInt();
+    }
+    else{
+        fuel_ = -1;
+    }
+    if (train.contains("goods")){
+        goods_ = train["goods"].toInt();
+        goodsCapacity_ = train["goods_capacity"].toInt();
+        goodsType_ = static_cast<GoodsType>(train["goods_type"].toInt());
+    }
+    else{
+        goods_ = -1;
+    }
+    if (train.contains("level")){
+        level_ = train["level"].toInt();
+        if (level_ == 3) {
+            isMaxLevel_ = true;
+            nextLevelPrice_ = -1;
+        } else {
+            nextLevelPrice_ = train["next_level_price"].toInt();
+        }
+    }
+    else{
+        level_ = -1;
+    }
+    if (train.contains("line_idx")){
+        lineIdx_ = train["line_idx"].toInt();
+    }
+    else{
+        lineIdx_ = -1;
+    }
+
+    position_ = train["position"].toInt();
+    speed_ = train["speed"].toInt();
 }
 

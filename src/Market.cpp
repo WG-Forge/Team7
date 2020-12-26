@@ -34,11 +34,11 @@ Market::Market(const QJsonObject& market){
 
     idx_ = market["idx"].toInt();
     name_ = market["name"].toString();
-    point_idx_ = market["point_idx"].toInt();
+    pointIdx_ = market["point_idx"].toInt();
 
     if(market.contains("product")){
         product_ = market["product"].toInt();
-        product_capacity_ = market["product_capacity"].toInt();
+        productCapacity_ = market["product_capacity"].toInt();
         replenishment_ = market["replenishment"].toInt();
     }
     else{
@@ -54,14 +54,26 @@ int Market::product(){
     return product_;
 }
 
-int Market::product_capacity(){
+int Market::productCapacity(){
     if(product_ == -1)
         throw std::invalid_argument("No product");
-    return product_capacity_;
+    return productCapacity_;
 }
 
 int Market::replenishment(){
     if(product_ == -1)
         throw std::invalid_argument("No product");
     return replenishment_;
+}
+
+void Market::update(const QJsonObject& data) {
+    if (data["name"].toString() != name_) {
+        qDebug() << "NE TOT MARKET!!!!!!!!!!!!!!";
+        throw("Pizdec");
+        return;
+    }
+
+    product_ = data["product"].toInt();
+    productCapacity_ = data["product_capacity"].toInt();
+    replenishment_ = data["replenishment"].toInt();
 }
