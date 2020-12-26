@@ -36,14 +36,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     thread = new QThread;
     game->moveToThread(thread);
-    connect(this, SIGNAL(disconnect()), game, SLOT(disconnect()));
     connect(this, SIGNAL(init()), game, SLOT(init()));
+    connect(game, SIGNAL(showMap()), this, SLOT(onShowMap()));
+    connect(this, SIGNAL(disconnect()), game, SLOT(disconnect()));
     connect(this, SIGNAL(updateGames()), game, SLOT(updateGames()));
+    connect(game, SIGNAL(playerChanged(Player)), this, SLOT(onPlayerChanged(Player)));
+    connect(game, SIGNAL(playerChanged(Player)), this, SLOT(onPlayerChanged(Player)));
+    connect(game, SIGNAL(getGames(const QJsonObject &)), this, SLOT(onGetGames(const QJsonObject &)));
     connect(this, SIGNAL(connectToGame(const QString &, const QString &, const QString &, const int &, const int &)),
             game, SLOT(connectToGame(const QString &, const QString &, const QString &, const int &, const int &)));
-    connect(game, SIGNAL(getGames(const QJsonObject &)), this, SLOT(onGetGames(const QJsonObject &)));
-    connect(game, SIGNAL(showMap()), this, SLOT(onShowMap()));
-    connect(game, SIGNAL(playerChanged(Player)), this, SLOT(onPlayerChanged(Player)));
     connect(game, SIGNAL(mapChanged(std::shared_ptr<Map>, Player, bool)), this, SLOT(onMapChanged(std::shared_ptr<Map>, Player, bool)));
 
     thread->start();

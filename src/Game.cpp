@@ -161,8 +161,6 @@ void Game::connectToGame(const QString &userName, const QString &password, const
 }
 
 void Game::gameCycle() {
-    qDebug() << "cycle";
-
     int currentIdx = 0,
         currentPos = 0;
     QJsonObject response;
@@ -190,17 +188,17 @@ void Game::gameCycle() {
 
     while(connected_) {
 //        emit infoChange(*player_); // замутить обнову ui
-        emit mapChanged(std::make_shared<Map>(*map_), *player_, false);
+
         for(auto &train : this->player().trains()){
-                if (train->edge() != nullptr) {
+                if (train->edge() != nullptr && train->idx() == 1) {
                     qDebug() << "Not noll:";
                     qDebug() << "Current:" << train->currentVertex()->idx()
                              << "Next: " << train->nextVertex()->idx();
-                } else qDebug() << "Null:" << tickCount;
+                } else if (train->idx() == 1) qDebug() << "Null:" << tickCount;
                 if(train->waitingTime() <= 0 && train->events().size() == 0){
                     this->wayStrategy(train);
                     this->sendTrain(train);
-                    qDebug() << train->cooldown();
+//                    qDebug() << train->cooldown();
                 }
                 train->setWaitingTime(train->waitingTime() - 1);
                 this->upgradeStrategy(train, upgradeTowns, upgradeTrains);
@@ -212,12 +210,15 @@ void Game::gameCycle() {
         this->updateUser();
         this->updatePosts();
 
+        emit mapChanged(std::make_shared<Map>(*map_), *player_, false);
+        emit playerChanged(this->player());
+
         QApplication::processEvents();
     }
 }
 // устанавливает current / next / final
 void Game::sendTrain(Train *train) {
-    if (train->edge() == nullptr) {
+    if (train->edge() == nullptr && train->idx() == 1) {
         qDebug() << "АТДИХАЕМ ПАЦАНВА"
                  << "Current:" << train->currentVertex()->idx();
         return;
@@ -230,17 +231,20 @@ void Game::sendTrain(Train *train) {
     Vertex end;
     int speed = train->speed();
 
-    qDebug() << "Start pos:" << train->currentVertex()->idx()
-             << "Final pos:" << train->finalVertex()->idx();
-    qDebug() << "Line:" << currentLine->idx()
-             << "V1:" << currentLine->vertex1().idx()
-             << "V2:" << currentLine->vertex2().idx();
+    if (train->idx() == 1) {
+        qDebug() << "Start pos:" << train->currentVertex()->idx()
+                 << "Final pos:" << train->finalVertex()->idx();
+        qDebug() << "Line:" << currentLine->idx()
+                 << "V1:" << currentLine->vertex1().idx()
+                 << "V2:" << currentLine->vertex2().idx();
 
-    if (train->speed() != 0) {
+    }
+
+    if (train->speed() != 0 && train->idx() == 1) {
         qDebug() << "Edem FROM:" << train->currentVertex()->idx()
                  << "TO:" << train->nextVertex()->idx()
                  << "Position:" << train->position();
-    } else {
+    } else if (train->idx() == 1) {
         qDebug() << "Stoim V:" << train->edge()->idx()
                  << "Current:" << train->currentVertex()->idx()
                  << "Position:" << train->position();
@@ -346,12 +350,6 @@ void Game::shortestWay(Train *train, Vertex &start, Vertex &goal) {
     path.emplace_back(&start);
 
     std::reverse(path.begin(), path.end());
-    std::cout << "PATH: ";
-    for (auto &c : path) {
-        std::cout << c->idx() << " -> ";
-    }
-    std::cout << "\n";
-    std::cout << std::endl;
 
     this->map()->graph().restoreMatrix(); // ТУТ ВОССТАНАВЛИВАЕТСЯ МАТРИЦА, НО МОЖНО ЭТОГО И НЕ ДЕЛАТЬ
 }
@@ -427,16 +425,32 @@ void Game::updateUser() {
     for (auto &train : this->player().trains()) {
         train->update(response["trains"].toArray()[trainIndex].toObject());
         trainIndex++;
+        if (train->idx() == 1) {
+            if (train->nextVertex() != nullptr) {
+                qDebug() << "TRAIN:" << train->idx()
+                         << "LINE:" << train->lineIdx() << train->edge()->idx()
+                         << "POSITION:" << train->position()
+                         << "CURRENT VERTEX:" << train->currentVertex()->idx()
+                         << "NEXT VERTEX" << train->nextVertex()->idx();
+            } else {
+                qDebug() << "TRAIN:" << train->idx()
+                         << "LINE:" << train->lineIdx()
+                         << "POSITION:" << train->position()
+                         << "CURRENT VERTEX:" << train->currentVertex()->idx()
+                         << "NEXT VERTEX: NULL";
+            }
+        }
     }
 
-    qDebug() << "SERVER: Product:" << this->player().town().product()
-             << "Population:" << this->player().town().population()
-             << "Armor:" << this->player().town().armor()
-             << "Train:" << this->player().trains()[0]->lineIdx()
-             << this->player().trains()[0]->position()
-             << this->player().trains()[0]->speed()
-             << this->player().trains()[0]->goods()
-             << (int)this->player().trains()[0]->goodsType();
+//    qDebug() << "SERVER: Product:" << this->player().town().product()
+//             << "Population:" << this->player().town().population()
+//             << "Armor:" << this->player().town().armor()
+//             << "Train:" << this->player().trains()[0]->lineIdx()
+//             << this->player().trains()[0]->position()
+//             << this->player().trains()[0]->speed()
+//             << this->player().trains()[0]->goods()
+//             << (int)this->player().trains()[0]->goodsType();
+
 }
 
 void Game::updatePosts() {
