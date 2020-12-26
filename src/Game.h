@@ -60,6 +60,7 @@ class Game : public QObject {
         void getMap();
         void makeMap();
         void connectToServer();
+        bool productProblem();
 
         // SOCKET ACTIONS
         void tick();

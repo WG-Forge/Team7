@@ -176,16 +176,11 @@ void Game::gameCycle() {
     for (auto &train : this->player().trains()) {
         train->setCurrentVertex(&this->player().town().vertex());
         train->setWaitingTime(i);
-        if(i == 1){
-            i += 4;
+        if(i != 0){
+            i += 6;
         }
         else{
-            if(i == 5){
-                i += 15;
-            }
-            else{
-                ++i;
-            }
+            ++i;
         }
     }
 
@@ -201,7 +196,7 @@ void Game::gameCycle() {
 //        emit infoChange(*player_); // замутить обнову ui
 
         for(auto &train : this->player().trains()){
-            if(train->idx() == this->player().trains()[0]->idx()){
+            //if(train->idx() != this->player().trains()[3]->idx()){
                 if (train->edge() != nullptr && train->currentVertex()->idx() != train->finalVertex()->idx()) {
                     qDebug() << "Not noll:";
                     qDebug() << "Current:" << train->currentVertex()->idx()
@@ -218,7 +213,7 @@ void Game::gameCycle() {
                 }
                 this->upgradeStrategy(train, upgradeTowns, upgradeTrains);
             }
-        }
+       // }
 
         tickCount++;
         this->tick();
@@ -271,10 +266,8 @@ void Game::sendTrain(Train *train) {
 
    if(train->speed() == 0){
        if (currentLine->vertex1().idx() == train->currentVertex()->idx()) {
-           train->setNextVertex(&currentLine->vertex2());
            train->setFinalLinePosition(currentLine->length());
        } else {
-           train->setNextVertex(&currentLine->vertex1());
            train->setFinalLinePosition(0);
        }
        if (train->currentVertex()->idx() < train->nextVertex()->idx()) {
@@ -298,7 +291,6 @@ void Game::sendTrain(Train *train) {
                 << "Current:" << train->currentVertex()->idx()
                 << "Position:" << train->position();
    }
-
 }
 
 void Game::moveAction(Train *train, Edge *moveLine, int speed) {
@@ -611,7 +603,7 @@ void Game::wayStrategy(Train* trainPlayer){
                     this->shortestWay(trainPlayer, *trainPlayer->currentVertex(), *trainPlayer->finalVertex());
                     trainPlayer->setCurrentIndex(1);
                     trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex()]);
-
+                    trainPlayer->setWaysType(static_cast<WaysType>(1));
                     //this->avoidTrains(trainPlayer);
                     break;}
                 case 3:{//Поезд в стораже, одевается в доспехи наверно
@@ -620,6 +612,7 @@ void Game::wayStrategy(Train* trainPlayer){
                     this->shortestWay(trainPlayer, *trainPlayer->currentVertex(), *trainPlayer->finalVertex());
                     trainPlayer->setCurrentIndex(1);
                     trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex()]);
+                    trainPlayer->setWaysType(static_cast<WaysType>(1));
                     //this->avoidTrains(trainPlayer);
                     break;}
                 }
@@ -632,7 +625,7 @@ void Game::wayStrategy(Train* trainPlayer){
         else{//Поезд НЕ достиг точки назначения, WHY или в городе нашем
             if(trainPlayer->finalVertex() == nullptr){//Тут логика отправления поезда
                 if(static_cast<int>(this->player().trains()[0]->waysType()) == 2){
-                    if(trainPlayer->idx() == this->player().trains()[2]->idx()){
+                    if(this->productProblem()){
                         trainPlayer->setCurrentVertex(&this->player().town().vertex());
                         trainPlayer->setFinalVertex(&findPostVertex(PostType::MARKET, this->player().town().vertex(), trainPlayer));
                         this->shortestWay(trainPlayer, *trainPlayer->currentVertex(), *trainPlayer->finalVertex());
@@ -641,12 +634,12 @@ void Game::wayStrategy(Train* trainPlayer){
                         trainPlayer->setWaysType(static_cast<WaysType>(2));
                     }
                     else{
-                    trainPlayer->setCurrentVertex(&this->player().town().vertex());
-                    trainPlayer->setFinalVertex(&findPostVertex(PostType::STORAGE, this->player().town().vertex(), trainPlayer));
-                    this->shortestWay(trainPlayer, *trainPlayer->currentVertex(), *trainPlayer->finalVertex());
-                    trainPlayer->setCurrentIndex(1);
-                    trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex()]);
-                    trainPlayer->setWaysType(static_cast<WaysType>(3));
+                        trainPlayer->setCurrentVertex(&this->player().town().vertex());
+                        trainPlayer->setFinalVertex(&findPostVertex(PostType::STORAGE, this->player().town().vertex(), trainPlayer));
+                        this->shortestWay(trainPlayer, *trainPlayer->currentVertex(), *trainPlayer->finalVertex());
+                        trainPlayer->setCurrentIndex(1);
+                        trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex()]);
+                        trainPlayer->setWaysType(static_cast<WaysType>(3));
                     }
                 }
                 else{
@@ -747,7 +740,24 @@ void Game::upgradeStrategy(Train* trainPlayer, std::vector<Town*> upgradeTowns, 
         }
     }
 }
-
+bool Game::productProblem(){
+    int sum = 0;
+    int productProeb = 0;
+    for(auto& train: this->player().trains()){
+        if(static_cast<int>(train->waysType()) == 2){
+            sum += train->goodsCapacity();
+            productProeb += (train->waysLengthMarket()[this->map()->graph().idx().at(train->currentVertex()->idx())]
+                    [this->map()->graph().idx().at(train->finalVertex()->idx())]
+                    + train->waysLengthMarket()[this->map()->graph().idx().at(train->finalVertex()->idx())]
+                    [this->map()->graph().idx().at(this->player().town().vertex().idx())]) * this->player().town().population();
+        }
+    }
+    int nehvatka = this->player().town().productCapacity() - this->player().town().product() - productProeb;
+    if(nehvatka >= sum){
+        return true;
+    }
+    return false;
+}
 void Game::printMap(enum PostType type) {
     switch (type) {
     case PostType::TOWN :
