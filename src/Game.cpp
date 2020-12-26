@@ -175,10 +175,17 @@ void Game::gameCycle() {
     for (auto &train : this->player().trains()) {
         train->setCurrentVertex(&this->player().town().vertex());
         train->setWaitingTime(i);
-        if(i == 2){
-            i += 5;
+        if(i == 1){
+            i += 4;
         }
-        else{++i;}
+        else{
+            if(i == 5){
+                i += 15;
+            }
+            else{
+                ++i;
+            }
+        }
     }
 
 //    emit mapChanged(std::make_shared<Map>(*map_), *player_, true);
@@ -192,19 +199,22 @@ void Game::gameCycle() {
 //        emit infoChange(*player_); // замутить обнову ui
         emit mapChanged(std::make_shared<Map>(*map_), *player_, false);
         for(auto &train : this->player().trains()){
+            if(train->idx() == this->player().trains()[0]->idx()){
                 if (train->edge() != nullptr) {
                     qDebug() << "Not noll:";
                     qDebug() << "Current:" << train->currentVertex()->idx()
                              << "Next: " << train->nextVertex()->idx();
                 } else qDebug() << "Null:" << tickCount;
-                if(train->waitingTime() <= 0 && train->events().size() == 0){
-                    this->wayStrategy(train);
-                    this->sendTrain(train);
+                if(train->waitingTime() == 0){
+                        this->wayStrategy(train);
+                        this->sendTrain(train);
                     qDebug() << train->cooldown();
                 }
+                if(train->waitingTime() != 0){
                 train->setWaitingTime(train->waitingTime() - 1);
+                }
                 this->upgradeStrategy(train, upgradeTowns, upgradeTrains);
-           // }
+            }
         }
 
         tickCount++;
@@ -217,19 +227,37 @@ void Game::gameCycle() {
 }
 // устанавливает current / next / final
 void Game::sendTrain(Train *train) {
-    if (train->edge() == nullptr) {
+    if (train->nextVertex() == nullptr) {
         qDebug() << "АТДИХАЕМ ПАЦАНВА"
                  << "Current:" << train->currentVertex()->idx();
         return;
     }
 
 //   if (train->nextVertex() == nullptr) return;
+    Edge *currentLine = nullptr;
+    for(auto& edge: train->currentVertex()->edges()){
+        if((edge.get().vertex1().idx() == train->currentVertex()->idx() && edge.get().vertex2().idx() == train->nextVertex()->idx())
+                || (edge.get().vertex1().idx() == train->nextVertex()->idx() && edge.get().vertex2().idx() == train->currentVertex()->idx())){
+            currentLine = &edge.get();
+        }
+    }
 
-    Edge *currentLine = train->edge();
     Vertex start;
     Vertex end;
     int speed = train->speed();
-
+    if(train->speed() == 0){
+        if (currentLine->vertex1().idx() == train->currentVertex()->idx()) {
+            train->setNextVertex(&currentLine->vertex2());
+            train->setFinalLinePosition(currentLine->length());
+        } else {
+            train->setNextVertex(&currentLine->vertex1());
+            train->setFinalLinePosition(0);
+        }
+        if (train->currentVertex()->idx() < train->nextVertex()->idx()) {
+            speed = 1;
+        } else speed = -1;
+        this->moveAction(train, currentLine, speed);
+    }
     qDebug() << "Start pos:" << train->currentVertex()->idx()
              << "Final pos:" << train->finalVertex()->idx();
     qDebug() << "Line:" << currentLine->idx()
@@ -245,19 +273,7 @@ void Game::sendTrain(Train *train) {
                  << "Current:" << train->currentVertex()->idx()
                  << "Position:" << train->position();
     }
-    if(train->speed() == 0){
-    if (currentLine->vertex1().idx() == train->currentVertex()->idx()) {
-        train->setNextVertex(&currentLine->vertex2());
-        train->setFinalLinePosition(currentLine->length());
-    } else {
-        train->setNextVertex(&currentLine->vertex1());
-        train->setFinalLinePosition(0);
-    }
-    if (train->currentVertex()->idx() < train->nextVertex()->idx()) {
-        speed = 1;
-    } else speed = -1;
-    this->moveAction(train, currentLine, speed);
-    }
+
 }
 
 void Game::moveAction(Train *train, Edge *moveLine, int speed) {
@@ -294,7 +310,7 @@ double Game::heuristic(Vertex *v1, Vertex *v2) {
     return abs(x1 - x2) + abs(y1 - y2);
 };
 
-void Game::shortestWay(Train *train, Vertex &start, Vertex &goal) {
+std::vector<Vertex*> Game::shortestWay(Train *train, Vertex &start, Vertex &goal) {
     int minVertex = this->map()->graph().minVertexIdx();
     int newCost = 0;
     double priority = 0;
@@ -310,7 +326,6 @@ void Game::shortestWay(Train *train, Vertex &start, Vertex &goal) {
     cost_so_far.insert(std::pair<Vertex*, double>(&start, 0));
     came_from.insert(std::pair<Vertex*, Vertex*>(&start, &start));
 
-    this->map()->graph().setNewLength(70, 80, 1000);
 
     while (!frontier2.empty()) {
         current = frontier2.get();
@@ -352,8 +367,9 @@ void Game::shortestWay(Train *train, Vertex &start, Vertex &goal) {
     }
     std::cout << "\n";
     std::cout << std::endl;
-
-    this->map()->graph().restoreMatrix(); // ТУТ ВОССТАНАВЛИВАЕТСЯ МАТРИЦА, НО МОЖНО ЭТОГО И НЕ ДЕЛАТЬ
+   train->setCurrentPath(path);
+   // this->map()->graph().restoreMatrix(); // ТУТ ВОССТАНАВЛИВАЕТСЯ МАТРИЦА, НО МОЖНО ЭТОГО И НЕ ДЕЛАТЬ
+    return path;
 }
 
 Vertex& Game::findPostVertex(PostType type, Vertex currentVertex, Train *train) {
@@ -524,7 +540,13 @@ void Game::upgradeAction(std::vector<Town*> towns, std::vector<Train*> trains){
 }
 
 void Game::wayStrategy(Train* trainPlayer){
-    if(trainPlayer->edge() == nullptr){//поезд стоит, не может ехать
+    if(trainPlayer->cooldown() != 0){
+        trainPlayer->setCurrentVertex(&this->player().town().vertex());
+        trainPlayer->setNextVertex(nullptr);
+        trainPlayer->setFinalVertex(nullptr);
+        return;
+    }
+    if(trainPlayer->nextVertex() == nullptr){//поезд стоит, не может ехать
         if(trainPlayer->currentVertex() == trainPlayer->finalVertex()){//Поезд достиг точки назначения
             if(trainPlayer->finalVertex()->isPostIdxNull() == false){//Мы на каком то посту
                 switch (static_cast<int>(trainPlayer->finalVertex()->post().type())) {
@@ -538,28 +560,22 @@ void Game::wayStrategy(Train* trainPlayer){
                 case 2:{//Поезд в маркете, забрал продукты, мама будет довольна
                     trainPlayer->setCurrentVertex(trainPlayer->finalVertex());
                     trainPlayer->setFinalVertex(&player().town().vertex());
-                    if(trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
-                                            [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]->vertex1().idx()
-                            == trainPlayer->currentVertex()->idx()){ trainPlayer->
-                                setEdge(trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
-                                [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]);}
-                            else{trainPlayer->
-                                setEdge(trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
-                                [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]);}
+                    this->shortestWay(trainPlayer, *trainPlayer->currentVertex(), *trainPlayer->finalVertex());
+                    trainPlayer->setCurrentIndex(1);
+                    trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex()]);
                     trainPlayer->setWaysType(static_cast<WaysType>(1));
+
+                    this->avoidTrains(trainPlayer);
                     break;}
                 case 3:{//Поезд в стораже, одевается в доспехи наверно
                     trainPlayer->setCurrentVertex(trainPlayer->finalVertex());
                     trainPlayer->setFinalVertex(&player().town().vertex());
-                    if(trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
-                                            [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]->vertex1().idx()
-                            == trainPlayer->currentVertex()->idx()){ trainPlayer->
-                                setEdge(trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
-                                [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]);}
-                            else{trainPlayer->
-                                setEdge(trainPlayer->waysAll()[map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
-                                [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]);}
+                    this->shortestWay(trainPlayer, *trainPlayer->currentVertex(), *trainPlayer->finalVertex());
+                    trainPlayer->setCurrentIndex(1);
+                    trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex()]);
                     trainPlayer->setWaysType(static_cast<WaysType>(1));
+
+                    this->avoidTrains(trainPlayer);
                     break;}
                 }
 
@@ -574,15 +590,17 @@ void Game::wayStrategy(Train* trainPlayer){
                     if(trainPlayer->idx() == this->player().trains()[2]->idx()){
                         trainPlayer->setCurrentVertex(&this->player().town().vertex());
                         trainPlayer->setFinalVertex(&findPostVertex(PostType::MARKET, this->player().town().vertex(), trainPlayer));
-                        trainPlayer->setEdge(trainPlayer->waysMarket()[map()->graph().idx().at(this->player().town().vertex().idx())]
-                                [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]);
+                        this->shortestWay(trainPlayer, *trainPlayer->currentVertex(), *trainPlayer->finalVertex());
+                        trainPlayer->setCurrentIndex(2);
+                        trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex()]);
                         trainPlayer->setWaysType(static_cast<WaysType>(2));
                     }
                     else{
                     trainPlayer->setCurrentVertex(&this->player().town().vertex());
                     trainPlayer->setFinalVertex(&findPostVertex(PostType::STORAGE, this->player().town().vertex(), trainPlayer));
-                    trainPlayer->setEdge(trainPlayer->waysStorage()[map()->graph().idx().at(this->player().town().vertex().idx())]
-                            [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]);
+                    this->shortestWay(trainPlayer, *trainPlayer->currentVertex(), *trainPlayer->finalVertex());
+                    trainPlayer->setCurrentIndex(2);
+                    trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex()]);
                     trainPlayer->setWaysType(static_cast<WaysType>(3));
                     }
                 }
@@ -590,11 +608,13 @@ void Game::wayStrategy(Train* trainPlayer){
                     if(this->player().town().product() <= this->player().town().productCapacity()){
                         trainPlayer->setCurrentVertex(&this->player().town().vertex());
                         trainPlayer->setFinalVertex(&findPostVertex(PostType::MARKET, this->player().town().vertex(), trainPlayer));
-                        trainPlayer->setEdge(trainPlayer->waysMarket()[map()->graph().idx().at(this->player().town().vertex().idx())]
-                                [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]);
+                        this->shortestWay(trainPlayer, *trainPlayer->currentVertex(), *trainPlayer->finalVertex());
+                        trainPlayer->setCurrentIndex(2);
+                        trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex()]);
                         trainPlayer->setWaysType(static_cast<WaysType>(2));
                     }
                 }
+                this->avoidTrains(trainPlayer);
             }
             else{
 
@@ -602,120 +622,66 @@ void Game::wayStrategy(Train* trainPlayer){
         }
     }
     else{//Поезд едет
-
         if(trainPlayer->speed() == 0){
-            if(trainPlayer->edge()->vertex1().idx() == trainPlayer->finalVertex()->idx() ||
-                    trainPlayer->edge()->vertex2().idx() == trainPlayer->finalVertex()->idx()){
+            if(trainPlayer->nextVertex() == trainPlayer->finalVertex()){
                 if(trainPlayer->finalVertex()->idx() == this->player().town().vertex().idx()){
                     trainPlayer->setFinalVertex(nullptr);
                     trainPlayer->setCurrentVertex(&this->player().town().vertex());
+                    trainPlayer->setWaysType(WaysType::ANYTING);
                 }
                 else{
                     trainPlayer->setCurrentVertex(trainPlayer->finalVertex());
                 }
-                trainPlayer->setEdge(nullptr);
-                this->wayStrategy(trainPlayer);
+                trainPlayer->setNextVertex(nullptr);
+                wayStrategy(trainPlayer);
             }
             else{
-                switch(static_cast<int>(trainPlayer->waysType())){
-                case 1:{
-                    if(trainPlayer->currentVertex()->idx() == trainPlayer->edge()->vertex1().idx()){
-                        trainPlayer->setCurrentVertex(&trainPlayer->edge()->vertex2());
-                    }
-                    else{
-                        trainPlayer->setCurrentVertex(&trainPlayer->edge()->vertex1());
-                    }
-                    trainPlayer->setEdge(trainPlayer->waysReturn()
-                            [map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
-                            [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]);
-                    break;}
-                case 2:{
-                    if(trainPlayer->currentVertex()->idx() == trainPlayer->edge()->vertex1().idx()){
-                        trainPlayer->setCurrentVertex(&trainPlayer->edge()->vertex2());
-                    }
-                    else{
-                        trainPlayer->setCurrentVertex(&trainPlayer->edge()->vertex1());
-                    }
-                    trainPlayer->setEdge(trainPlayer->waysMarket()
-                            [map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
-                            [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]);
-                    break;}
-                case 3:{
-                    if(trainPlayer->currentVertex()->idx() == trainPlayer->edge()->vertex1().idx()){
-                        trainPlayer->setCurrentVertex(&trainPlayer->edge()->vertex2());
-                    }
-                    else{
-                        trainPlayer->setCurrentVertex(&trainPlayer->edge()->vertex1());
-                    }
-                    trainPlayer->setEdge(trainPlayer->waysStorage()
-                            [map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
-                            [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]);
-                    break;}
-                case 4:{
-                    if(trainPlayer->currentVertex()->idx() == trainPlayer->edge()->vertex1().idx()){
-                        trainPlayer->setCurrentVertex(&trainPlayer->edge()->vertex2());
-                    }
-                    else{
-                        trainPlayer->setCurrentVertex(&trainPlayer->edge()->vertex1());
-                    }
-                    trainPlayer->setEdge(trainPlayer->waysAll()
-                            [map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
-                            [map()->graph().idx().at(trainPlayer->finalVertex()->idx())]);
-                    break;}
-                }
+                trainPlayer->setCurrentVertex(trainPlayer->nextVertex());
+                trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex() + 1]);
+                trainPlayer->setCurrentIndex(trainPlayer->currentIndex() + 1);
             }
-            for(auto train: this->player().trains()){//Здесь ивейдим столкновения поездов
-                 if(train->idx() != trainPlayer->idx()){
-                             if(trainPlayer->edge()
-                                     == train->edge()){
-                                 if((trainPlayer->edge()->vertex1().idx() == trainPlayer->currentVertex()->idx()
-                                         && trainPlayer->currentVertex()->idx() < trainPlayer->edge()->vertex2().idx()
-                                         && train->speed() == -1)
-                                   ||(trainPlayer->edge()->vertex1().idx() == trainPlayer->currentVertex()->idx()
-                                        && trainPlayer->currentVertex()->idx() > trainPlayer->edge()->vertex2().idx()
-                                        && train->speed() == 1)
-                                   ||(trainPlayer->edge()->vertex2().idx() == trainPlayer->currentVertex()->idx()
-                                      && trainPlayer->currentVertex()->idx() < trainPlayer->edge()->vertex1().idx()
-                                      && train->speed() == -1)
-                                   ||(trainPlayer->edge()->vertex2().idx() == trainPlayer->currentVertex()->idx()
-                                            && trainPlayer->currentVertex()->idx() > trainPlayer->edge()->vertex1().idx()
-                                            && train->speed() == 1)){
-                                 for(auto& edge: trainPlayer->currentVertex()->edges()){
-                                     if(edge.get().vertex1().idx() == trainPlayer->currentVertex()->idx()){
-                                         if(trainPlayer->waysAll()[this->map()->graph().idx().at(edge.get().vertex2().idx())]
-                                                 [this->map()->graph().idx().at(trainPlayer->finalVertex()->idx())] != nullptr){
-                                             trainPlayer->setEdge(trainPlayer->waysAll()[this->map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
-                                                     [this->map()->graph().idx().at(edge.get().vertex2().idx())]);
-                                         }
 
-                                     }
-                                     else{
-                                         if(trainPlayer->waysAll()[this->map()->graph().idx().at(edge.get().vertex1().idx())]
-                                                 [this->map()->graph().idx().at(trainPlayer->finalVertex()->idx())] != nullptr){
-                                             trainPlayer->setEdge(trainPlayer->waysAll()[this->map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
-                                                     [this->map()->graph().idx().at(edge.get().vertex1().idx())] );
-                                         }
-
-                                     }
-                                 }
-                                 }
-                             }
-                     }
-             }
         }
         else{//если поезд едет с любой скоростью != 0
-                for(auto train: this->player().trains()){//Здесь ивейдим столкновения поездов
-                     if(train->idx() != trainPlayer->idx()){
-                                 if(trainPlayer->edge()
-                                         == train->edge()){
-                                 }
-                     }
 
-                }
 
         }
+        this->avoidTrains(trainPlayer);
     }
 
+}
+
+void Game::avoidTrains(Train* trainPlayer){
+    if(trainPlayer->speed() == 0){
+    for(auto train: this->player().trains()){//Здесь ивейдим столкновения поездов
+         if(train->idx() != trainPlayer->idx()){
+                     if(trainPlayer->nextVertex()
+                             == train->currentVertex()){
+                            int pidaras = map()->graph().lengthBetween(trainPlayer->currentVertex()->idx(), trainPlayer->nextVertex()->idx());
+                            map()->graph().setNewLength(trainPlayer->currentVertex()->idx(), trainPlayer->nextVertex()->idx(), 1000000);
+                            this->shortestWay(trainPlayer, *trainPlayer->currentVertex(), *trainPlayer->finalVertex());
+                            trainPlayer->setCurrentIndex(2);
+                            map()->graph().setNewLength(trainPlayer->currentVertex()->idx(), trainPlayer->nextVertex()->idx(), pidaras);
+                            trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex()]);
+                     }
+
+    }
+    }
+    }
+    else{
+        /*for(auto train: this->player().trains()){//Здесь ивейдим столкновения поездов
+             if(train->idx() != trainPlayer->idx()){
+                         if(trainPlayer->edge()
+                                 == train->edge()){
+                             if((train->speed() == 1 && trainPlayer->speed() == -1) || (train->speed() == -1 && trainPlayer->speed() == 1)){
+                                 this->moveAction(trainPlayer, trainPlayer->edge(), -trainPlayer->speed());
+                                 trainPlayer->setSpeed(-trainPlayer->speed());
+                                 return;
+                             }
+                         }
+             }
+        }*/
+         }
 }
 
 void Game::upgradeStrategy(Train* trainPlayer, std::vector<Town*> upgradeTowns, std::vector<Train*> upgradeTrains){
