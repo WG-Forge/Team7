@@ -118,6 +118,7 @@ class Game : public QObject {
         void mapChanged(std::shared_ptr<Map> map, Player *player, bool ggg);
         void getGames(const QJsonObject &gamesData);
         void showMap();
+        void gameEnd(const int);
 
     private:
         bool connected_ = false;

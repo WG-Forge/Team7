@@ -74,6 +74,7 @@ void Game::getMap() {
 
     socket_->sendData(Request(Action::MAP, QJsonObject({{"layer", 1}})));
      layer_1 = socket_->getData();
+     qDebug() << layer_1;
 
     socket_->sendData(Request(Action::MAP, QJsonObject({{"layer", 10}})));
      layer_2 = socket_->getData();
@@ -213,6 +214,10 @@ void Game::gameCycle() {
         emit mapChanged(std::make_shared<Map>(*map_), player_, false);
         emit playerChanged(player_, true);
 
+        if (tickCount == this->totalTicks()) {
+            emit gameEnd(player_->rating());
+        }
+
         QApplication::processEvents();
     }
 }
@@ -299,7 +304,24 @@ void Game::moveAction(Train *train, Edge *moveLine, int speed) {
 
 void Game::tick() {
     this->socket_->sendData(Request(Action::TURN, QJsonObject()));
+    socket_->waitForReadyRead();
     QJsonObject response = socket_->getData();
+
+    socket_->sendData(Request(Action::GAMES, QJsonObject()));
+    response = socket_->getData();
+    qDebug() << "IS START?";
+
+    for (auto game : response["games"].toArray()) {
+        if (game.toObject()["name"].toString() == this->gameName()) {
+            if (game.toObject()["state"].toInt() == 2) {
+                continue;
+            } else {
+                socket_->close();
+                emit gameEnd(this->player().rating());
+                emit disconnect();
+            }
+        }
+    }
 }
 
 double Game::heuristic(Vertex *v1, Vertex *v2) {

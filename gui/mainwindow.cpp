@@ -10,6 +10,7 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     ui->graphview->hide();
+    ui->postScreen->hide();
 
     gamesList = ui->gamesList;
     ui->postInfo->hide();
@@ -46,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(this, SIGNAL(connectToGame(const QString &, const QString &, const QString &, const int &, const int &)),
             game, SLOT(connectToGame(const QString &, const QString &, const QString &, const int &, const int &)));
     connect(game, SIGNAL(mapChanged(std::shared_ptr<Map>, Player *, bool)), this, SLOT(onMapChanged(std::shared_ptr<Map>, Player *, bool)));
+    connect(game, SIGNAL(gameEnd(const int)), this, SLOT(onGameEnd(const int)));
 
     thread->start();
 
@@ -358,4 +360,21 @@ void MainWindow::on_updateServers_clicked()
 {
     qDebug() << "clicked";
     emit updateGames();
+}
+
+void MainWindow::onGameEnd(int rating) {
+    thread->exit();
+    this->disconnect();
+
+    ui->graphview->hide();
+    ui->postScreen->show();
+    ui->postRating->setText("Финальный рейтинг: " + QString::number(rating));
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    ui->postScreen->hide();
+    ui->startMenu->show();
+    emit init();
+    thread->start();
 }
