@@ -74,7 +74,7 @@ class Game : public QObject {
         void connectToGame(QString gameName, int players, int ticks);
         void upgradeAction(std::vector<Town*> towns, std::vector<Train*> trains);
         int moveTrain(const int start, const int end, enum PostType type, Train *train);
-        void avoidTrains(Train* train);
+        bool avoidTrains(Train* train);
 
         // MOVE TRAIN
 
