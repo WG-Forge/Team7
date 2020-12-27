@@ -10,12 +10,12 @@ GraphView::~GraphView() {
     delete ui;
 }
 
-void GraphView::setMap(std::shared_ptr<Map> m, Player &player, bool ggg) {
+void GraphView::setMap(std::shared_ptr<Map> m, Player *player, bool ggg) {
     if (ggg) {
         map_ = m;
         qDebug() << "MAP UPDATE";
     }
-    player_ = new Player(player);
+    player_ = player;
 }
 
 void GraphView::paintEvent(QPaintEvent *event) {

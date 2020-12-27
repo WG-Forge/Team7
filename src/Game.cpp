@@ -149,9 +149,9 @@ void Game::connectToGame(const QString &userName, const QString &password, const
     this->getMap();
     this->makeMap();
     this->player().setInGame(true);
-    emit playerChanged(*player_);
+    emit playerChanged(player_, false);
 
-    emit mapChanged(std::make_shared<Map>(*map_), *player_, true);
+    emit mapChanged(std::make_shared<Map>(*map_), player_, true);
     emit showMap();
 
     qDebug() << this->isGameStarted(gameName, players);
@@ -184,36 +184,24 @@ void Game::gameCycle() {
         }
     }
 
-//    emit mapChanged(std::make_shared<Map>(*map_), *player_, true);
+    emit mapChanged(std::make_shared<Map>(*map_), player_, true);
     int tickCount = 0;
-//    this->shortestWay(this->player().trains()[0], this->player().town().vertex(), this->map()->markets()[0].vertex());
-
 
     std::vector<Town*> upgradeTowns;
     std::vector<Train*> upgradeTrains;
 
     while(connected_) {
-//        emit infoChange(*player_); // замутить обнову ui
-
         for(auto &train : this->player().trains()){
-            //if(train->idx() != this->player().trains()[3]->idx()){
-                if (train->edge() != nullptr && train->currentVertex()->idx() != train->finalVertex()->idx()) {
-                    qDebug() << "Not noll:";
-                    qDebug() << "Current:" << train->currentVertex()->idx()
-                             << "Next: " << train->nextVertex()->idx();
-                } else qDebug() << "Null:" << tickCount;
                 if(train->waitingTime() == 0){
                     this->wayStrategy(train);
                     this->printPlayerData(train, &this->player().town());
                     this->sendTrain(train);
-//                    qDebug() << train->cooldown();
                 }
                 if(train->waitingTime() != 0){
                 train->setWaitingTime(train->waitingTime() - 1);
                 }
                 this->upgradeStrategy(train, upgradeTowns, upgradeTrains);
             }
-       // }
 
         tickCount++;
         this->tick();
@@ -221,9 +209,11 @@ void Game::gameCycle() {
         this->updatePosts();
         this->setCurrentTick(this->currentTick() + 1);
         player_->setTicks(this->currentTick(), this->totalTicks());
-
-        emit mapChanged(std::make_shared<Map>(*map_), *player_, false);
-        emit playerChanged(this->player());
+        for (auto &train : player_->trains()) {
+            qDebug() << "GDF;JGSDS" << train->idx();
+        }
+        emit mapChanged(std::make_shared<Map>(*map_), player_, false);
+        emit playerChanged(player_, true);
 
         QApplication::processEvents();
     }
@@ -482,16 +472,6 @@ void Game::updateUser() {
             }
         }
     }
-
-//    qDebug() << "SERVER: Product:" << this->player().town().product()
-//             << "Population:" << this->player().town().population()
-//             << "Armor:" << this->player().town().armor()
-//             << "Train:" << this->player().trains()[0]->lineIdx()
-//             << this->player().trains()[0]->position()
-//             << this->player().trains()[0]->speed()
-//             << this->player().trains()[0]->goods()
-//             << (int)this->player().trains()[0]->goodsType();
-
 }
 
 void Game::updatePosts() {

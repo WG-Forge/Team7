@@ -21,8 +21,8 @@ class MainWindow : public QMainWindow {
     private slots:
 //        void onGameConnection();
 
-        void onPlayerChanged(Player player);
-        void onMapChanged(std::shared_ptr<Map> map, Player player, bool ggg);
+        void onPlayerChanged(Player *player, bool isReady);
+        void onMapChanged(std::shared_ptr<Map> map, Player *player, bool ggg);
         void onGetGames(const QJsonObject &gamesData);
         void onShowMap();
 
