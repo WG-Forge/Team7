@@ -217,7 +217,7 @@ void Train::update(const QJsonObject &train){
     else{
         lineIdx_ = -1;
     }
-
+    cooldown_ = train["cooldown"].toInt();
     position_ = train["position"].toInt();
     speed_ = train["speed"].toInt();
 }

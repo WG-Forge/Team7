@@ -90,10 +90,8 @@ Map::Map(const QJsonObject &staticObj, const QJsonObject &dynamicObj, const QJso
     }
 
     for (auto & train : trains_) {
-        if(train.playerIdx() != nullptr) {
-            if(train.playerIdx() == player.idx()) {
+        if(train.playerIdx() == player.idx()) {
                 player.setTrain(train);
-            }
         }
     }
 }

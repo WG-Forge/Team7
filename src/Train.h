@@ -30,11 +30,16 @@ public:
     void setNextVertex(Vertex *vertex) { nextVertex_ = vertex; };
     void setFinalVertex(Vertex *vertex) { finalVertex_ = vertex; };
     void setCurrentVertex(Vertex *vertex) { currentVertex_ = vertex; };
+    void setCurrentPath(std::vector<Vertex*> path) {currentPath_ = path;};
 
     void setEdge(Edge *edge) { edge_ = edge; };
+    void setCurrentIndex(int index){currentIndex_ = index;};
     void setWaysType(WaysType waysType){ waysType_ = waysType; };
     void setFinalLinePosition(int position) { finalLinePosition_ = position; };
+    void setWaitingTime(int x){ waitingTime_ = x;};
+    void setSpeed(int speed){ speed_ = speed ;};
     void update(const QJsonObject& data);
+    int currentIndex(){return currentIndex_;};
 
     int cooldown();
     int fuel();
@@ -50,6 +55,7 @@ public:
     int speed();
     int priority() { return priority_; };
     bool isMaxLevel() { return isMaxLevel_; };
+    int waitingTime(){return waitingTime_;};
     bool cheat(){return cheat_; };
     QString playerIdx();
     std::vector<Event*>& events();
@@ -69,6 +75,7 @@ public:
     std::vector<std::vector<Edge *>> waysMarket() { return waysMarket_; };
     std::vector<std::vector<Edge *>> waysReturn() { return waysReturn_; };
     std::vector<std::vector<Edge *>> waysAll() { return waysAll_; };
+    std::vector<Vertex*> currentPath(){ return currentPath_;};
     WaysType waysType(){ return waysType_; };
     void trainWays(const std::vector<std::vector<int>>& masMarket,
                    const  std::vector<std::vector<Edge*>>& pMarket,
@@ -90,6 +97,7 @@ private:
     int fuelConsumption_;
     int goods_;
     int goodsCapacity_;
+    int currentIndex_;
     int idx_;
     int level_;
     int lineIdx_;
@@ -109,6 +117,7 @@ private:
     Vertex *currentVertex_ = nullptr;   // вертекс из которого выехал или в котором стоишь
     Edge *edge_ = nullptr;      // в который едешь сейчас aka промежуточный между currentVertex и finalVertex
     enum WaysType waysType_;
+    int waitingTime_;
     std::vector<std::vector<int>> waysLengthMarket_;
     std::vector<std::vector<Edge*>> waysMarket_;
     std::vector<std::vector<int>> waysLengthStorage_;
@@ -117,6 +126,7 @@ private:
     std::vector<std::vector<Edge*>> waysReturn_;
     std::vector<std::vector<int>> waysLengthAll_;
     std::vector<std::vector<Edge*>> waysAll_;
+    std::vector<Vertex*> currentPath_;
 };
 
 #endif // TRAIN_H
