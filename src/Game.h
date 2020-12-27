@@ -114,8 +114,8 @@ class Game : public QObject {
         void connectToGame(const QString &userName, const QString &password, const QString &gameName, const int &players, const int &ticks);
 
     signals:
-        void playerChanged(Player player);
-        void mapChanged(std::shared_ptr<Map> map, Player player, bool ggg);
+        void playerChanged(Player *player, bool isReady);
+        void mapChanged(std::shared_ptr<Map> map, Player *player, bool ggg);
         void getGames(const QJsonObject &gamesData);
         void showMap();
 

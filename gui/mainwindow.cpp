@@ -40,12 +40,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(game, SIGNAL(showMap()), this, SLOT(onShowMap()));
     connect(this, SIGNAL(disconnect()), game, SLOT(disconnect()));
     connect(this, SIGNAL(updateGames()), game, SLOT(updateGames()));
-    connect(game, SIGNAL(playerChanged(Player)), this, SLOT(onPlayerChanged(Player)));
-    connect(game, SIGNAL(playerChanged(Player)), this, SLOT(onPlayerChanged(Player)));
+//    connect(game, SIGNAL(playerChanged(Player)), this, SLOT(onPlayerChanged(Player)));
+    connect(game, SIGNAL(playerChanged(Player *, bool)), this, SLOT(onPlayerChanged(Player *, bool)));
     connect(game, SIGNAL(getGames(const QJsonObject &)), this, SLOT(onGetGames(const QJsonObject &)));
     connect(this, SIGNAL(connectToGame(const QString &, const QString &, const QString &, const int &, const int &)),
             game, SLOT(connectToGame(const QString &, const QString &, const QString &, const int &, const int &)));
-    connect(game, SIGNAL(mapChanged(std::shared_ptr<Map>, Player, bool)), this, SLOT(onMapChanged(std::shared_ptr<Map>, Player, bool)));
+    connect(game, SIGNAL(mapChanged(std::shared_ptr<Map>, Player *, bool)), this, SLOT(onMapChanged(std::shared_ptr<Map>, Player *, bool)));
 
     thread->start();
 
@@ -66,34 +66,6 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
-//void MainWindow::setMap(std::shared_ptr<Map> m) {
-//    ui->graphview->setMap(m, game_->player());
-//}
-
-//void MainWindow::on_startButton_clicked() {
-//    if (ui->userNameForm->toPlainText() != "") {
-//        ui->startMenu->hide();
-//        ui->gamesWidget->show();
-//        //        ui->graphview->show();
-
-//        Game *game = new Game();
-
-//        QString userName = ui->userNameForm->toPlainText();
-
-//        this->update();
-
-//        thread = new QThread;
-////        game->moveToThread(thread);
-//        connect(this, SIGNAL(disconnect()), game, SLOT(disconnect()));
-////        connect(this, SIGNAL(init(const QString&)), game, SLOT(init(const QString&)));
-//        connect(game, SIGNAL(playerChanged(Player)), this, SLOT(onPlayerChanged(Player)));
-//        connect(game, SIGNAL(mapChanged(std::shared_ptr<Map>, Player, bool)), this, SLOT(onMapChanged(std::shared_ptr<Map>, Player, bool)));
-//        thread->start();
-
-////        emit init(userName);
-//    }
-//}
-
 void MainWindow::onShowMap() {
     ui->graphview->show();
     ui->startMenu->hide();
@@ -111,39 +83,53 @@ void MainWindow::on_logoutButton_clicked() {
     emit updateGames();
 }
 
-void MainWindow::onPlayerChanged(Player player) {
-    ui->userName->setText(player.name());
-    ui->userTown->setText("City: " + player.town().name());
+void MainWindow::onPlayerChanged(Player *player, bool isReady) {
+    qDebug() << "PLAYER UPDATE";
+    for (auto &train : player->trains()) {
+    }
+    ui->userName->setText(player->name());
+    ui->userTown->setText("City: " + player->town().name());
     ui->userPopulation->setText("Population: " +
-                                QString::number(player.town().population()) +
+                                QString::number(player->town().population()) +
                                 " / " +
-                                QString::number(player.town().populationCapacity()));
+                                QString::number(player->town().populationCapacity()));
     ui->userProducts->setText("Products: " +
-                              QString::number(player.town().product()) +
+                              QString::number(player->town().product()) +
                               " / " +
-                              QString::number(player.town().productCapacity()));
+                              QString::number(player->town().productCapacity()));
 
-    ui->userRating->setText("Rating: " + QString::number(player.rating()));
-    ui->userArmor->setText("Armor: " + QString::number(player.town().armor()));
-    ui->userLevel->setText("Level: " + QString::number(player.town().level()));
-    QString maxTicks = QString::number(player.maxTicks());
-    if (player.maxTicks() == -1) {
+    ui->userRating->setText("Rating: " + QString::number(player->rating()));
+    ui->userArmor->setText("Armor: " + QString::number(player->town().armor()));
+    ui->userLevel->setText("Level: " + QString::number(player->town().level()));
+    QString maxTicks = QString::number(player->maxTicks());
+    if (player->maxTicks() == -1) {
         maxTicks = "UNLIMITED";
     }
-    ui->currentGameTicks->setText("Ticks: " + QString::number(player.currentTick()) + " / " + maxTicks);
+    ui->currentGameTicks->setText("Ticks: " + QString::number(player->currentTick()) + " / " + maxTicks);
 
-    ui->trainLevel_1->setText(QString::number(player.trains()[0]->level()));
-    ui->trainLevel_2->setText(QString::number(player.trains()[1]->level()));
-    ui->trainLevel_3->setText(QString::number(player.trains()[2]->level()));
-    ui->trainLevel_4->setText(QString::number(player.trains()[3]->level()));
-
-    ui->trainGoods_1->setText(QString::number(player.trains()[0]->goods()));
-    ui->trainGoods_2->setText(QString::number(player.trains()[1]->goods()));
-    ui->trainGoods_3->setText(QString::number(player.trains()[2]->goods()));
-    ui->trainGoods_4->setText(QString::number(player.trains()[3]->goods()));
+    int trainIndex = 0;
+    for (auto &train : player->trains()) {
+        if (trainIndex == 0) {
+            ui->trainLevel_1->setText(QString::number(player->trains()[trainIndex]->level()));
+            ui->trainGoods_1->setText(QString::number(player->trains()[trainIndex]->goods()));
+        }
+        if (trainIndex == 1) {
+            ui->trainLevel_2->setText(QString::number(player->trains()[trainIndex]->level()));
+            ui->trainGoods_2->setText(QString::number(player->trains()[trainIndex]->goods()));
+        }
+        if (trainIndex == 2) {
+            ui->trainLevel_3->setText(QString::number(player->trains()[trainIndex]->level()));
+            ui->trainGoods_3->setText(QString::number(player->trains()[trainIndex]->goods()));
+        }
+        if (trainIndex == 3) {
+            ui->trainLevel_4->setText(QString::number(player->trains()[trainIndex]->level()));
+            ui->trainGoods_4->setText(QString::number(player->trains()[trainIndex]->goods()));
+        }
+        trainIndex++;
+    }
 }
 
-void MainWindow::onMapChanged(std::shared_ptr<Map> map, Player player, bool ggg) {
+void MainWindow::onMapChanged(std::shared_ptr<Map> map, Player *player, bool ggg) {
     ui->graphview->setMap(map, player, ggg);
     update();
     qDebug() << "Received map from Game thread";
