@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <queue>
 #include <unordered_map>
+#include <QVector>
 
 template<typename T, typename priority_t>
 struct PriorityQueue {
@@ -38,65 +39,99 @@ class Game : public QObject {
     public:
         explicit Game(QObject *parent = nullptr);
 
-        void strategy(Train* trainPlayer);
+        // A* ALGORITHM
+        double heuristic(Vertex *v1, Vertex *v2);
+        std::vector<Vertex*> shortestWay(Train *train, Vertex &start, Vertex &goal);
 
-        void out();
+        // UNREAL STRATEGY
+        void strategy(Train* trainPlayer);
+        Vertex getGoods(Train *train, PostType type, Vertex currentVertex);
+
+        void wayStrategy(Train* trainPlayer);
+        void upgradeStrategy(Train* trainPlaye, std::vector<Town*> upgradeTowns, std::vector<Train*> upgradeTrainsr);
+
+
+        // GAME ACTIONS
         void start();
         void end();
         void gameCycle();
         void login(QString userName);
         void logout();
-        void connectToServer();
-        void connectToGame();
         void getMap();
         void makeMap();
+        void connectToServer();
+        bool productProblem();
 
+        // SOCKET ACTIONS
         void tick();
+        bool isGameStarted(const QString &name, const int &players);
         void updatePosts();
         void updateUser();
-        void upgradeAction(std::vector<Town*> towns, std::vector<Train*> trains);
-        void moveAction(Train *train, Edge *edge, int speed);
-
-        Vertex getGoods(Train *train, PostType type, Vertex currentVertex);
-        int moveTrain(const int start, const int end, enum PostType type, Train *train);
+        void getGamesList();
         void sendTrain(Train *train);
+        void hostGame(QString name, int players, int ticks);
+        void moveAction(Train *train, Edge *edge, int speed);
+        void connectToGame(QString gameName, int players, int ticks);
+        void upgradeAction(std::vector<Town*> towns, std::vector<Train*> trains);
+        int moveTrain(const int start, const int end, enum PostType type, Train *train);
+        bool avoidTrains(Train* train);
 
-        Vertex& findPostVertex(PostType type, Vertex currentVertex, Train *train);
-        Edge& getLine(Train *train, Vertex start, Vertex end, enum WaysType wayType);
-        int findEdge(int start, int end, int speed);
+        // MOVE TRAIN
+
+        // А ТУТ ЧОТА ДА
         int getIdx(int position);
         int returnToHome(int currentPosition);
-        void unloadTrain(Train *train);
+        int findEdge(int start, int end, int speed);
+        Vertex& findPostVertex(PostType type, Vertex currentVertex, Train *train);
+        Edge& getLine(Train *train, Vertex start, Vertex end, enum WaysType wayType);
 
-        void shortestWay(Train *train, Vertex start, Vertex goal);
-        double heuristic(Vertex *v1, Vertex *v2);
-
+        // SOME RETURNS
         Socket& socket() { return *socket_; };
         Player& player() { return *player_; };
         std::shared_ptr<Map> map() { return map_; };
         std::vector<Player>& enemies() { return enemies_; };
         Edge& currentMoveLine() { return *currentMoveLine_; };
 
+        int currentTick() { return currentTick_; };
+        int enemiesAmount() { return enemiesAmount_; };
+        int totalTicks() { return totalTicks_; };
+        QString gameName() { return gameName_; };
+
+        void setCurrentTick(const int tick) { currentTick_ = tick; };
+        void setEnemiesCount(const int amount) { enemiesAmount_ = amount; };
+        void setTotalTicks(const int total) { totalTicks_ = total; };
+        void setGameName(const QString &name) { gameName_ = name; };
+
+        // PRINTS
         void printPlayerData(Train *train, Town *town);
         void printPosts();
         void printMap(enum PostType type);
 
     public slots:
-        void init(const QString &username);
+        void init();
         void disconnect();
+        void updateGames();
+        void connectToGame(const QString &userName, const QString &password, const QString &gameName, const int &players, const int &ticks);
 
     signals:
-        void playerChanged(Player player);
-        void mapChanged(std::shared_ptr<Map> map, Player player, bool ggg);
+        void playerChanged(Player *player, bool isReady);
+        void mapChanged(std::shared_ptr<Map> map, Player *player, bool ggg);
+        void getGames(const QJsonObject &gamesData);
+        void showMap();
 
     private:
-        Socket *socket_ = nullptr;
-        std::shared_ptr<Map> map_ = nullptr;
-        QJsonObject layer_0, layer_1, layer_2;
-        Player *player_ = nullptr;
-        std::vector<Player> enemies_;
         bool connected_ = false;
         Edge *currentMoveLine_;
+        QString gameName_;
+        int currentTick_;
+        int totalTicks_;
+        int enemiesAmount_;
+
+        Socket *socket_ = nullptr;
+        Player *player_ = nullptr;
+        std::vector<Player> enemies_;
+        std::shared_ptr<Map> map_ = nullptr;
+        QJsonObject layer_0, layer_1, layer_2;
 };
 
 #endif // GAME_H

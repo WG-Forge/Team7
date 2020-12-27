@@ -145,13 +145,6 @@ int Town::trainCooldown(){
 }
 
 void Town::update(const QJsonObject& data) {
-//    qDebug() << name_ << data["name"].toString();
-
-    if (data["name"].toString() != name_) {
-        qDebug() << "NE TOT TOWN!!!!!!!!!!!!!!";
-        throw("Pizdec");
-        return;
-    }
 
     armor_ = data["armor"].toInt();
     armorCapacity_ = data["armor_capacity"].toInt();

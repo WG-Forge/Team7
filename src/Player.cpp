@@ -10,6 +10,8 @@ Player::Player(const QJsonObject &playerData) {
     name_ = playerData["name"].toString();
     rating_ = playerData["rating"].toInt();
     inGame_ = playerData["in_game"].toBool();
+    currentTick_ = 0;
+    maxTicks_ = 0;
 }
 
 Player::Player(const Player &player) {
@@ -18,9 +20,11 @@ Player::Player(const Player &player) {
     name_ = player.name_;
     idx_ = player.idx_;
     inGame_ = player.inGame_;
+    currentTick_ = player.currentTick_;
+    maxTicks_ = player.maxTicks_;
 
-    for (auto &train : player.trains_)
-        trains_.push_back(new Train(*train));
+//    for (auto &train : player.trains_)
+//        trains_.push_back(new Train(*train));
 }
 
 void Player::update(const QJsonObject &playerData) {

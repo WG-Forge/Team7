@@ -39,7 +39,8 @@ Graph::Graph(const QJsonObject &graph, Map &map) {
     }
 
     std::vector<int> supMatrix(vertices_.size());
-    matrix_.resize(supMatrix.size());
+    matrixOrig_.resize(supMatrix.size());
+    matrixChanged_.resize(supMatrix.size());
 
     for (Vertex &vI : vertices_) {
         for (Vertex &vJ : vertices_) {
@@ -56,7 +57,8 @@ Graph::Graph(const QJsonObject &graph, Map &map) {
             }
             if (!isLine) supMatrix[vJ.idx() - minVertexIdx_] = 0;
         }
-        matrix_[vI.idx() - minVertexIdx_] = supMatrix;
+        matrixOrig_[vI.idx() - minVertexIdx_] = supMatrix;
+        matrixChanged_[vI.idx() - minVertexIdx_] = supMatrix;
     }
     supMatrix.clear();
 }

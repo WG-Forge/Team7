@@ -43,7 +43,21 @@ class Graph {
         std::map<int,int>& idx();
         std::map<int,int>& idxEdges();
         Vertex& vertex(int idx);
-        std::vector<std::vector<int>> matrix() { return matrix_; };
+
+        std::vector<std::vector<int>> matrixOrig() { return matrixOrig_; };         // дефолтная матрица смежностей
+        std::vector<std::vector<int>> matrixChanged() { return matrixChanged_; };   // изменённая (при создании такая же как и дефолтная)
+
+        void restoreMatrix() {
+            int index = 0;
+            for (auto &t : matrixOrig_) {
+                matrixChanged_[index].clear();
+                matrixChanged_[index] = t;
+                index++;
+            }
+//            std::copy(&matrixOrig_[0][0], &matrixOrig_[0][0] + matrixOrig_.size() * matrixOrig_[0].size(), &matrixChanged_[0][0]); // восстановить матрицу
+        }
+        int lengthBetween(int v1, int v2) { return matrixChanged_[v1 - minVertexIdx_][v2 - minVertexIdx_]; }; //  расстояние между двумя вертексами
+        void setNewLength(int v1, int v2, int newLength) { matrixChanged_[v1 - minVertexIdx_][v2 - minVertexIdx_] = newLength; }; // изменить расстояние между двумя вертексами
 
     private:
         std::vector<Vertex> vertices_;
@@ -56,7 +70,8 @@ class Graph {
         bool isSelfIntersecting();
         void placeVertices(float W, float H);
         void fitToSize(float W, float H);
-        std::vector<std::vector<int>> matrix_;
+        std::vector<std::vector<int>> matrixOrig_;
+        std::vector<std::vector<int>> matrixChanged_;
 };
 
 #endif // GRAPH_H
