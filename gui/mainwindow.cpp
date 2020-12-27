@@ -86,7 +86,6 @@ void MainWindow::on_logoutButton_clicked() {
 void MainWindow::onPlayerChanged(Player *player, bool isReady) {
     qDebug() << "PLAYER UPDATE";
     for (auto &train : player->trains()) {
-        qDebug() << "PLAEEEEEEEEEEEEEER" << train->idx();
     }
     ui->userName->setText(player->name());
     ui->userTown->setText("City: " + player->town().name());
@@ -128,14 +127,6 @@ void MainWindow::onPlayerChanged(Player *player, bool isReady) {
         }
         trainIndex++;
     }
-
-//        ui->trainLevel_2->setText(QString::number(player->trains()[1]->level()));
-//        ui->trainLevel_3->setText(QString::number(player->trains()[2]->level()));
-//        ui->trainLevel_4->setText(QString::number(player->trains()[3]->level()));
-
-//        ui->trainGoods_2->setText(QString::number(player->trains()[1]->goods()));
-//        ui->trainGoods_3->setText(QString::number(player->trains()[2]->goods()));
-//        ui->trainGoods_4->setText(QString::number(player->trains()[3]->goods()));
 }
 
 void MainWindow::onMapChanged(std::shared_ptr<Map> map, Player *player, bool ggg) {
