@@ -86,28 +86,28 @@ void GraphView::paintEvent(QPaintEvent *event) {
         int position = 0;
 
         painter.translate(W / 2, H / 2);
-
+        int trainIdx = 1;
         for (auto &train : map_.get()->trains()) {
             QLabel *currentLabel;
 
-            if (train.idx() == 1) currentLabel = ui->trainObject_1;
-            if (train.idx() == 2) currentLabel = ui->trainObject_2;
-            if (train.idx() == 3) currentLabel = ui->trainObject_3;
-            if (train.idx() == 4) currentLabel = ui->trainObject_4;
-            if (train.idx() == 5) currentLabel = ui->trainObject_5;
-            if (train.idx() == 6) currentLabel = ui->trainObject_6;
-            if (train.idx() == 7) currentLabel = ui->trainObject_7;
-            if (train.idx() == 8) currentLabel = ui->trainObject_8;
-            if (train.idx() == 9) currentLabel = ui->trainObject_9;
-            if (train.idx() == 10) currentLabel = ui->trainObject_10;
-            if (train.idx() == 11) currentLabel = ui->trainObject_11;
-            if (train.idx() == 12) currentLabel = ui->trainObject_12;
-            if (train.idx() == 13) currentLabel = ui->trainObject_13;
-            if (train.idx() == 14) currentLabel = ui->trainObject_14;
-            if (train.idx() == 15) currentLabel = ui->trainObject_15;
-            if (train.idx() == 16) currentLabel = ui->trainObject_16;
+            if (trainIdx == 1) currentLabel = ui->trainObject_1;
+            if (trainIdx == 2) currentLabel = ui->trainObject_2;
+            if (trainIdx == 3) currentLabel = ui->trainObject_3;
+            if (trainIdx == 4) currentLabel = ui->trainObject_4;
+            if (trainIdx == 5) currentLabel = ui->trainObject_5;
+            if (trainIdx == 6) currentLabel = ui->trainObject_6;
+            if (trainIdx == 7) currentLabel = ui->trainObject_7;
+            if (trainIdx == 8) currentLabel = ui->trainObject_8;
+            if (trainIdx == 9) currentLabel = ui->trainObject_9;
+            if (trainIdx == 10) currentLabel = ui->trainObject_10;
+            if (trainIdx == 11) currentLabel = ui->trainObject_11;
+            if (trainIdx == 12) currentLabel = ui->trainObject_12;
+            if (trainIdx == 13) currentLabel = ui->trainObject_13;
+            if (trainIdx == 14) currentLabel = ui->trainObject_14;
+            if (trainIdx == 15) currentLabel = ui->trainObject_15;
+            if (trainIdx == 16) currentLabel = ui->trainObject_16;
 
-
+           trainIdx++;
             for (auto &edge : map_.get()->graph().edges()) {
                 if (train.lineIdx() == edge.idx()) {
                     Vertex v1 = edge.vertex1();

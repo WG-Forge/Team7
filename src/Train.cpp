@@ -211,21 +211,21 @@ void Train::update(const QJsonObject &train){
     cooldown_ = train["cooldown"].toInt();
     position_ = train["position"].toInt();
     speed_ = train["speed"].toInt();
-    if (train.contains("events")){
-        if(!train["events"].isArray()){
-            throw std::invalid_argument("Wrong JSON graph format.");
-        }
-        QJsonArray eventsJsonArray = train["events"].toArray();
-        for(auto event: eventsJsonArray){
-            if (!event.isObject())
-                throw std::invalid_argument("Wrong JSON graph format.");
-            int k = event.toObject()["type"].toInt();
-            switch(k){
-            case 1:
-                events_.push_back(new TrainCollision(event.toObject()));
-                break;
-            }
-        }
-    }
+//    if (train.contains("events")){
+//        if(!train["events"].isArray()){
+//            throw std::invalid_argument("Wrong JSON graph format.");
+//        }
+//        QJsonArray eventsJsonArray = train["events"].toArray();
+//        for(auto event: eventsJsonArray){
+//            if (!event.isObject())
+//                throw std::invalid_argument("Wrong JSON graph format.");
+//            int k = event.toObject()["type"].toInt();
+//            switch(k){
+//            case 1:
+//                events_.push_back(new TrainCollision(event.toObject()));
+//                break;
+//            }
+//        }
+//    }
 }
 
