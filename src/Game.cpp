@@ -786,7 +786,7 @@ void Game::wayStrategy(Train* trainPlayer){
                         trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex()]);
                         trainPlayer->setWaysType(static_cast<WaysType>(2));
                     }
-                    if(count == 4 && trainPlayer->level() != 3 && trainPlayer->goods() == 0){
+                    if(count == 4 && trainPlayer->level() != 3 && trainPlayer->goods() == 0 && (!wow || this->player().town().level() != 3)){
                         trainPlayer->setFinalVertex(&findPostVertex(PostType::STORAGE, *trainPlayer->currentVertex(), trainPlayer));
                         this->shortestWay(trainPlayer, *trainPlayer->currentVertex(), *trainPlayer->finalVertex());
                         trainPlayer->setCurrentIndex(1);
@@ -798,12 +798,16 @@ void Game::wayStrategy(Train* trainPlayer){
                             [this->map()->graph().idx().at(this->player().town().vertex().idx())]->length() * this->player().town().population() + trainPlayer->goods()
                             >= this->player().town().productCapacity()
                             && trainPlayer->nextVertex()->idx() == this->player().town().vertex().idx()){
-                        trainPlayer->setWaitingTime(trainPlayer->waitingTime() + 1);
-                        trainPlayer->setCurrentVertex(trainPlayer->currentPath()[trainPlayer->currentIndex() - 2]);
-                        trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex() - 1]);
-                        trainPlayer->setCurrentIndex(trainPlayer->currentIndex() - 1);
-                        avoidTrains(trainPlayer);
-                        return;
+                        if(avoidTrains(trainPlayer)){
+                        trainPlayer->setWaitingTime(0);
+                        }
+                        else{
+                            trainPlayer->setCurrentVertex(trainPlayer->currentPath()[trainPlayer->currentIndex() - 2]);
+                            trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex() - 1]);
+                            trainPlayer->setCurrentIndex(trainPlayer->currentIndex() - 1);
+                            trainPlayer->setWaitingTime(trainPlayer->waitingTime() + 1);
+                            return;
+                        }
                     }
                     avoidTrains(trainPlayer);
                     return;
@@ -850,6 +854,9 @@ bool Game::avoidTrains(Train* trainPlayer){
                              }
                              }
                          }
+                         else{
+
+                         }
                      }
                      else{
                          if(trainPlayer->currentVertex()->idx() == train->nextVertex()->idx()
@@ -859,10 +866,6 @@ bool Game::avoidTrains(Train* trainPlayer){
                                 return false;
                              }
                              else{
-                                 trainPlayer->setWaitingTime(0);
-                                 trainPlayer->setCurrentVertex(trainPlayer->nextVertex());
-                                 trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex() + 1]);
-                                 trainPlayer->setCurrentIndex(trainPlayer->currentIndex() + 1);
                                 return true;
                              }
                          }
@@ -920,7 +923,7 @@ void Game::upgradeStrategy(Train* trainPlayer, std::vector<Town*> upgradeTowns, 
                 countUp += train->level();
         }
     if(trainPlayer->currentVertex()->idx() == this->player().town().vertex().idx()){
-        if(this->player().town().armor() >= trainPlayer->nextLevelPrice() + 6 && trainPlayer->level() != 3){
+        if(this->player().town().armor() >= trainPlayer->nextLevelPrice() + 8 && trainPlayer->level() != 3){
                         upgradeTrains.push_back(trainPlayer);
                         this->upgradeAction(upgradeTowns, upgradeTrains);
                         upgradeTrains.pop_back();
@@ -928,7 +931,7 @@ void Game::upgradeStrategy(Train* trainPlayer, std::vector<Town*> upgradeTowns, 
         }
     }
     if(this->player().town().level() != 3 && (count > 3)){
-        if(this->player().town().armor() >= this->player().town().nextLevelPrice() + 6){
+        if(this->player().town().armor() >= this->player().town().nextLevelPrice() + 8){
             upgradeTowns.push_back(&this->player().town());
             this->upgradeAction(upgradeTowns, upgradeTrains);
             upgradeTowns.pop_back();
