@@ -20,6 +20,7 @@ class Map {
         std::vector<Storage>& storages();
         std::vector<Post>& posts();
         Post& userPost() { return userPost_; };
+        std::vector<QString>& playersIdx() { return playersIdx_; };
 
         std::vector<Train>& trains();
         void makeWays(Town town);
@@ -33,6 +34,7 @@ class Map {
         int idx_;
         Graph graph_;
         Post userPost_;
+        std::vector<QString> playersIdx_;
 };
 
 #endif // MAP_H

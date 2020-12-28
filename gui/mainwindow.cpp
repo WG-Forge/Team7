@@ -44,10 +44,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 //    connect(game, SIGNAL(playerChanged(Player)), this, SLOT(onPlayerChanged(Player)));
     connect(game, SIGNAL(playerChanged(Player *, bool)), this, SLOT(onPlayerChanged(Player *, bool)));
     connect(game, SIGNAL(getGames(const QJsonObject &)), this, SLOT(onGetGames(const QJsonObject &)));
+    connect(game, SIGNAL(gameEnd(const int)), this, SLOT(onGameEnd(const int)));
     connect(this, SIGNAL(connectToGame(const QString &, const QString &, const QString &, const int &, const int &)),
             game, SLOT(connectToGame(const QString &, const QString &, const QString &, const int &, const int &)));
-    connect(game, SIGNAL(mapChanged(std::shared_ptr<Map>, Player *, bool)), this, SLOT(onMapChanged(std::shared_ptr<Map>, Player *, bool)));
-    connect(game, SIGNAL(gameEnd(const int)), this, SLOT(onGameEnd(const int)));
+    connect(game, SIGNAL(mapChanged(std::shared_ptr<Map>, Player *, bool, std::vector<QString> *, std::vector<int> *)),
+            this, SLOT(onMapChanged(std::shared_ptr<Map>, Player *, bool, std::vector<QString> *, std::vector<int> *)));
 
     thread->start();
 
@@ -131,10 +132,12 @@ void MainWindow::onPlayerChanged(Player *player, bool isReady) {
     }
 }
 
-void MainWindow::onMapChanged(std::shared_ptr<Map> map, Player *player, bool ggg) {
-    ui->graphview->setMap(map, player, ggg);
+void MainWindow::onMapChanged(std::shared_ptr<Map> map, Player *player, bool ggg, std::vector<QString> *playersNames, std::vector<int> *ratings) {
+    ui->graphview->setMap(map, player, ggg, playersNames, ratings);
 //    update();
+
     qDebug() << "Received map from Game thread";
+    qDebug() << &ratings;
 }
 
 void MainWindow::onGetGames(const QJsonObject &gamesData) {
@@ -369,14 +372,6 @@ void MainWindow::onGameEnd(int rating) {
     ui->graphview->hide();
     ui->postScreen->show();
     ui->postRating->setText("Финальный рейтинг: " + QString::number(rating));
-}
-
-void MainWindow::on_pushButton_clicked()
-{
-    ui->postScreen->hide();
-    ui->startMenu->show();
-    emit init();
-//    thread->start();
 }
 
 void MainWindow::on_exitFInal_clicked()

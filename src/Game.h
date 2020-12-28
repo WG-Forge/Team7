@@ -33,6 +33,11 @@ struct PriorityQueue {
   }
 };
 
+struct Ratings {
+    QString name;
+    int rating;
+};
+
 class Game : public QObject {
     Q_OBJECT
 
@@ -115,7 +120,7 @@ class Game : public QObject {
 
     signals:
         void playerChanged(Player *player, bool isReady);
-        void mapChanged(std::shared_ptr<Map> map, Player *player, bool ggg);
+        void mapChanged(std::shared_ptr<Map> map, Player *player, bool ggg, std::vector<QString> *playersNames, std::vector<int> *ratings);
         void getGames(const QJsonObject &gamesData);
         void showMap();
         void gameEnd(const int);
@@ -133,6 +138,8 @@ class Game : public QObject {
         std::vector<Player> enemies_;
         std::shared_ptr<Map> map_ = nullptr;
         QJsonObject layer_0, layer_1, layer_2;
+        std::vector<int> playersRatings;
+        std::vector<QString> playersNames;
 };
 
 #endif // GAME_H

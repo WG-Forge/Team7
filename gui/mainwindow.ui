@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>932</width>
-    <height>629</height>
+    <width>858</width>
+    <height>532</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -24,7 +24,7 @@
     <item row="2" column="1" alignment="Qt::AlignHCenter">
      <widget class="QWidget" name="startMenu" native="true">
       <layout class="QVBoxLayout" name="verticalLayout_41">
-       <item alignment="Qt::AlignTop">
+       <item>
         <widget class="QWidget" name="widget" native="true">
          <layout class="QFormLayout" name="formLayout">
           <item row="1" column="1">
@@ -215,7 +215,7 @@ p, li { white-space: pre-wrap; }
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-60</y>
+            <y>0</y>
             <width>284</width>
             <height>1164</height>
            </rect>
@@ -1169,7 +1169,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>932</width>
+     <width>858</width>
      <height>20</height>
     </rect>
    </property>

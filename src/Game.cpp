@@ -70,19 +70,24 @@ void Game::disconnect() {
 
 void Game::getMap() {
     socket_->sendData(Request(Action::MAP, QJsonObject({{"layer", 0}})));
-     layer_0 = socket_->getData();
+    layer_0 = socket_->getData();
 
     socket_->sendData(Request(Action::MAP, QJsonObject({{"layer", 1}})));
-     layer_1 = socket_->getData();
+    layer_1 = socket_->getData();
 
     socket_->sendData(Request(Action::MAP, QJsonObject({{"layer", 10}})));
-     layer_2 = socket_->getData();
+    layer_2 = socket_->getData();
 }
 
 void Game::makeMap() {
     qDebug() << "Draw map";
     map_ = std::make_shared<Map>(layer_0, layer_1, layer_2, *player_);
     map_->makeWays(this->player().town());
+
+    for (auto userIdx : map_->playersIdx()) {
+        playersRatings.emplace_back(layer_1["ratings"].toObject()[userIdx].toObject()["rating"].toInt());
+        playersNames.emplace_back(layer_1["ratings"].toObject()[userIdx].toObject()["name"].toString());
+    }
 }
 
 void Game::getGamesList() {
@@ -112,9 +117,6 @@ bool Game::isGameStarted(const QString &name, const int &players) {
                 return true;
             }
         }
-//        qDebug() << game.toObject()["name"].toString()
-//                 << game.toObject()["num_players"].toInt()
-//                 << game.toObject()["state"].toInt();
     }
 
     return false;
@@ -135,7 +137,7 @@ void Game::connectToGame(const QString &userName, const QString &password, const
         qDebug() << "ERROR" << response;
         return;
     }
-    qDebug() << response;
+//    qDebug() << response;
 
     player_ = new Player(response);
     player_->setPassword(password);
@@ -149,9 +151,9 @@ void Game::connectToGame(const QString &userName, const QString &password, const
     this->getMap();
     this->makeMap();
     this->player().setInGame(true);
-    emit playerChanged(player_, false);
 
-    emit mapChanged(std::make_shared<Map>(*map_), player_, true);
+    emit playerChanged(player_, false);
+    emit mapChanged(std::make_shared<Map>(*map_), player_, true, &playersNames, &playersRatings);
     emit showMap();
 
     bool isStarted = this->isGameStarted(gameName, players);
@@ -169,6 +171,7 @@ void Game::gameCycle() {
     int currentIdx = 0,
         currentPos = 0;
     QJsonObject response;
+    qDebug() << this->map()->playersIdx();
 
     const int USER_POST_IDX = this->player().town().pointIdx();
     const int USER_POST_POS = this->map()->graph().idx().at(USER_POST_IDX);
@@ -190,7 +193,7 @@ void Game::gameCycle() {
         }
     }
 
-    emit mapChanged(std::make_shared<Map>(*map_), player_, true);
+    emit mapChanged(std::make_shared<Map>(*map_), player_, true, &playersNames, &playersRatings);
     int tickCount = 0;
 
     std::vector<Town*> upgradeTowns;
@@ -222,7 +225,7 @@ void Game::gameCycle() {
         this->setCurrentTick(this->currentTick() + 1);
 
         player_->setTicks(this->currentTick(), this->totalTicks());
-        emit mapChanged(std::make_shared<Map>(*map_), player_, false);
+        emit mapChanged(std::make_shared<Map>(*map_), player_, false, &playersNames, &playersRatings);
         emit playerChanged(player_, true);
         QApplication::processEvents();
     }
@@ -477,33 +480,39 @@ void Game::updateUser() {
 
 void Game::updatePosts() {
     socket_->sendData(Request(Action::MAP, QJsonObject({{"layer", 1}})));
-     layer_1 = socket_->getData();
+    layer_1 = socket_->getData();
 
-     int marketIter = 0;
-     int townIter = 0;
-     int storageIter = 0;
+    int marketIter = 0;
+    int townIter = 0;
+    int storageIter = 0;
+    int playerIter = 0;
 
-     QJsonArray posts = layer_1["posts"].toArray();
-     QJsonArray trains = layer_1["trains"].toArray();
+    QJsonArray posts = layer_1["posts"].toArray();
+    QJsonArray trains = layer_1["trains"].toArray();
 
-     for (auto const &post : posts) {
-         int postType = post.toObject()["type"].toInt();
+    for (auto const &post : posts) {
+        int postType = post.toObject()["type"].toInt();
 
-         switch(postType) {
-         case 1:
-             this->map()->towns()[townIter].update(post.toObject());
-             townIter++;
-             break;
-         case 2:
-             this->map()->markets()[marketIter].update(post.toObject());
-             marketIter++;
-             break;
-         case 3:
-             this->map()->storages()[storageIter].update(post.toObject());
-             storageIter++;
-             break;
-         }
-     }
+        switch(postType) {
+        case 1:
+            this->map()->towns()[townIter].update(post.toObject());
+            townIter++;
+            break;
+        case 2:
+            this->map()->markets()[marketIter].update(post.toObject());
+            marketIter++;
+            break;
+        case 3:
+            this->map()->storages()[storageIter].update(post.toObject());
+            storageIter++;
+            break;
+        }
+    }
+
+    for (auto userIdx : map_->playersIdx()) {
+        playersRatings[playerIter] = layer_1["ratings"].toObject()[userIdx].toObject()["rating"].toInt();
+        playersNames[playerIter] = layer_1["ratings"].toObject()[userIdx].toObject()["name"].toString();
+    }
 }
 
 Edge& Game::getLine(Train *train, Vertex start, Vertex end, enum WaysType wayType) {

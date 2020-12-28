@@ -59,11 +59,13 @@ GraphView::~GraphView() {
     delete ui;
 }
 
-void GraphView::setMap(std::shared_ptr<Map> m, Player *player, bool ggg) {
+void GraphView::setMap(std::shared_ptr<Map> m, Player *player, bool ggg, std::vector<QString> *names, std::vector<int> *ratings) {
     isMap = ggg;
     qDebug() << "MAP UPDATE";
     map_ = m;
     player_ = player;
+    playersRatings = *ratings;
+    playersNames = *names;
 }
 
 void GraphView::paintEvent(QPaintEvent *event) {
@@ -132,6 +134,7 @@ void GraphView::paintEvent(QPaintEvent *event) {
     }
 
     int townIndex = 0;
+    int playersIndex = 0;
     for (auto &town : map_->towns()) {
         QPainter painter(this);
         Graph& graph = map_->graph();
@@ -156,7 +159,15 @@ void GraphView::paintEvent(QPaintEvent *event) {
         if (town.playerIdx() != player_->idx()) currentTown->setStyleSheet({enemyTownStyleSheet});
         else currentTown->setStyleSheet({playerTownStyleSheet});
 
-        QRect boundingRect(metrics.boundingRect(QString(town.name() + " | " + QString::number(town.population()))));
+        QString townTitle;
+
+        if (townIndex < playersNames.size()) {
+            townTitle = QString(town.name() + " | " + QString::number(town.population()) + " | " + playersNames[townIndex] + " | " + QString::number(playersRatings[townIndex]));
+        } else {
+            townTitle = QString(town.name() + " | " + QString::number(town.population()));
+        }
+
+        QRect boundingRect(metrics.boundingRect(townTitle));
         boundingRect.setTopLeft(boundingRect.topLeft() - QPoint(textRectMargin, textRectMargin));
         boundingRect.setRight(boundingRect.right() + 3 * textRectMargin);
         boundingRect.setSize(boundingRect.size() + QSize(textRectMargin, textRectMargin));
@@ -167,7 +178,8 @@ void GraphView::paintEvent(QPaintEvent *event) {
         if (townIndex == 2) boundingRect.moveTo(posX * scale + W/2, posY * scale + H/2 + circleSize);
         if (townIndex == 3) boundingRect.moveTo(posX * scale + W/2 + circleSize / 2, posY * scale + H/2 + circleSize);
 
-        currentTown->setText(QString(town.name() + " | " + QString::number(town.population())));
+        currentTown->setText(townTitle);
+
         currentTown->setGeometry(boundingRect);
         if (!isMap) currentTown->show();
         painter.restore();

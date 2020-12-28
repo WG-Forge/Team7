@@ -15,7 +15,7 @@ class GraphView : public QWidget {
         explicit GraphView(QWidget *parent = nullptr);
         ~GraphView();
 
-        void setMap(std::shared_ptr<Map> m, Player *player, bool map);
+        void setMap(std::shared_ptr<Map> m, Player *player, bool map, std::vector<QString> *names, std::vector<int> *ratings);
         bool isMap;;
 
     protected:
@@ -24,7 +24,8 @@ class GraphView : public QWidget {
     private:
         std::shared_ptr<Map> map_ = nullptr;
         Player *player_;
-
+        std::vector<int> playersRatings;
+        std::vector<QString> playersNames;
         Ui::GraphView *ui;
 };
 

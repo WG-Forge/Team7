@@ -21,6 +21,10 @@ Map::Map(const QJsonObject &staticObj, const QJsonObject &dynamicObj, const QJso
         case 1:
             towns_.emplace_back(post.toObject());
             posts_.emplace_back(post.toObject());
+
+            if (post.toObject()["player_idx"].toString() != "") {
+                playersIdx_.emplace_back(post.toObject()["player_idx"].toString());
+            }
             break;
         case 2:
             markets_.emplace_back(post.toObject());
