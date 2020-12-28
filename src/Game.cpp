@@ -101,7 +101,7 @@ void Game::updateGames() {
 bool Game::isGameStarted(const QString &name, const int &players) {
     socket_->sendData(Request(Action::GAMES, QJsonObject()));
     QJsonObject response = socket_->getData();
-    qDebug() << "IS START?";
+    qDebug() << "IS GAME START BEGIN?";
 
     for (auto game : response["games"].toArray()) {
         if (game.toObject()["name"].toString() == name) {
@@ -154,10 +154,12 @@ void Game::connectToGame(const QString &userName, const QString &password, const
     emit mapChanged(std::make_shared<Map>(*map_), player_, true);
     emit showMap();
 
-    qDebug() << this->isGameStarted(gameName, players);
-    while (!this->isGameStarted(gameName, players)) {
+    bool isStarted = this->isGameStarted(gameName, players);
+    qDebug() << "IS:" << isStarted;
+
+    while (!isStarted) {
         qDebug() << "Waiting for players..";
-        continue;
+        isStarted = this->isGameStarted(gameName, players);
     }
 
     this->gameCycle();
@@ -227,23 +229,11 @@ void Game::gameCycle() {
 }
 
 void Game::sendTrain(Train *train) {
-//    qDebug() << "SEND FUNCTION" << train->speed();
-
-//    std::cout << "SEND FUNCTION PATH:" << std::endl;
-//    for (auto &path : train->currentPath()) {
-//        std::cout << path->idx() << " ";
-//    }
-//    std::cout << std::endl;
-//    std::cout << std::endl;
-
     if (train->nextVertex() == nullptr) {
         qDebug() << "АТДИХАЕМ ПАЦАНВА"
                  << "Current:" << train->currentVertex()->idx();
         return;
     }
-
-//    qDebug() << "FROM SEND FUNCTION:" << "Current:" << train->currentVertex()->idx() << "Final:" << train->finalVertex()->idx();
-//    if (train->currentVertex()->idx() == train->finalVertex()->idx()) return;
 
    if (train->nextVertex() == nullptr) return;
 
@@ -272,22 +262,6 @@ void Game::sendTrain(Train *train) {
        } else speed = -1;
        this->moveAction(train, currentLine, speed);
    }
-
-//   qDebug() << "Start pos:" << train->currentVertex()->idx()
-//            << "Final pos:" << train->finalVertex()->idx();
-//   qDebug() << "Line:" << currentLine->idx()
-//            << "V1:" << currentLine->vertex1().idx()
-//            << "V2:" << currentLine->vertex2().idx();
-
-//   if (train->speed() != 0) {
-//       qDebug() << "Edem FROM:" << train->currentVertex()->idx()
-//                << "TO:" << train->nextVertex()->idx()
-//                << "Position:" << train->position();
-//   } else {
-//       qDebug() << "Stoim V:" << train->edge()->idx()
-//                << "Current:" << train->currentVertex()->idx()
-//                << "Position:" << train->position();
-//   }
 }
 
 void Game::moveAction(Train *train, Edge *moveLine, int speed) {
@@ -300,15 +274,36 @@ void Game::moveAction(Train *train, Edge *moveLine, int speed) {
     socket_->sendData(Request(Action::MOVE, request));
     QJsonObject response = socket_->getData();
 
-    if (response != QJsonObject()) {
-        qDebug() << "MOVEMENT ERROR" << response;
-        throw(response);
-    }
+//    if (response != QJsonObject()) {
+//        qDebug() << "MOVEMENT ERROR" << response;
+//        throw(response);
+//    }
 }
 
 void Game::tick() {
     this->socket_->sendData(Request(Action::TURN, QJsonObject()));
-    QJsonObject response = socket_->getData();
+    QJsonObject response;
+    if (!socket_->waitForReadyRead()) {
+        response = socket_->getData();
+    }
+
+    socket_->sendData(Request(Action::GAMES, QJsonObject()));
+    if (!socket_->waitForReadyRead()) {
+        response = socket_->getData();
+    }
+
+    for (auto game : response["games"].toArray()) {
+        if (game.toObject()["name"].toString() == this->gameName()) {
+            if (game.toObject()["state"].toInt() == 2) {
+                qDebug() << " GAME IN PROGGRES";
+                continue;
+            } else {
+                socket_->close();
+                emit gameEnd(this->player().rating());
+                emit disconnect();
+            }
+        }
+    }
 }
 
 double Game::heuristic(Vertex *v1, Vertex *v2) {
