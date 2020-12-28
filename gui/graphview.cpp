@@ -90,22 +90,10 @@ void GraphView::paintEvent(QPaintEvent *event) {
         for (auto &train : map_.get()->trains()) {
             QLabel *currentLabel;
 
-            if (trainIdx == 1) currentLabel = ui->trainObject_1;
-            if (trainIdx == 2) currentLabel = ui->trainObject_2;
-            if (trainIdx == 3) currentLabel = ui->trainObject_3;
-            if (trainIdx == 4) currentLabel = ui->trainObject_4;
-            if (trainIdx == 5) currentLabel = ui->trainObject_5;
-            if (trainIdx == 6) currentLabel = ui->trainObject_6;
-            if (trainIdx == 7) currentLabel = ui->trainObject_7;
-            if (trainIdx == 8) currentLabel = ui->trainObject_8;
-            if (trainIdx == 9) currentLabel = ui->trainObject_9;
-            if (trainIdx == 10) currentLabel = ui->trainObject_10;
-            if (trainIdx == 11) currentLabel = ui->trainObject_11;
-            if (trainIdx == 12) currentLabel = ui->trainObject_12;
-            if (trainIdx == 13) currentLabel = ui->trainObject_13;
-            if (trainIdx == 14) currentLabel = ui->trainObject_14;
-            if (trainIdx == 15) currentLabel = ui->trainObject_15;
-            if (trainIdx == 16) currentLabel = ui->trainObject_16;
+            if (train.playerIdx() == player_->idx() && trainIdx == 1) currentLabel = ui->trainObject_1;
+            if (train.playerIdx() == player_->idx() && trainIdx == 2) currentLabel = ui->trainObject_2;
+            if (train.playerIdx() == player_->idx() && trainIdx == 3) currentLabel = ui->trainObject_3;
+            if (train.playerIdx() == player_->idx() && trainIdx == 4) currentLabel = ui->trainObject_4;
 
            trainIdx++;
             for (auto &edge : map_.get()->graph().edges()) {

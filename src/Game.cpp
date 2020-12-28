@@ -484,6 +484,7 @@ void Game::updatePosts() {
      int storageIter = 0;
 
      QJsonArray posts = layer_1["posts"].toArray();
+     QJsonArray trains = layer_1["trains"].toArray();
 
      for (auto const &post : posts) {
          int postType = post.toObject()["type"].toInt();
