@@ -94,18 +94,18 @@ void GraphView::paintEvent(QPaintEvent *event) {
             if (train.idx() == 2) currentLabel = ui->trainObject_2;
             if (train.idx() == 3) currentLabel = ui->trainObject_3;
             if (train.idx() == 4) currentLabel = ui->trainObject_4;
-//            if (train.idx() == 5) currentLabel = ui->trainObject_5;
-//            if (train.idx() == 6) currentLabel = ui->trainObject_6;
-//            if (train.idx() == 7) currentLabel = ui->trainObject_7;
-//            if (train.idx() == 8) currentLabel = ui->trainObject_8;
-//            if (train.idx() == 9) currentLabel = ui->trainObject_9;
-//            if (train.idx() == 10) currentLabel = ui->trainObject_10;
-//            if (train.idx() == 11) currentLabel = ui->trainObject_11;
-//            if (train.idx() == 12) currentLabel = ui->trainObject_12;
-//            if (train.idx() == 13) currentLabel = ui->trainObject_13;
-//            if (train.idx() == 14) currentLabel = ui->trainObject_14;
-//            if (train.idx() == 15) currentLabel = ui->trainObject_15;
-//            if (train.idx() == 16) currentLabel = ui->trainObject_16;
+            if (train.idx() == 5) currentLabel = ui->trainObject_5;
+            if (train.idx() == 6) currentLabel = ui->trainObject_6;
+            if (train.idx() == 7) currentLabel = ui->trainObject_7;
+            if (train.idx() == 8) currentLabel = ui->trainObject_8;
+            if (train.idx() == 9) currentLabel = ui->trainObject_9;
+            if (train.idx() == 10) currentLabel = ui->trainObject_10;
+            if (train.idx() == 11) currentLabel = ui->trainObject_11;
+            if (train.idx() == 12) currentLabel = ui->trainObject_12;
+            if (train.idx() == 13) currentLabel = ui->trainObject_13;
+            if (train.idx() == 14) currentLabel = ui->trainObject_14;
+            if (train.idx() == 15) currentLabel = ui->trainObject_15;
+            if (train.idx() == 16) currentLabel = ui->trainObject_16;
 
 
             for (auto &edge : map_.get()->graph().edges()) {

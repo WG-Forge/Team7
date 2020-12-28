@@ -43,6 +43,8 @@ class MainWindow : public QMainWindow {
 
         void on_pushButton_clicked();
 
+        void on_exitFInal_clicked();
+
 signals:
         void init();
         void disconnect();

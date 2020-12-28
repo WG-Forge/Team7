@@ -215,7 +215,7 @@ p, li { white-space: pre-wrap; }
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
+            <y>-60</y>
             <width>284</width>
             <height>1164</height>
            </rect>
@@ -1126,7 +1126,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QWidget" name="postScreen" native="true">
       <layout class="QVBoxLayout" name="verticalLayout_5">
        <item alignment="Qt::AlignLeft|Qt::AlignTop">
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="exitFInal">
          <property name="text">
           <string>Exit</string>
          </property>

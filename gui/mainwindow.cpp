@@ -363,7 +363,7 @@ void MainWindow::on_updateServers_clicked()
 }
 
 void MainWindow::onGameEnd(int rating) {
-    thread->exit();
+//    thread->exit();
     this->disconnect();
 
     ui->graphview->hide();
@@ -376,5 +376,13 @@ void MainWindow::on_pushButton_clicked()
     ui->postScreen->hide();
     ui->startMenu->show();
     emit init();
-    thread->start();
+//    thread->start();
+}
+
+void MainWindow::on_exitFInal_clicked()
+{
+    ui->postScreen->hide();
+    ui->startMenu->show();
+    emit init();
+//    thread->start();
 }

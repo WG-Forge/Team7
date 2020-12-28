@@ -199,7 +199,7 @@ void Game::gameCycle() {
     while(connected_) {
         for(auto &train : this->player().trains()){
 
-                if(train->waitingTime() == 0){
+                if(train->waitingTime() == 0 && train->cooldown() == 0){
                     this->wayStrategy(train);
 //                    this->printPlayerData(train, &this->player().town());
                 }
@@ -237,6 +237,14 @@ void Game::gameCycle() {
             emit gameEnd(player_->rating());
         }
 
+        for(auto& train: this->player().trains()){
+            if(train->events().size() != 0){
+            train->setCurrentVertex(&this->player().town().vertex());
+            train->setNextVertex(nullptr);
+            train->setFinalVertex(nullptr);
+            train->popEvent();
+            }
+        }
         QApplication::processEvents();
     }
 }
@@ -573,12 +581,6 @@ void Game::upgradeAction(std::vector<Town*> towns, std::vector<Train*> trains){
 }
 
 void Game::wayStrategy(Train* trainPlayer){
-    if(trainPlayer->cooldown() != 0){
-        trainPlayer->setCurrentVertex(&this->player().town().vertex());
-        trainPlayer->setNextVertex(nullptr);
-        trainPlayer->setFinalVertex(nullptr);
-        return;
-    }
     if(trainPlayer->nextVertex() == nullptr){//поезд стоит, не может ехать
         if(trainPlayer->currentVertex() == trainPlayer->finalVertex()){//Поезд достиг точки назначения
             qDebug() << "Поезд достиг точки назначения";
@@ -592,6 +594,15 @@ void Game::wayStrategy(Train* trainPlayer){
                     }
                     break;}
                 case 2:{//Поезд в маркете, забрал продукты, мама будет довольна
+                    if(trainPlayer->goods() != trainPlayer->goodsCapacity()){
+                        if(avoidTrains(trainPlayer)){
+                        trainPlayer->setWaitingTime(0);
+                        }
+                        else{
+                        trainPlayer->setWaitingTime(trainPlayer->waitingTime() + 1);
+                        return;
+                           }
+                        }
                     trainPlayer->setCurrentVertex(trainPlayer->finalVertex());
                     trainPlayer->setFinalVertex(&player().town().vertex());
                     this->shortestWay(trainPlayer, *trainPlayer->currentVertex(), *trainPlayer->finalVertex());
