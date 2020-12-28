@@ -9,6 +9,7 @@ public:
     explicit TrainCollision() = default;
     explicit TrainCollision(const QJsonObject &event);
     ~TrainCollision() = default;
+    int train(){return train_;};
 
 private:
     enum EventType type_;
