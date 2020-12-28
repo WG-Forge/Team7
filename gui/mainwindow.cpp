@@ -133,7 +133,7 @@ void MainWindow::onPlayerChanged(Player *player, bool isReady) {
 
 void MainWindow::onMapChanged(std::shared_ptr<Map> map, Player *player, bool ggg) {
     ui->graphview->setMap(map, player, ggg);
-    update();
+//    update();
     qDebug() << "Received map from Game thread";
 }
 

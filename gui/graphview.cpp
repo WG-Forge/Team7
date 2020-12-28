@@ -60,9 +60,7 @@ GraphView::~GraphView() {
 }
 
 void GraphView::setMap(std::shared_ptr<Map> m, Player *player, bool ggg) {
-    if (ggg) {
-        isMap = ggg;
-    } else isMap = !ggg;
+    isMap = ggg;
     qDebug() << "MAP UPDATE";
     map_ = m;
     player_ = player;
@@ -96,18 +94,18 @@ void GraphView::paintEvent(QPaintEvent *event) {
             if (train.idx() == 2) currentLabel = ui->trainObject_2;
             if (train.idx() == 3) currentLabel = ui->trainObject_3;
             if (train.idx() == 4) currentLabel = ui->trainObject_4;
-            if (train.idx() == 5) currentLabel = ui->trainObject_5;
-            if (train.idx() == 6) currentLabel = ui->trainObject_6;
-            if (train.idx() == 7) currentLabel = ui->trainObject_7;
-            if (train.idx() == 8) currentLabel = ui->trainObject_8;
-            if (train.idx() == 9) currentLabel = ui->trainObject_9;
-            if (train.idx() == 10) currentLabel = ui->trainObject_10;
-            if (train.idx() == 11) currentLabel = ui->trainObject_11;
-            if (train.idx() == 12) currentLabel = ui->trainObject_12;
-            if (train.idx() == 13) currentLabel = ui->trainObject_13;
-            if (train.idx() == 14) currentLabel = ui->trainObject_14;
-            if (train.idx() == 15) currentLabel = ui->trainObject_15;
-            if (train.idx() == 16) currentLabel = ui->trainObject_16;
+//            if (train.idx() == 5) currentLabel = ui->trainObject_5;
+//            if (train.idx() == 6) currentLabel = ui->trainObject_6;
+//            if (train.idx() == 7) currentLabel = ui->trainObject_7;
+//            if (train.idx() == 8) currentLabel = ui->trainObject_8;
+//            if (train.idx() == 9) currentLabel = ui->trainObject_9;
+//            if (train.idx() == 10) currentLabel = ui->trainObject_10;
+//            if (train.idx() == 11) currentLabel = ui->trainObject_11;
+//            if (train.idx() == 12) currentLabel = ui->trainObject_12;
+//            if (train.idx() == 13) currentLabel = ui->trainObject_13;
+//            if (train.idx() == 14) currentLabel = ui->trainObject_14;
+//            if (train.idx() == 15) currentLabel = ui->trainObject_15;
+//            if (train.idx() == 16) currentLabel = ui->trainObject_16;
 
 
             for (auto &edge : map_.get()->graph().edges()) {
@@ -141,7 +139,7 @@ void GraphView::paintEvent(QPaintEvent *event) {
             currentLabel->setGeometry(r1);
             currentLabel->setText(QString::number(train.level()));
 
-            if (isMap) currentLabel->show();
+            if (!isMap) currentLabel->show();
         }
     }
 
@@ -183,7 +181,7 @@ void GraphView::paintEvent(QPaintEvent *event) {
 
         currentTown->setText(QString(town.name() + " | " + QString::number(town.population())));
         currentTown->setGeometry(boundingRect);
-        if (isMap) currentTown->show();
+        if (!isMap) currentTown->show();
         painter.restore();
         townIndex++;
     }
@@ -227,7 +225,7 @@ void GraphView::paintEvent(QPaintEvent *event) {
 
         currentMarket->setText(QString(market.name() + " | " + QString::number(market.product())));
         currentMarket->setGeometry(boundingRect);
-        if (isMap) currentMarket->show();
+        if (!isMap) currentMarket->show();
         painter.restore();
         marketIndex++;
     }
@@ -271,12 +269,10 @@ void GraphView::paintEvent(QPaintEvent *event) {
 
         currentStorage->setText(QString(storage.name() + " | " + QString::number(storage.armor())));
         currentStorage->setGeometry(boundingRect);
-        if (isMap) currentStorage->show();
+        if (!isMap) currentStorage->show();
         painter.restore();
         storageIndex++;
     }
-
-    if (!isMap) return;
 
     if (map_) {
         QPainter painter(this);
@@ -298,19 +294,12 @@ void GraphView::paintEvent(QPaintEvent *event) {
             float posY1 = edge.vertex1().position().y() * scale;
             float posX2 = edge.vertex2().position().x() * scale;
             float posY2 = edge.vertex2().position().y() * scale;
-
-            // отрисовка данных edge (помогает разбираться в путях для поезда)
-//            painter.drawText(posX1 + (posX2 - posX1) / 2, posY1 + (posY2 - posY1) / 2, QString::number(edge.idx())); // edge idx
-//            painter.drawText(posX1 + (posX2 - posX1) / 2, posY1 + 15 + (posY2 - posY1) / 2, QString::number(edge.length())); // edge length
-//            painter.drawText(posX1 - 20 + 20 + (posX2 - posX1) / 2, posY1 + 10 + (posY2 - posY1) / 2, QString::number(edge.vertex1().idx())); // edge vertex 1
-//            painter.drawText(posX1 + 20 - 20 + (posX2 - posX1) / 2, posY1 - 10 + (posY2 - posY1) / 2, QString::number(edge.vertex2().idx())); // edge vertex 2
         }
 
-        for (Vertex &vertex : graph.vertices()) {
-            if (!vertex.isPostIdxNull()) {
-                float posX = vertex.position().x() * scale;
-                float posY = vertex.position().y() * scale;
-                enum PostType type = vertex.post().type();
+        for (auto &post : map_->posts()) {
+                float posX = post.vertex().position().x() * scale;
+                float posY = post.vertex().position().y() * scale;
+                enum PostType type = post.type();
 
                 switch(type) {
                     case PostType::TOWN:
@@ -326,14 +315,13 @@ void GraphView::paintEvent(QPaintEvent *event) {
                         painter.setBrush(Qt::white);
                 }
 
-                if (vertex.post().playerIdx() == player_->idx()) {
+                if (post.playerIdx() == player_->idx()) {
                     painter.setBrush(Qt::yellow);
                     painter.drawEllipse(posX - userCircleSize / 2, posY - userCircleSize / 2, userCircleSize, userCircleSize);
                     continue;
                 }
 
                 painter.drawEllipse(posX - circleSize / 2, posY - circleSize / 2, circleSize, circleSize);
-            }
         }
     }
 }
