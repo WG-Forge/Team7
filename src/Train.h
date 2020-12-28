@@ -58,7 +58,8 @@ public:
     int waitingTime(){return waitingTime_;};
     bool cheat(){return cheat_; };
     QString playerIdx();
-    std::vector<Event*>& events();
+    std::vector<TrainCollision*>& events();
+    void popEvent(){events_.pop_back();};
 
     Vertex* nextVertex(){return nextVertex_; };
     Vertex* finalVertex(){return finalVertex_; };
@@ -108,7 +109,7 @@ private:
     bool isMaxLevel_;
     bool cheat_ = false;
     QString playerIdx_;
-    std::vector<Event*> events_;
+    std::vector<TrainCollision*> events_;
     enum GoodsType goodsType_;
 
     int finalLinePosition_ = -1;

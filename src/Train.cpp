@@ -21,17 +21,8 @@ Train::Train(const QJsonObject &train){
             case 1:
                 events_.push_back(new TrainCollision(event.toObject()));
                 break;
-            case 2:
-                events_.push_back(new HijackersAssault(event.toObject()));
-                break;
-            case 3:
-                events_.push_back(new ParasitesAssault(event.toObject()));
-                break;
-            case 4:
-                events_.push_back(new RefugeesArrival(event.toObject()));
-                break;
-            }
         }
+    }
     }
     if (train.contains("fuel")){
         fuel_ = train["fuel"].toInt();
@@ -72,7 +63,7 @@ int Train::cooldown(){
     return cooldown_;
 }
 
-std::vector<Event*>& Train::events() {
+std::vector<TrainCollision*>& Train::events() {
     return events_;
 }
 
@@ -220,5 +211,21 @@ void Train::update(const QJsonObject &train){
     cooldown_ = train["cooldown"].toInt();
     position_ = train["position"].toInt();
     speed_ = train["speed"].toInt();
+    if (train.contains("events")){
+        if(!train["events"].isArray()){
+            throw std::invalid_argument("Wrong JSON graph format.");
+        }
+        QJsonArray eventsJsonArray = train["events"].toArray();
+        for(auto event: eventsJsonArray){
+            if (!event.isObject())
+                throw std::invalid_argument("Wrong JSON graph format.");
+            int k = event.toObject()["type"].toInt();
+            switch(k){
+            case 1:
+                events_.push_back(new TrainCollision(event.toObject()));
+                break;
+            }
+        }
+    }
 }
 
