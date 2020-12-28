@@ -177,11 +177,11 @@ void Game::gameCycle() {
         train->setCurrentVertex(&this->player().town().vertex());
         train->setWaitingTime(i);
         if(i == 1){
-            i += 13;
+            i += (train->goodsCapacity() + 45 - this->map()->storages()[0].armorCapacity()) / this->map()->storages()[0].replenishment();
         }
         else{
-            if(i == 14){
-                i += 16;
+            if(i != 0){
+                i += (train->goodsCapacity() + 45) / this->map()->storages()[0].replenishment();
             }
             else{
             ++i;}
@@ -197,7 +197,7 @@ void Game::gameCycle() {
     while(connected_) {
         for(auto &train : this->player().trains()){
 
-                if(train->waitingTime() == 0 && train->cooldown() == 0){
+                if(train->waitingTime() == 0){
                     this->wayStrategy(train);
 //                    this->printPlayerData(train, &this->player().town());
                 }
@@ -218,18 +218,10 @@ void Game::gameCycle() {
         this->updateUser();
         this->updatePosts();
         this->setCurrentTick(this->currentTick() + 1);
-        player_->setTicks(this->currentTick(), this->totalTicks());
 
+        player_->setTicks(this->currentTick(), this->totalTicks());
         emit mapChanged(std::make_shared<Map>(*map_), player_, false);
         emit playerChanged(player_, true);
-        for(auto& train: this->player().trains()){
-            if(train->events().size() != 0){
-            train->setCurrentVertex(&this->player().town().vertex());
-            train->setNextVertex(nullptr);
-            train->setFinalVertex(nullptr);
-            train->popEvent();
-            }
-        }
         QApplication::processEvents();
     }
 }
@@ -573,6 +565,23 @@ void Game::upgradeAction(std::vector<Town*> towns, std::vector<Train*> trains){
 }
 
 void Game::wayStrategy(Train* trainPlayer){
+    if(trainPlayer->cooldown() != 0){
+        int count = 0;
+        for(auto& train: this->player().trains()){
+            if(trainPlayer->idx() != train->idx()){
+            if(train->cooldown() != 0 && train->waitingTime() == 0){
+                trainPlayer->setWaitingTime(count + 2);
+                count++;
+            }
+            }
+
+        }
+        trainPlayer->setFinalVertex(nullptr);
+        trainPlayer->setCurrentVertex(&this->player().town().vertex());
+        trainPlayer->setWaysType(WaysType::ANYTING);
+        trainPlayer->setNextVertex(nullptr);
+        return;
+    }
     if(trainPlayer->nextVertex() == nullptr){//поезд стоит, не может ехать
         if(trainPlayer->currentVertex() == trainPlayer->finalVertex()){//Поезд достиг точки назначения
             qDebug() << "Поезд достиг точки назначения";
