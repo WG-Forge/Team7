@@ -59,11 +59,13 @@ GraphView::~GraphView() {
     delete ui;
 }
 
-void GraphView::setMap(std::shared_ptr<Map> m, Player *player, bool ggg) {
+void GraphView::setMap(std::shared_ptr<Map> m, Player *player, bool ggg, std::vector<QString> *names, std::vector<int> *ratings) {
     isMap = ggg;
     qDebug() << "MAP UPDATE";
     map_ = m;
     player_ = player;
+    playersRatings = *ratings;
+    playersNames = *names;
 }
 
 void GraphView::paintEvent(QPaintEvent *event) {
@@ -90,22 +92,10 @@ void GraphView::paintEvent(QPaintEvent *event) {
         for (auto &train : map_.get()->trains()) {
             QLabel *currentLabel;
 
-            if (trainIdx == 1) currentLabel = ui->trainObject_1;
-            if (trainIdx == 2) currentLabel = ui->trainObject_2;
-            if (trainIdx == 3) currentLabel = ui->trainObject_3;
-            if (trainIdx == 4) currentLabel = ui->trainObject_4;
-            if (trainIdx == 5) currentLabel = ui->trainObject_5;
-            if (trainIdx == 6) currentLabel = ui->trainObject_6;
-            if (trainIdx == 7) currentLabel = ui->trainObject_7;
-            if (trainIdx == 8) currentLabel = ui->trainObject_8;
-            if (trainIdx == 9) currentLabel = ui->trainObject_9;
-            if (trainIdx == 10) currentLabel = ui->trainObject_10;
-            if (trainIdx == 11) currentLabel = ui->trainObject_11;
-            if (trainIdx == 12) currentLabel = ui->trainObject_12;
-            if (trainIdx == 13) currentLabel = ui->trainObject_13;
-            if (trainIdx == 14) currentLabel = ui->trainObject_14;
-            if (trainIdx == 15) currentLabel = ui->trainObject_15;
-            if (trainIdx == 16) currentLabel = ui->trainObject_16;
+            if (train.playerIdx() == player_->idx() && trainIdx == 1) currentLabel = ui->trainObject_1;
+            if (train.playerIdx() == player_->idx() && trainIdx == 2) currentLabel = ui->trainObject_2;
+            if (train.playerIdx() == player_->idx() && trainIdx == 3) currentLabel = ui->trainObject_3;
+            if (train.playerIdx() == player_->idx() && trainIdx == 4) currentLabel = ui->trainObject_4;
 
            trainIdx++;
             for (auto &edge : map_.get()->graph().edges()) {
@@ -144,6 +134,7 @@ void GraphView::paintEvent(QPaintEvent *event) {
     }
 
     int townIndex = 0;
+    int playersIndex = 0;
     for (auto &town : map_->towns()) {
         QPainter painter(this);
         Graph& graph = map_->graph();
@@ -168,7 +159,15 @@ void GraphView::paintEvent(QPaintEvent *event) {
         if (town.playerIdx() != player_->idx()) currentTown->setStyleSheet({enemyTownStyleSheet});
         else currentTown->setStyleSheet({playerTownStyleSheet});
 
-        QRect boundingRect(metrics.boundingRect(QString(town.name() + " | " + QString::number(town.population()))));
+        QString townTitle;
+
+        if (townIndex < playersNames.size()) {
+            townTitle = QString(town.name() + " | " + QString::number(town.population()) + " | " + playersNames[townIndex] + " | " + QString::number(playersRatings[townIndex]));
+        } else {
+            townTitle = QString(town.name() + " | " + QString::number(town.population()));
+        }
+
+        QRect boundingRect(metrics.boundingRect(townTitle));
         boundingRect.setTopLeft(boundingRect.topLeft() - QPoint(textRectMargin, textRectMargin));
         boundingRect.setRight(boundingRect.right() + 3 * textRectMargin);
         boundingRect.setSize(boundingRect.size() + QSize(textRectMargin, textRectMargin));
@@ -179,7 +178,8 @@ void GraphView::paintEvent(QPaintEvent *event) {
         if (townIndex == 2) boundingRect.moveTo(posX * scale + W/2, posY * scale + H/2 + circleSize);
         if (townIndex == 3) boundingRect.moveTo(posX * scale + W/2 + circleSize / 2, posY * scale + H/2 + circleSize);
 
-        currentTown->setText(QString(town.name() + " | " + QString::number(town.population())));
+        currentTown->setText(townTitle);
+
         currentTown->setGeometry(boundingRect);
         if (!isMap) currentTown->show();
         painter.restore();

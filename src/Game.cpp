@@ -70,19 +70,24 @@ void Game::disconnect() {
 
 void Game::getMap() {
     socket_->sendData(Request(Action::MAP, QJsonObject({{"layer", 0}})));
-     layer_0 = socket_->getData();
+    layer_0 = socket_->getData();
 
     socket_->sendData(Request(Action::MAP, QJsonObject({{"layer", 1}})));
-     layer_1 = socket_->getData();
+    layer_1 = socket_->getData();
 
     socket_->sendData(Request(Action::MAP, QJsonObject({{"layer", 10}})));
-     layer_2 = socket_->getData();
+    layer_2 = socket_->getData();
 }
 
 void Game::makeMap() {
     qDebug() << "Draw map";
     map_ = std::make_shared<Map>(layer_0, layer_1, layer_2, *player_);
     map_->makeWays(this->player().town());
+
+    for (auto userIdx : map_->playersIdx()) {
+        playersRatings.emplace_back(layer_1["ratings"].toObject()[userIdx].toObject()["rating"].toInt());
+        playersNames.emplace_back(layer_1["ratings"].toObject()[userIdx].toObject()["name"].toString());
+    }
 }
 
 void Game::getGamesList() {
@@ -112,9 +117,6 @@ bool Game::isGameStarted(const QString &name, const int &players) {
                 return true;
             }
         }
-//        qDebug() << game.toObject()["name"].toString()
-//                 << game.toObject()["num_players"].toInt()
-//                 << game.toObject()["state"].toInt();
     }
 
     return false;
@@ -135,7 +137,7 @@ void Game::connectToGame(const QString &userName, const QString &password, const
         qDebug() << "ERROR" << response;
         return;
     }
-    qDebug() << response;
+//    qDebug() << response;
 
     player_ = new Player(response);
     player_->setPassword(password);
@@ -149,9 +151,9 @@ void Game::connectToGame(const QString &userName, const QString &password, const
     this->getMap();
     this->makeMap();
     this->player().setInGame(true);
-    emit playerChanged(player_, false);
 
-    emit mapChanged(std::make_shared<Map>(*map_), player_, true);
+    emit playerChanged(player_, false);
+    emit mapChanged(std::make_shared<Map>(*map_), player_, true, &playersNames, &playersRatings);
     emit showMap();
 
     bool isStarted = this->isGameStarted(gameName, players);
@@ -169,6 +171,7 @@ void Game::gameCycle() {
     int currentIdx = 0,
         currentPos = 0;
     QJsonObject response;
+    qDebug() << this->map()->playersIdx();
 
     const int USER_POST_IDX = this->player().town().pointIdx();
     const int USER_POST_POS = this->map()->graph().idx().at(USER_POST_IDX);
@@ -190,7 +193,7 @@ void Game::gameCycle() {
         }
     }
 
-    emit mapChanged(std::make_shared<Map>(*map_), player_, true);
+    emit mapChanged(std::make_shared<Map>(*map_), player_, true, &playersNames, &playersRatings);
     int tickCount = 0;
 
     std::vector<Town*> upgradeTowns;
@@ -222,7 +225,7 @@ void Game::gameCycle() {
         this->setCurrentTick(this->currentTick() + 1);
 
         player_->setTicks(this->currentTick(), this->totalTicks());
-        emit mapChanged(std::make_shared<Map>(*map_), player_, false);
+        emit mapChanged(std::make_shared<Map>(*map_), player_, false, &playersNames, &playersRatings);
         emit playerChanged(player_, true);
         QApplication::processEvents();
     }
@@ -477,32 +480,39 @@ void Game::updateUser() {
 
 void Game::updatePosts() {
     socket_->sendData(Request(Action::MAP, QJsonObject({{"layer", 1}})));
-     layer_1 = socket_->getData();
+    layer_1 = socket_->getData();
 
-     int marketIter = 0;
-     int townIter = 0;
-     int storageIter = 0;
+    int marketIter = 0;
+    int townIter = 0;
+    int storageIter = 0;
+    int playerIter = 0;
 
-     QJsonArray posts = layer_1["posts"].toArray();
+    QJsonArray posts = layer_1["posts"].toArray();
+    QJsonArray trains = layer_1["trains"].toArray();
 
-     for (auto const &post : posts) {
-         int postType = post.toObject()["type"].toInt();
+    for (auto const &post : posts) {
+        int postType = post.toObject()["type"].toInt();
 
-         switch(postType) {
-         case 1:
-             this->map()->towns()[townIter].update(post.toObject());
-             townIter++;
-             break;
-         case 2:
-             this->map()->markets()[marketIter].update(post.toObject());
-             marketIter++;
-             break;
-         case 3:
-             this->map()->storages()[storageIter].update(post.toObject());
-             storageIter++;
-             break;
-         }
-     }
+        switch(postType) {
+        case 1:
+            this->map()->towns()[townIter].update(post.toObject());
+            townIter++;
+            break;
+        case 2:
+            this->map()->markets()[marketIter].update(post.toObject());
+            marketIter++;
+            break;
+        case 3:
+            this->map()->storages()[storageIter].update(post.toObject());
+            storageIter++;
+            break;
+        }
+    }
+
+    for (auto userIdx : map_->playersIdx()) {
+        playersRatings[playerIter] = layer_1["ratings"].toObject()[userIdx].toObject()["rating"].toInt();
+        playersNames[playerIter] = layer_1["ratings"].toObject()[userIdx].toObject()["name"].toString();
+    }
 }
 
 Edge& Game::getLine(Train *train, Vertex start, Vertex end, enum WaysType wayType) {
@@ -692,7 +702,7 @@ void Game::wayStrategy(Train* trainPlayer){
                             trainPlayer->setWaysType(static_cast<WaysType>(2));
                             return;
                             break;
-                        case 3:
+                        case 3:{
                             if(trainPlayer->level() != 3){
                                 trainPlayer->setCurrentVertex(&this->player().town().vertex());
                                 trainPlayer->setFinalVertex(&findPostVertex(PostType::STORAGE, this->player().town().vertex(), trainPlayer));
@@ -703,7 +713,6 @@ void Game::wayStrategy(Train* trainPlayer){
                                 return;
                             }
                             else{
-                                if(this->player().town().level() == 2 || this->player().town().level() == 3){
                                 trainPlayer->setCurrentVertex(&this->player().town().vertex());
                                 trainPlayer->setFinalVertex(&findPostVertex(PostType::MARKET, this->player().town().vertex(), trainPlayer));
                                 this->shortestWay(trainPlayer, *trainPlayer->currentVertex(), *trainPlayer->finalVertex());
@@ -712,17 +721,8 @@ void Game::wayStrategy(Train* trainPlayer){
                                 trainPlayer->setWaysType(static_cast<WaysType>(2));
                                 return;
                                 }
-                                else{
-                                    trainPlayer->setCurrentVertex(&this->player().town().vertex());
-                                    trainPlayer->setFinalVertex(&findPostVertex(PostType::STORAGE, this->player().town().vertex(), trainPlayer));
-                                    this->shortestWay(trainPlayer, *trainPlayer->currentVertex(), *trainPlayer->finalVertex());
-                                    trainPlayer->setCurrentIndex(1);
-                                    trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex()]);
-                                    trainPlayer->setWaysType(static_cast<WaysType>(3));
-                                    return;
-                                }
-                            }
                             break;
+                        }
                         }
                         }
                     else{
@@ -778,12 +778,36 @@ void Game::wayStrategy(Train* trainPlayer){
                     trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex() + 1]);
                     trainPlayer->setCurrentIndex(trainPlayer->currentIndex() + 1);
                     bool wow = productProblem();
-                    if(wow && trainPlayer->goods() == 0 && (count < 3 || countUp == 15)){
+                    if((wow && trainPlayer->goods() == 0 && (count < 3 || countUp == 15) && (trainPlayer->level() != 1 || this->player().town().population() >= 3)
+                            )|| (trainPlayer->level() == 3 && trainPlayer->goods() == 0)){
                         trainPlayer->setFinalVertex(&findPostVertex(PostType::MARKET, *trainPlayer->currentVertex(), trainPlayer));
                         this->shortestWay(trainPlayer, *trainPlayer->currentVertex(), *trainPlayer->finalVertex());
                         trainPlayer->setCurrentIndex(1);
                         trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex()]);
                         trainPlayer->setWaysType(static_cast<WaysType>(2));
+                    }
+                    if(count == 4 && trainPlayer->level() != 3 && trainPlayer->goods() == 0 && (!wow || this->player().town().level() != 3)){
+                        trainPlayer->setFinalVertex(&findPostVertex(PostType::STORAGE, *trainPlayer->currentVertex(), trainPlayer));
+                        this->shortestWay(trainPlayer, *trainPlayer->currentVertex(), *trainPlayer->finalVertex());
+                        trainPlayer->setCurrentIndex(1);
+                        trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex()]);
+                        trainPlayer->setWaysType(static_cast<WaysType>(3));
+                    }
+                    if(trainPlayer->goodsType() == GoodsType::product && trainPlayer->goods() != 0
+                            && this->player().town().product() - trainPlayer->waysAll()[this->map()->graph().idx().at(trainPlayer->currentVertex()->idx())]
+                            [this->map()->graph().idx().at(this->player().town().vertex().idx())]->length() * this->player().town().population() + trainPlayer->goods()
+                            >= this->player().town().productCapacity()
+                            && trainPlayer->nextVertex()->idx() == this->player().town().vertex().idx()){
+                        if(avoidTrains(trainPlayer)){
+                        trainPlayer->setWaitingTime(0);
+                        }
+                        else{
+                            trainPlayer->setCurrentVertex(trainPlayer->currentPath()[trainPlayer->currentIndex() - 2]);
+                            trainPlayer->setNextVertex(trainPlayer->currentPath()[trainPlayer->currentIndex() - 1]);
+                            trainPlayer->setCurrentIndex(trainPlayer->currentIndex() - 1);
+                            trainPlayer->setWaitingTime(trainPlayer->waitingTime() + 1);
+                            return;
+                        }
                     }
                     avoidTrains(trainPlayer);
                     return;
@@ -814,7 +838,6 @@ void Game::wayStrategy(Train* trainPlayer){
 
 bool Game::avoidTrains(Train* trainPlayer){
     if(trainPlayer->speed() == 0){
-
     for(auto train: this->player().trains()){//Здесь ивейдим столкновения поездов
          if(train->idx() != trainPlayer->idx()){
              if(train->nextVertex() != nullptr){
@@ -831,7 +854,21 @@ bool Game::avoidTrains(Train* trainPlayer){
                              }
                              }
                          }
+                         else{
 
+                         }
+                     }
+                     else{
+                         if(trainPlayer->currentVertex()->idx() == train->nextVertex()->idx()
+                                 && trainPlayer->nextVertex()->idx() == this->player().town().vertex().idx()){
+                             if(abs(train->finalLinePosition() - train->position()) > 1 && trainPlayer->goods() != 0
+                                     ){
+                                return false;
+                             }
+                             else{
+                                return true;
+                             }
+                         }
                      }
 //                     if(trainPlayer->currentVertex()->idx() == train->nextVertex()->idx()){
 //                         int pidaras = map()->graph().lengthBetween(trainPlayer->currentVertex()->idx(), trainPlayer->nextVertex()->idx());
@@ -886,16 +923,15 @@ void Game::upgradeStrategy(Train* trainPlayer, std::vector<Town*> upgradeTowns, 
                 countUp += train->level();
         }
     if(trainPlayer->currentVertex()->idx() == this->player().town().vertex().idx()){
-        if(this->player().town().armor() >= trainPlayer->nextLevelPrice() && trainPlayer->level() != 3){
+        if(this->player().town().armor() >= trainPlayer->nextLevelPrice() + 8 && trainPlayer->level() != 3){
                         upgradeTrains.push_back(trainPlayer);
                         this->upgradeAction(upgradeTowns, upgradeTrains);
                         upgradeTrains.pop_back();
-                        return;
 
         }
     }
-    if(this->player().town().level() != 3 && ((count >= 3 && countUp >= 9) || count == 12)){
-        if(this->player().town().armor() >= this->player().town().nextLevelPrice()){
+    if(this->player().town().level() != 3 && (count > 3)){
+        if(this->player().town().armor() >= this->player().town().nextLevelPrice() + 8){
             upgradeTowns.push_back(&this->player().town());
             this->upgradeAction(upgradeTowns, upgradeTrains);
             upgradeTowns.pop_back();
@@ -903,7 +939,6 @@ void Game::upgradeStrategy(Train* trainPlayer, std::vector<Town*> upgradeTowns, 
         }
     }
 }
-
 }
 bool Game::productProblem(){
     int sum = 0;
@@ -919,7 +954,7 @@ bool Game::productProblem(){
             }
         }
     }
-    int nehvatka = this->player().town().product() - productProeb + sum;
+    int nehvatka = this->player().town().product() - productProeb + sum - 10;
     if(nehvatka <= this->player().town().productCapacity()){
         return true;
     }
