@@ -22,7 +22,7 @@ class MainWindow : public QMainWindow {
 //        void onGameConnection();
 
         void onPlayerChanged(Player *player, bool isReady);
-        void onMapChanged(std::shared_ptr<Map> map, Player *player, bool ggg);
+        void onMapChanged(std::shared_ptr<Map> map, Player *player, bool ggg, std::vector<QString> *, std::vector<int> *);
         void onGetGames(const QJsonObject &gamesData);
         void onShowMap();
         void onGameEnd(const int);
@@ -40,8 +40,6 @@ class MainWindow : public QMainWindow {
 
         void on_updateServers_clicked();
         void on_hostButton_clicked();
-
-        void on_pushButton_clicked();
 
         void on_exitFInal_clicked();
 
